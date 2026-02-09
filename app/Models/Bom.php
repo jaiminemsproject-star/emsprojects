@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Tasks\Task as BomTask;
 
 class Bom extends Model
 {
@@ -39,6 +40,11 @@ class Bom extends Model
     public function items(): HasMany
     {
         return $this->hasMany(BomItem::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(BomTask::class);
     }
 
     public function finalizedBy(): BelongsTo
@@ -214,5 +220,4 @@ class Bom extends Model
         return $summary;
     }
 }
-
 

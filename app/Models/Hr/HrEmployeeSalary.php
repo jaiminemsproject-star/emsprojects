@@ -16,60 +16,30 @@ class HrEmployeeSalary extends Model
         'hr_salary_structure_id',
         'effective_from',
         'effective_to',
-        'basic',
-        'hra',
-        'da',
-        'special_allowance',
-        'conveyance',
-        'medical',
-        'other_allowances',
-        'gross_salary',
-        'pf_applicable',
-        'pf_employee',
-        'pf_employer',
-        'esi_applicable',
-        'esi_employee',
-        'esi_employer',
-        'pt_applicable',
-        'professional_tax',
-        'tds_applicable',
-        'lwf_applicable',
-        'total_deductions',
-        'net_salary',
-        'ctc',
         'is_current',
-        'revision_reason',
-        'approved_by',
-        'approved_at',
+        'annual_ctc',
+        'monthly_ctc',
+        'monthly_gross',
+        'monthly_basic',
+        'monthly_net',
+        'revision_type',
+        'increment_percent',
+        'previous_ctc',
+        'remarks',
         'created_by',
     ];
 
     protected $casts = [
         'effective_from' => 'date',
         'effective_to' => 'date',
-        'basic' => 'decimal:2',
-        'hra' => 'decimal:2',
-        'da' => 'decimal:2',
-        'special_allowance' => 'decimal:2',
-        'conveyance' => 'decimal:2',
-        'medical' => 'decimal:2',
-        'other_allowances' => 'decimal:2',
-        'gross_salary' => 'decimal:2',
-        'pf_employee' => 'decimal:2',
-        'pf_employer' => 'decimal:2',
-        'esi_employee' => 'decimal:2',
-        'esi_employer' => 'decimal:2',
-        'professional_tax' => 'decimal:2',
-        'total_deductions' => 'decimal:2',
-        'net_salary' => 'decimal:2',
-        'ctc' => 'decimal:2',
-        'pf_applicable' => 'boolean',
-        'esi_applicable' => 'boolean',
-        'pt_applicable' => 'boolean',
-        'tds_applicable' => 'boolean',
-        'lwf_applicable' => 'boolean',
+        'annual_ctc' => 'decimal:2',
+        'monthly_ctc' => 'decimal:2',
+        'monthly_gross' => 'decimal:2',
+        'monthly_basic' => 'decimal:2',
+        'monthly_net' => 'decimal:2',
+        'increment_percent' => 'decimal:2',
+        'previous_ctc' => 'decimal:2',
         'is_current' => 'boolean',
-        'approved_at' => 'datetime',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -86,7 +56,7 @@ class HrEmployeeSalary extends Model
 
     public function approvedByUser(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function createdByUser(): BelongsTo
@@ -119,28 +89,27 @@ class HrEmployeeSalary extends Model
 
     public function getFormattedGrossAttribute(): string
     {
-        return '₹' . number_format($this->gross_salary, 0);
+        return '₹' . number_format((float) $this->monthly_gross, 0);
     }
 
     public function getFormattedNetAttribute(): string
     {
-        return '₹' . number_format($this->net_salary, 0);
+        return '₹' . number_format((float) $this->monthly_net, 0);
     }
 
     public function getFormattedCtcAttribute(): string
     {
-        return '₹' . number_format($this->ctc, 0);
+        return '₹' . number_format((float) $this->annual_ctc, 0);
     }
 
     public function getTotalEarningsAttribute(): float
     {
-        return $this->basic + $this->hra + $this->da + $this->special_allowance + 
-               $this->conveyance + $this->medical + $this->other_allowances;
+        return (float) $this->monthly_gross;
     }
 
     public function getTotalEmployerContributionAttribute(): float
     {
-        return $this->pf_employer + $this->esi_employer;
+        return max(0, ((float) $this->monthly_ctc) - ((float) $this->monthly_gross));
     }
 
     // ==================== METHODS ====================
@@ -150,7 +119,7 @@ class HrEmployeeSalary extends Model
      */
     public function getDailySalary(int $workingDays = 26): float
     {
-        return $this->gross_salary / $workingDays;
+        return ((float) $this->monthly_gross) / max(1, $workingDays);
     }
 
     /**
@@ -173,5 +142,26 @@ class HrEmployeeSalary extends Model
 
         $this->is_current = true;
         return $this->save();
+    }
+
+    // Backward-compatible virtual attributes expected by older controllers/views.
+    public function getBasicAttribute()
+    {
+        return $this->monthly_basic;
+    }
+
+    public function getGrossSalaryAttribute()
+    {
+        return $this->monthly_gross;
+    }
+
+    public function getNetSalaryAttribute()
+    {
+        return $this->monthly_net;
+    }
+
+    public function getCtcAttribute()
+    {
+        return $this->annual_ctc;
     }
 }

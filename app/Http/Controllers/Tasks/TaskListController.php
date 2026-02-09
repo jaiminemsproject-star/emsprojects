@@ -26,14 +26,24 @@ class TaskListController extends Controller
         $this->middleware('permission:tasks.list.delete')->only(['destroy']);
     }
 
+    protected function getCompanyId(): int
+    {
+        return auth()->user()->company_id ?? 1;
+    }
+
     public function index(Request $request): View
     {
         $query = TaskList::with(['project', 'owner', 'defaultStatus', 'defaultPriority'])
-            ->withCount(['tasks', 'tasks as open_tasks_count' => function ($q) {
-                $q->whereHas('status', fn($s) => $s->where('is_closed', false));
-            }])
-            ->forCompany(1)
-            ->notArchived();
+            ->withCount([
+                'tasks',
+                'tasks as open_tasks_count' => function ($q) {
+                    $q->whereHas('status', fn($s) => $s->where('is_closed', false));
+                },
+                'tasks as completed_tasks_count' => function ($q) {
+                    $q->whereHas('status', fn($s) => $s->where('is_closed', true));
+                },
+            ])
+            ->forCompany($this->getCompanyId());
 
         if ($projectId = $request->get('project')) {
             $query->forProject($projectId);
@@ -43,8 +53,10 @@ class TaskListController extends Controller
             $query->search($search);
         }
 
-        if ($request->get('archived')) {
+        if ($request->boolean('archived')) {
             $query->where('is_archived', true);
+        } else {
+            $query->notArchived();
         }
 
         $taskLists = $query->rootLists()->orderBy('sort_order')->orderBy('name')->get();
@@ -53,10 +65,10 @@ class TaskListController extends Controller
 
         // Statistics
         $stats = [
-            'total_lists' => TaskList::forCompany(1)->active()->count(),
-            'total_tasks' => Task::forCompany(1)->notArchived()->count(),
-            'open_tasks' => Task::forCompany(1)->notArchived()->open()->count(),
-            'overdue_tasks' => Task::forCompany(1)->notArchived()->overdue()->count(),
+            'total_lists' => TaskList::forCompany($this->getCompanyId())->active()->count(),
+            'total_tasks' => Task::forCompany($this->getCompanyId())->notArchived()->count(),
+            'open_tasks' => Task::forCompany($this->getCompanyId())->notArchived()->open()->count(),
+            'overdue_tasks' => Task::forCompany($this->getCompanyId())->notArchived()->overdue()->count(),
         ];
 
         return view('tasks.lists.index', compact('taskLists', 'projects', 'stats'));
@@ -100,13 +112,15 @@ class TaskListController extends Controller
             'visibility' => 'required|in:private,team,public',
         ]);
 
-        $data['company_id'] = 1;
+        $data['company_id'] = $this->getCompanyId();
         $data['owner_id'] = auth()->id();
 
         $taskList = TaskList::create($data);
 
         // Add creator as owner member
-        $taskList->members()->attach(auth()->id(), ['role' => 'owner']);
+        $taskList->members()->syncWithoutDetaching([
+            auth()->id() => ['role' => 'owner'],
+        ]);
 
         return redirect()
             ->route('task-lists.show', $taskList)
@@ -115,7 +129,16 @@ class TaskListController extends Controller
 
     public function show(TaskList $taskList, Request $request): View
     {
-        $taskList->load(['project', 'owner', 'members', 'children']);
+        $taskList->load([
+            'project',
+            'owner',
+            'members',
+            'children' => fn($q) => $q->withCount('tasks'),
+        ])->loadCount([
+            'tasks',
+            'tasks as open_tasks_count' => fn($q) => $q->whereHas('status', fn($s) => $s->where('is_closed', false)),
+            'tasks as completed_tasks_count' => fn($q) => $q->whereHas('status', fn($s) => $s->where('is_closed', true)),
+        ]);
 
         // Get tasks for this list
         $query = Task::with(['status', 'priority', 'assignee', 'labels'])
@@ -147,7 +170,11 @@ class TaskListController extends Controller
         }
 
         $sortField = $request->get('sort', 'position');
-        $sortDir = $request->get('dir', 'asc');
+        $sortDir = strtolower((string) $request->get('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+        $allowedSortFields = ['position', 'created_at', 'updated_at', 'due_date', 'title', 'task_number'];
+        if (!in_array($sortField, $allowedSortFields, true)) {
+            $sortField = 'position';
+        }
         $query->orderBy($sortField, $sortDir);
 
         $tasks = $query->paginate(25)->withQueryString();
@@ -253,6 +280,11 @@ class TaskListController extends Controller
         $taskList->load(['project', 'owner']);
 
         $tasks = Task::with(['status', 'priority', 'assignee', 'labels', 'children'])
+            ->withCount([
+                'comments',
+                'children as subtask_count',
+                'children as completed_subtask_count' => fn($q) => $q->whereHas('status', fn($s) => $s->where('is_closed', true)),
+            ])
             ->forList($taskList->id)
             ->notArchived()
             ->rootTasks()

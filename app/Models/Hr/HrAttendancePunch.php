@@ -13,23 +13,26 @@ class HrAttendancePunch extends Model
         'hr_employee_id',
         'punch_time',
         'punch_type',
+        'source',
         'device_id',
-        'device_name',
-        'location',
+        'location_name',
         'latitude',
         'longitude',
+        'ip_address',
+        'raw_data',
+        'is_processed',
         'is_valid',
-        'is_manual',
         'remarks',
         'created_by',
     ];
 
     protected $casts = [
         'punch_time' => 'datetime',
+        'is_processed' => 'boolean',
         'is_valid' => 'boolean',
-        'is_manual' => 'boolean',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'raw_data' => 'array',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -96,7 +99,7 @@ class HrAttendancePunch extends Model
 
     // ==================== METHODS ====================
 
-    public function markInvalid(string $reason = null): bool
+    public function markInvalid(?string $reason = null): bool
     {
         $this->is_valid = false;
         if ($reason) {
@@ -109,5 +112,36 @@ class HrAttendancePunch extends Model
     {
         $this->is_valid = true;
         return $this->save();
+    }
+
+    // Backward-compatible aliases
+    public function getDeviceNameAttribute()
+    {
+        return $this->source;
+    }
+
+    public function setDeviceNameAttribute($value): void
+    {
+        $this->attributes['source'] = $value;
+    }
+
+    public function getLocationAttribute()
+    {
+        return $this->location_name;
+    }
+
+    public function setLocationAttribute($value): void
+    {
+        $this->attributes['location_name'] = $value;
+    }
+
+    public function getIsManualAttribute()
+    {
+        return false;
+    }
+
+    public function setIsManualAttribute($value): void
+    {
+        // Kept for backward compatibility; no dedicated DB column.
     }
 }

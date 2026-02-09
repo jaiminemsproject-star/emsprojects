@@ -40,6 +40,12 @@ class UpdateTaskRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        if ($this->filled('estimated_hours')) {
+            $this->merge([
+                'estimated_minutes' => max(0, (int) round(((float) $this->input('estimated_hours')) * 60)),
+            ]);
+        }
+
         if ($this->has('is_milestone')) {
             $this->merge(['is_milestone' => $this->boolean('is_milestone')]);
         }

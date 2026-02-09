@@ -16,67 +16,43 @@ class MaterialTypeController extends Controller
         $this->middleware('permission:core.material_type.update')->only(['edit', 'update']);
         $this->middleware('permission:core.material_type.delete')->only('destroy');
     }
-   public function index(Request $request)
-{
-    $query = MaterialType::withCount('categories');
+    public function index(Request $request)
+    {
+        $query = MaterialType::withCount('categories');
 
-    /* --------------------
-     | Filters
-     |--------------------*/
+        $q = trim((string) $request->get('q', ''));
+        if ($q !== '') {
+            $like = '%' . $q . '%';
+            $query->where(function ($qq) use ($like) {
+                $qq->where('code', 'like', $like)
+                    ->orWhere('name', 'like', $like)
+                    ->orWhere('description', 'like', $like);
+            });
+        }
 
-    // Code filter
-    if ($request->filled('code')) {
-        $query->where('code', 'like', '%' . trim($request->code) . '%');
+        $status = $request->get('status');
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        $sort = (string) $request->get('sort', '');
+        $dir = strtolower((string) $request->get('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        $sortable = ['code', 'name', 'sort_order', 'is_active', 'categories_count', 'created_at'];
+
+        if ($sort !== '' && in_array($sort, $sortable, true)) {
+            $query->orderBy($sort, $dir);
+        } else {
+            // Preserve existing behaviour
+            $query->orderBy('sort_order')->orderBy('code');
+        }
+
+        $types = $query->paginate(25)->withQueryString();
+
+        return view('material_types.index', compact('types'));
     }
-
-    // Name filter
-    if ($request->filled('name')) {
-        $query->where('name', 'like', '%' . trim($request->name) . '%');
-    }
-
-    // Description filter
-    if ($request->filled('description')) {
-        $query->where('description', 'like', '%' . trim($request->description) . '%');
-    }
-
-    // Status filter
-    if ($request->filled('status')) {
-        $query->where('is_active', $request->status === 'active');
-    }
-
-    /* --------------------
-     | Sorting
-     |--------------------*/
-
-    $sortable = [
-        'code',
-        'name',
-        'sort_order',
-        'is_active',
-        'categories_count',
-        'created_at',
-    ];
-
-    $sort = $request->get('sort');
-    $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
-
-    if (in_array($sort, $sortable, true)) {
-        $query->orderBy($sort, $dir);
-    } else {
-        // Default sorting
-        $query->orderBy('sort_order')
-              ->orderBy('code');
-    }
-
-    /* --------------------
-     | Pagination
-     |--------------------*/
-
-    $types = $query->paginate(25)->withQueryString();
-
-    return view('material_types.index', compact('types'));
-}
-
 
     public function create()
     {

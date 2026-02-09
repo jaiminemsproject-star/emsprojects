@@ -15,24 +15,30 @@ class HrLeaveBalance extends Model
         'year',
         'opening_balance',
         'credited',
-        'taken',
+        'used',
+        'pending',
         'adjusted',
         'lapsed',
         'encashed',
-        'closing_balance',
         'carry_forward',
+        'closing_balance',
+        'available_balance',
+        'is_processed',
     ];
 
     protected $casts = [
         'year' => 'integer',
         'opening_balance' => 'decimal:2',
         'credited' => 'decimal:2',
-        'taken' => 'decimal:2',
+        'used' => 'decimal:2',
+        'pending' => 'decimal:2',
         'adjusted' => 'decimal:2',
         'lapsed' => 'decimal:2',
         'encashed' => 'decimal:2',
-        'closing_balance' => 'decimal:2',
         'carry_forward' => 'decimal:2',
+        'closing_balance' => 'decimal:2',
+        'available_balance' => 'decimal:2',
+        'is_processed' => 'boolean',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -68,7 +74,7 @@ class HrLeaveBalance extends Model
 
     public function getAvailableBalanceAttribute(): float
     {
-        return $this->opening_balance + $this->credited - $this->taken - $this->adjusted - $this->lapsed - $this->encashed;
+        return (float) ($this->attributes['available_balance'] ?? ($this->opening_balance + $this->credited - $this->used - $this->adjusted - $this->lapsed - $this->encashed));
     }
 
     public function getTotalCreditedAttribute(): float
@@ -78,7 +84,7 @@ class HrLeaveBalance extends Model
 
     public function getTotalUsedAttribute(): float
     {
-        return $this->taken + $this->adjusted + $this->lapsed + $this->encashed;
+        return $this->used + $this->adjusted + $this->lapsed + $this->encashed;
     }
 
     // ==================== METHODS ====================
@@ -88,8 +94,9 @@ class HrLeaveBalance extends Model
      */
     public function deduct(float $days): bool
     {
-        $this->taken += $days;
+        $this->used += $days;
         $this->closing_balance = $this->available_balance;
+        $this->available_balance = max(0, $this->closing_balance);
         return $this->save();
     }
 
@@ -100,6 +107,7 @@ class HrLeaveBalance extends Model
     {
         $this->credited += $days;
         $this->closing_balance = $this->available_balance;
+        $this->available_balance = max(0, $this->closing_balance);
         return $this->save();
     }
 
@@ -114,6 +122,7 @@ class HrLeaveBalance extends Model
             $this->adjusted -= $days;
         }
         $this->closing_balance = $this->available_balance;
+        $this->available_balance = max(0, $this->closing_balance);
         return $this->save();
     }
 
@@ -131,13 +140,27 @@ class HrLeaveBalance extends Model
             [
                 'opening_balance' => 0,
                 'credited' => 0,
-                'taken' => 0,
+                'used' => 0,
+                'pending' => 0,
                 'adjusted' => 0,
                 'lapsed' => 0,
                 'encashed' => 0,
-                'closing_balance' => 0,
                 'carry_forward' => 0,
+                'closing_balance' => 0,
+                'available_balance' => 0,
+                'is_processed' => false,
             ]
         );
+    }
+
+    // Backward-compatible aliases
+    public function getTakenAttribute()
+    {
+        return $this->used;
+    }
+
+    public function setTakenAttribute($value): void
+    {
+        $this->attributes['used'] = $value;
     }
 }

@@ -42,16 +42,21 @@ class HrSalaryStructure extends Model
         return $this->hasMany(HrEmployee::class, 'hr_salary_structure_id');
     }
 
-    public function components(): HasMany
-    {
-        return $this->hasMany(HrSalaryStructureComponent::class, 'hr_salary_structure_id');
-    }
-
-    public function salaryComponents(): BelongsToMany
+    public function components(): BelongsToMany
     {
         return $this->belongsToMany(HrSalaryComponent::class, 'hr_salary_structure_components', 'hr_salary_structure_id', 'hr_salary_component_id')
             ->withPivot(['calculation_type', 'value', 'percentage', 'formula', 'min_value', 'max_value', 'is_mandatory', 'sort_order', 'is_active'])
             ->withTimestamps();
+    }
+
+    public function salaryComponents(): BelongsToMany
+    {
+        return $this->components();
+    }
+
+    public function structureComponents(): HasMany
+    {
+        return $this->hasMany(HrSalaryStructureComponent::class, 'hr_salary_structure_id');
     }
 
     public function employeeSalaries(): HasMany
@@ -128,7 +133,7 @@ class HrSalaryStructure extends Model
      */
     public function getEarningComponents()
     {
-        return $this->components()
+        return $this->structureComponents()
             ->whereHas('salaryComponent', function ($q) {
                 $q->where('component_type', 'earning');
             })
@@ -142,7 +147,7 @@ class HrSalaryStructure extends Model
      */
     public function getDeductionComponents()
     {
-        return $this->components()
+        return $this->structureComponents()
             ->whereHas('salaryComponent', function ($q) {
                 $q->where('component_type', 'deduction');
             })

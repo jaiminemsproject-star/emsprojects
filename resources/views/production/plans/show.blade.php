@@ -8,6 +8,9 @@
     $routeProject = request()->route('project');
     $projectId = $routeProject?->id ?? (int)($plan->project_id ?? 0);
     $planId = (int)($plan->id ?? 0);
+    $taskIndexRoute = \Illuminate\Support\Facades\Route::has('tasks.index') ? 'tasks.index' : null;
+    $taskBoardRoute = \Illuminate\Support\Facades\Route::has('task-board.index') ? 'task-board.index' : null;
+    $taskCreateRoute = \Illuminate\Support\Facades\Route::has('tasks.create') ? 'tasks.create' : null;
 @endphp
 
 <div class="container-fluid">
@@ -24,6 +27,27 @@
             <a href="{{ url('/projects/'.$projectId.'/production-plans') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
+
+            @can('tasks.view')
+                @if($taskIndexRoute)
+                    <a href="{{ route($taskIndexRoute, ['project' => $projectId, 'bom' => $plan->bom_id, 'q' => $plan->plan_number]) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-list-task"></i> Related Tasks
+                    </a>
+                @endif
+                @if($taskBoardRoute)
+                    <a href="{{ route($taskBoardRoute, ['project' => $projectId, 'bom' => $plan->bom_id]) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-kanban"></i> Task Board
+                    </a>
+                @endif
+            @endcan
+
+            @can('tasks.create')
+                @if($taskCreateRoute)
+                    <a href="{{ route($taskCreateRoute, ['project' => $projectId, 'bom' => $plan->bom_id, 'title' => 'Production Plan '. $plan->plan_number .' follow-up', 'description' => 'Linked from Production Plan '. $plan->plan_number]) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Add Task
+                    </a>
+                @endif
+            @endcan
 
             @if($plan->status === 'draft')
                 @can('production.plan.update')

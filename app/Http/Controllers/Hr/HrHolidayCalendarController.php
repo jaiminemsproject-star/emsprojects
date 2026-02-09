@@ -47,17 +47,17 @@ class HrHolidayCalendarController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'holiday_date' => 'required|date',
-            'holiday_type' => 'required|in:national,state,religious,company,optional',
+            'holiday_type' => 'required|in:national,regional,company,restricted,optional,state,religious',
             'description' => 'nullable|string|max:500',
             'is_optional' => 'boolean',
-            'is_restricted' => 'boolean',
-            'applicable_religions' => 'nullable|array',
-            'applicable_genders' => 'nullable|array',
-            'applicable_locations' => 'nullable|array',
         ]);
 
         $validated['is_optional'] = $request->boolean('is_optional', false);
-        $validated['is_restricted'] = $request->boolean('is_restricted', false);
+        $validated['is_paid'] = true;
+        $validated['holiday_type'] = $this->normalizeHolidayType(
+            $validated['holiday_type'],
+            $request->boolean('is_restricted', false)
+        );
         $validated['is_active'] = true;
 
         HrHoliday::create($validated);
@@ -89,17 +89,17 @@ class HrHolidayCalendarController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'holiday_date' => 'required|date',
-            'holiday_type' => 'required|in:national,state,religious,company,optional',
+            'holiday_type' => 'required|in:national,regional,company,restricted,optional,state,religious',
             'description' => 'nullable|string|max:500',
             'is_optional' => 'boolean',
-            'is_restricted' => 'boolean',
-            'applicable_religions' => 'nullable|array',
-            'applicable_genders' => 'nullable|array',
-            'applicable_locations' => 'nullable|array',
         ]);
 
         $validated['is_optional'] = $request->boolean('is_optional', false);
-        $validated['is_restricted'] = $request->boolean('is_restricted', false);
+        $validated['is_paid'] = true;
+        $validated['holiday_type'] = $this->normalizeHolidayType(
+            $validated['holiday_type'],
+            $request->boolean('is_restricted', false)
+        );
 
         $holidayCalendar->update($validated);
 
@@ -136,17 +136,13 @@ class HrHolidayCalendarController extends Controller
             
             if (!$exists) {
                 HrHoliday::create([
-                    'company_id' => $holiday->company_id,
                     'hr_holiday_calendar_id' => $holiday->hr_holiday_calendar_id,
                     'name' => $holiday->name,
                     'holiday_date' => $newDate,
                     'holiday_type' => $holiday->holiday_type,
+                    'is_paid' => $holiday->is_paid,
                     'is_optional' => $holiday->is_optional,
-                    'is_restricted' => $holiday->is_restricted,
                     'description' => $holiday->description,
-                    'applicable_religions' => $holiday->applicable_religions,
-                    'applicable_genders' => $holiday->applicable_genders,
-                    'applicable_locations' => $holiday->applicable_locations,
                     'is_active' => true,
                 ]);
                 $copied++;
@@ -155,5 +151,18 @@ class HrHolidayCalendarController extends Controller
 
         return redirect()->route('hr.holiday-calendars.index', ['year' => $toYear])
                          ->with('success', "{$copied} holidays copied to {$toYear}. Note: Variable date holidays (like Diwali, Holi) need manual adjustment.");
+    }
+
+    private function normalizeHolidayType(string $type, bool $isRestricted): string
+    {
+        if ($isRestricted) {
+            return 'restricted';
+        }
+
+        return match ($type) {
+            'state' => 'regional',
+            'religious' => 'regional',
+            default => $type,
+        };
     }
 }

@@ -3,13 +3,23 @@
 @section('title', 'Supplier Ageing Detail')
 
 @section('content')
+@php
+    $ledgerFrom = optional($asOfDate)->copy()->startOfMonth()->toDateString();
+    $ledgerTo = optional($asOfDate)->toDateString();
+@endphp
 <div class="container-fluid">
-    <h1 class="h4 mb-3">Supplier Ageing - Bills</h1>
-
-    <div class="mb-2 small">
-        <a href="{{ route('accounting.reports.supplier-ageing', ['supplier_id' => $party->id, 'as_of_date' => optional($asOfDate)->toDateString()]) }}">
-            &laquo; Back to Supplier Ageing
-        </a>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="h4 mb-0">Supplier Ageing - Bills</h1>
+        <div class="d-flex gap-2">
+            <a href="{{ route('accounting.reports.supplier-ageing', ['supplier_id' => $party->id, 'as_of_date' => optional($asOfDate)->toDateString()]) }}"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <a href="{{ route('accounting.reports.ledger', ['account_id' => $account->id, 'from_date' => $ledgerFrom, 'to_date' => $ledgerTo]) }}"
+               class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-journal-text"></i> Ledger
+            </a>
+        </div>
     </div>
 
     <div class="card mb-3">
@@ -26,6 +36,18 @@
                 Ageing as on {{ optional($asOfDate)->toDateString() }}
             </div>
         </div>
+    </div>
+
+    <div class="mb-2">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" id="supplierAgeingDetailSearch" class="form-control" placeholder="Search bill number...">
+            <button type="button" class="btn btn-outline-secondary" id="supplierAgeingDetailSearchClear">Clear</button>
+        </div>
+    </div>
+
+    <div id="supplierAgeingDetailNoMatch" class="alert alert-warning d-none py-2">
+        No bills match your search text.
     </div>
 
     <div class="card">
@@ -50,7 +72,7 @@
                                 $bill = $row['bill'];
                                 $label = $bucketLabels[$row['bucket']] ?? $row['bucket'];
                             @endphp
-                            <tr>
+                            <tr class="supplier-ageing-detail-row" data-search-text="{{ strtolower($row['bill_number'] ?? '') }}">
                                 <td class="small">{{ $row['bill_number'] }}</td>
                                 <td class="small">{{ optional($row['bill_date'])->toDateString() }}</td>
                                 <td class="small">{{ optional($row['due_date'])->toDateString() }}</td>
@@ -70,7 +92,7 @@
                     </tbody>
                     @if(count($rows))
                         <tfoot>
-                            <tr class="table-light fw-semibold">
+                            <tr class="table-light fw-semibold supplier-ageing-detail-total-row">
                                 <td colspan="3" class="small text-end">Total</td>
                                 <td class="small text-end">{{ number_format($grandTotals['bill_amount'], 2) }}</td>
                                 <td class="small text-end">{{ number_format($grandTotals['allocated'], 2) }}</td>
@@ -85,3 +107,39 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('supplierAgeingDetailSearch');
+    const clearBtn = document.getElementById('supplierAgeingDetailSearchClear');
+    const noMatch = document.getElementById('supplierAgeingDetailNoMatch');
+    const rows = Array.from(document.querySelectorAll('.supplier-ageing-detail-row'));
+    const totalRow = document.querySelector('.supplier-ageing-detail-total-row');
+
+    function applySearch() {
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        let visible = 0;
+
+        rows.forEach((row) => {
+            const txt = row.dataset.searchText || '';
+            const match = !query || txt.includes(query);
+            row.classList.toggle('d-none', !match);
+            if (match) visible += 1;
+        });
+
+        if (totalRow) totalRow.classList.toggle('d-none', !!query);
+        if (noMatch) noMatch.classList.toggle('d-none', !(query && visible === 0));
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applySearch);
+    if (clearBtn && searchInput) {
+        clearBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            applySearch();
+            searchInput.focus();
+        });
+    }
+});
+</script>
+@endpush

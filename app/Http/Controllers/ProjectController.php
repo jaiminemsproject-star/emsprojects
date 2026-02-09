@@ -6,8 +6,10 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Party;
 use App\Models\Project;
+use App\Models\Tasks\Task;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class ProjectController extends Controller
 {
@@ -76,9 +78,37 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        $project->load(['client', 'tpi', 'lead', 'quotation', 'creator']);
+        $project->load(['client', 'tpi', 'lead', 'quotation', 'creator'])
+            ->loadCount('boms');
 
-        return view('projects.show', compact('project'));
+        $taskStats = [
+            'total' => 0,
+            'open' => 0,
+            'completed' => 0,
+            'overdue' => 0,
+        ];
+        $recentTasks = collect();
+
+        if (auth()->user()?->can('tasks.view') && Schema::hasTable('tasks')) {
+            $taskQuery = Task::query()
+                ->with(['status', 'priority', 'assignee'])
+                ->where('project_id', $project->id)
+                ->notArchived();
+
+            $taskStats = [
+                'total' => (clone $taskQuery)->count(),
+                'open' => (clone $taskQuery)->open()->count(),
+                'completed' => (clone $taskQuery)->closed()->count(),
+                'overdue' => (clone $taskQuery)->overdue()->count(),
+            ];
+
+            $recentTasks = (clone $taskQuery)
+                ->orderByDesc('updated_at')
+                ->limit(8)
+                ->get();
+        }
+
+        return view('projects.show', compact('project', 'taskStats', 'recentTasks'));
     }
 
     public function edit(Project $project)

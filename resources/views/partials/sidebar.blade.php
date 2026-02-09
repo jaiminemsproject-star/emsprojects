@@ -633,6 +633,10 @@
 
                     {{-- Admin / HR Operations --}}
                     @if($hrAdminAccess)
+                        <li data-erp-menu-item class="nav-item mt-2 mb-1 px-3 text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">
+                            Operations
+                        </li>
+
                         {{-- Employees --}}
                         @can('hr.employee.view')
                             @if(Route::has('hr.employees.index'))
@@ -652,19 +656,68 @@
                                 <li class="nav-item">
                                     <a data-erp-menu-item href="{{ route('hr.attendance.index') }}"
                                        class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
-                                              {{ $isRoute('hr.attendance.*') ? 'active' : 'text-body-secondary' }}">
+                                              {{ $isRoute('hr.attendance.index') ? 'active' : 'text-body-secondary' }}">
                                         <i class="bi bi-calendar-check me-2"></i><span>Attendance</span>
                                     </a>
                                 </li>
                             @endif
 
-                            {{-- Bulk Entry (all employees) --}}
+                            @if(Route::has('hr.attendance.monthly'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.attendance.monthly') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.attendance.monthly') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-calendar3-week me-2"></i><span>Attendance Monthly</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.attendance.report'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.attendance.report') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.attendance.report') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-clipboard-data me-2"></i><span>Attendance Report</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.attendance.ot-approval'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.attendance.ot-approval') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.attendance.ot-approval*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-hourglass-top me-2"></i><span>OT Approval</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.attendance.regularization'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.attendance.regularization') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.attendance.regularization*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-arrow-repeat me-2"></i><span>Regularization</span>
+                                    </a>
+                                </li>
+                            @endif
+
                             @if(Route::has('hr.attendance.bulk-entry'))
                                 <li class="nav-item">
                                     <a data-erp-menu-item href="{{ route('hr.attendance.bulk-entry') }}"
                                        class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
                                               {{ $isRoute('hr.attendance.bulk-entry') ? 'active' : 'text-body-secondary' }}">
                                         <i class="bi bi-pencil-square me-2"></i><span>Bulk Attendance Entry</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.attendance.import-punches'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.attendance.import-punches') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.attendance.import-punches') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-upload me-2"></i><span>Import Punches</span>
                                     </a>
                                 </li>
                             @endif
@@ -676,18 +729,244 @@
                                 <li class="nav-item">
                                     <a data-erp-menu-item href="{{ route('hr.leave.index') }}"
                                        class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
-                                              {{ $isRoute('hr.leave.*') ? 'active' : 'text-body-secondary' }}">
+                                              {{ $isRoute('hr.leave.index') ? 'active' : 'text-body-secondary' }}">
                                         <i class="bi bi-calendar-minus me-2"></i><span>Leave Management</span>
                                     </a>
                                 </li>
                             @endif
+
+                            @if(Route::has('hr.leave.pending'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.leave.pending') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.leave.pending') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-hourglass-split me-2"></i><span>Leave Pending Approval</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.leave.calendar'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.leave.calendar') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.leave.calendar') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-calendar3 me-2"></i><span>Leave Calendar</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.leave.balance-report'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.leave.balance-report') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.leave.balance-report') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-bar-chart-steps me-2"></i><span>Leave Balance Report</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.leave-applications.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.leave-applications.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.leave-applications.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-journal-check me-2"></i><span>Leave Applications</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.leave.year-end'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.leave.year-end') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.leave.year-end') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-calendar2-x me-2"></i><span>Year End Leave Process</span>
+                                    </a>
+                                </li>
+                            @endif
                         @endcan
+
+                        {{-- Payroll --}}
+                        @can('hr.payroll.view')
+                            @if(Route::has('hr.payroll.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.payroll.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
+                                              {{ $isRoute('hr.payroll.index') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-cash-stack me-2"></i><span>Payroll</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.payroll.create-period'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.payroll.create-period') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.payroll.create-period') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-plus-square me-2"></i><span>Create Payroll Period</span>
+                                    </a>
+                                </li>
+                            @endif
+                        @endcan
+
+                        {{-- Loans, Advances, Tax, Reports --}}
+                        @canany(['hr.employee.view','hr.leave.view','hr.payroll.view'])
+                            @if(Route::has('hr.loans.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.loans.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
+                                              {{ $isRoute('hr.loans.index') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-cash-coin me-2"></i><span>Loans</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.loans.employee-loans.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.loans.employee-loans.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.loans.employee-loans.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-list-check me-2"></i><span>Employee Loans</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.advances.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.advances.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
+                                              {{ $isRoute('hr.advances.index') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-wallet2 me-2"></i><span>Advances</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.advances.salary-advances.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.advances.salary-advances.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.advances.salary-advances.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-bank me-2"></i><span>Salary Advances</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.tax.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.tax.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
+                                              {{ $isRoute('hr.tax.index') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-receipt-cutoff me-2"></i><span>Tax Dashboard</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.tax.declarations.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.tax.declarations.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.tax.declarations.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-file-earmark-text me-2"></i><span>Tax Declarations</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.reports.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.reports.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
+                                              {{ $isRoute('hr.reports.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-graph-up-arrow me-2"></i><span>HR Reports</span>
+                                    </a>
+                                </li>
+                            @endif
+                        @endcanany
 
                         {{-- HR Masters --}}
                         @canany(['hr.employee.view'])
                             <li data-erp-menu-item class="nav-item mt-2 mb-1 px-3 text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">
                                 HR Masters
                             </li>
+
+                            @if(Route::has('hr.designations.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.designations.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.designations.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-person-workspace me-2"></i><span>Designations</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.grades.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.grades.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.grades.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-sort-numeric-up me-2"></i><span>Grades</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.shifts.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.shifts.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.shifts.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-clock-history me-2"></i><span>Shifts</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.work-locations.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.work-locations.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.work-locations.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-geo-alt me-2"></i><span>Work Locations</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.attendance-policies.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.attendance-policies.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.attendance-policies.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-clipboard2-pulse me-2"></i><span>Attendance Policies</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.leave-types.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.leave-types.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.leave-types.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-calendar2-range me-2"></i><span>Leave Types</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.leave-policies.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.leave-policies.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.leave-policies.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-shield-check me-2"></i><span>Leave Policies</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.holiday-calendars.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.holiday-calendars.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.holiday-calendars.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-calendar-heart me-2"></i><span>Holiday Calendar</span>
+                                    </a>
+                                </li>
+                            @endif
 
                             @if(Route::has('hr.salary-components.index'))
                                 <li class="nav-item">
@@ -708,20 +987,77 @@
                                     </a>
                                 </li>
                             @endif
-                        @endcanany
 
-                        {{-- Payroll --}}
-                        @can('hr.payroll.view')
-                            @if(Route::has('hr.payroll.index'))
+                            @if(Route::has('hr.loan-types.index'))
                                 <li class="nav-item">
-                                    <a data-erp-menu-item href="{{ route('hr.payroll.index') }}"
-                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
-                                              {{ $isRoute('hr.payroll.*') ? 'active' : 'text-body-secondary' }}">
-                                        <i class="bi bi-cash-stack me-2"></i><span>Payroll</span>
+                                    <a data-erp-menu-item href="{{ route('hr.loan-types.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.loan-types.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-credit-card-2-front me-2"></i><span>Loan Types</span>
                                     </a>
                                 </li>
                             @endif
-                        @endcan
+
+                            @if(Route::has('hr.settings.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.settings.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.settings.index') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-gear me-2"></i><span>HR Settings</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.settings.pf-slabs.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.settings.pf-slabs.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.settings.pf-slabs.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-grid-3x3-gap me-2"></i><span>PF Slabs</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.settings.esi-slabs.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.settings.esi-slabs.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.settings.esi-slabs.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-grid-3x3-gap me-2"></i><span>ESI Slabs</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.settings.pt-slabs.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.settings.pt-slabs.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.settings.pt-slabs.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-grid-3x3-gap me-2"></i><span>PT Slabs</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.settings.tds-slabs.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.settings.tds-slabs.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.settings.tds-slabs.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-grid-3x3-gap me-2"></i><span>TDS Slabs</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(Route::has('hr.settings.lwf-slabs.index'))
+                                <li class="nav-item">
+                                    <a data-erp-menu-item href="{{ route('hr.settings.lwf-slabs.index') }}"
+                                       class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                              {{ $isRoute('hr.settings.lwf-slabs.*') ? 'active' : 'text-body-secondary' }}">
+                                        <i class="bi bi-grid-3x3-gap me-2"></i><span>LWF Slabs</span>
+                                    </a>
+                                </li>
+                            @endif
+                        @endcanany
                     @endif
                         </ul>
                     </div>
@@ -1268,10 +1604,11 @@
                     @php
                         $paymentCreateRoute = $pickRoute(['accounting.payments.create', 'payments.create']);
                         $receiptCreateRoute = $pickRoute(['accounting.receipts.create', 'receipts.create']);
+                        $onAccountRoute     = $pickRoute(['accounting.receipts.on-account.index', 'receipts.on-account.index']);
                     @endphp
 
                     @can('accounting.vouchers.create')
-                        @if($paymentCreateRoute || $receiptCreateRoute)
+                        @if($paymentCreateRoute || $receiptCreateRoute || $onAccountRoute)
                             <li data-erp-menu-item class="nav-item mt-2 mb-1 px-3 text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">
                                 Bank &amp; Cash
                             </li>
@@ -1298,6 +1635,17 @@
                                 </a>
                             </li>
                         @endif
+
+                        @if($onAccountRoute)
+                            <li class="nav-item">
+                                <a data-erp-menu-item href="{{ route($onAccountRoute) }}"
+                                   class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                          {{ $isRoute(['accounting.receipts.on-account.*', 'receipts.on-account.*']) ? 'active' : 'text-body-secondary' }}">
+                                    <i class="bi bi-link-45deg me-2"></i>
+                                    <span>On-Account Adjustment</span>
+                                </a>
+                            </li>
+                        @endif
                     @endcan
 
                     {{-- Reports --}}
@@ -1307,6 +1655,8 @@
                         $rDayBook             = $pickRoute(['accounting.reports.day-book', 'reports.day-book']);
                         $rProfitLoss          = $pickRoute(['accounting.reports.profit-loss', 'reports.profit-loss']);
                         $rBalanceSheet        = $pickRoute(['accounting.reports.balance-sheet', 'reports.balance-sheet']);
+                        $rInventoryValuation  = $pickRoute(['accounting.reports.inventory-valuation', 'reports.inventory-valuation']);
+                        $rProjectCostSheet    = $pickRoute(['accounting.reports.project-cost-sheet', 'reports.project-cost-sheet']);
                         $rGstSummary          = $pickRoute(['accounting.reports.gst-summary', 'reports.gst-summary']);
                         $rGstPurchaseRegister = $pickRoute(['accounting.reports.gst-purchase-register', 'reports.gst-purchase-register']);
                         $rGstSalesRegister    = $pickRoute(['accounting.reports.gst-sales-register', 'reports.gst-sales-register']);
@@ -1326,6 +1676,7 @@
                     @can('accounting.reports.view')
                         @if(
                             $rTrialBalance || $rLedger || $rDayBook || $rProfitLoss || $rBalanceSheet ||
+                            $rInventoryValuation || $rProjectCostSheet ||
                             $rSupplierOutstanding || $rClientOutstanding || $rSupplierAgeing || $rClientAgeing ||
                             $rCashFlow || $rFundFlow || $rUnbalancedVouchers || $rTdsCertificates || $rGstSummary ||
                             $rGstPurchaseRegister || $rGstSalesRegister || $rGstVoucherRegister ||
@@ -1387,6 +1738,28 @@
                                           {{ $isRoute(['accounting.reports.balance-sheet', 'reports.balance-sheet']) ? 'active' : 'text-body-secondary' }}">
                                     <i class="bi bi-columns-gap me-2"></i>
                                     <span>Balance Sheet</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if($rInventoryValuation)
+                            <li class="nav-item">
+                                <a data-erp-menu-item href="{{ route($rInventoryValuation) }}"
+                                   class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                          {{ $isRoute(['accounting.reports.inventory-valuation', 'reports.inventory-valuation']) ? 'active' : 'text-body-secondary' }}">
+                                    <i class="bi bi-box-seam me-2"></i>
+                                    <span>Inventory Valuation</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if($rProjectCostSheet)
+                            <li class="nav-item">
+                                <a data-erp-menu-item href="{{ route($rProjectCostSheet) }}"
+                                   class="nav-link erp-nav-link d-flex align-items-center px-3 py-1 ps-4
+                                          {{ $isRoute(['accounting.reports.project-cost-sheet*', 'reports.project-cost-sheet*']) ? 'active' : 'text-body-secondary' }}">
+                                    <i class="bi bi-kanban me-2"></i>
+                                    <span>Project Cost Sheet</span>
                                 </a>
                             </li>
                         @endif
@@ -1901,6 +2274,3 @@
         </div>
     </div>
 </nav>
-
-
-

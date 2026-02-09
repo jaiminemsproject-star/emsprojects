@@ -53,6 +53,16 @@
                     </select>
                 </div>
                 <div class="col-auto">
+                    <select name="bom" class="form-select form-select-sm" onchange="this.form.submit()" {{ $boms->isEmpty() ? 'disabled' : '' }}>
+                        <option value="">{{ $boms->isEmpty() ? 'Select Project for BOMs' : 'All BOMs' }}</option>
+                        @foreach($boms as $bom)
+                        <option value="{{ $bom->id }}" {{ request('bom') == $bom->id ? 'selected' : '' }}>
+                            {{ $bom->bom_number }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-auto">
                     <select name="assignee" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">All Assignees</option>
                         <option value="me" {{ request('assignee') === 'me' ? 'selected' : '' }}>My Tasks</option>
@@ -69,13 +79,49 @@
                            value="{{ request('q') }}" style="width: 150px;">
                 </div>
                 <div class="col-auto">
-                    @if(request()->hasAny(['list', 'project', 'assignee', 'q']))
+                    @if(request()->hasAny(['list', 'project', 'bom', 'assignee', 'q']))
                     <a href="{{ route('task-board.index') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-x"></i> Clear
                     </a>
                     @endif
                 </div>
             </form>
+        </div>
+    </div>
+
+    {{-- Overview --}}
+    <div class="row g-2 mb-3">
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 bg-primary bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Total</small>
+                    <strong class="h5 mb-0">{{ $boardStats['total'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 bg-warning bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Open</small>
+                    <strong class="h5 mb-0">{{ $boardStats['open'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 bg-danger bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Overdue</small>
+                    <strong class="h5 mb-0">{{ $boardStats['overdue'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 bg-secondary bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Unassigned</small>
+                    <strong class="h5 mb-0">{{ $boardStats['unassigned'] ?? 0 }}</strong>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -114,6 +160,15 @@
                         <a href="{{ route('tasks.show', $task) }}" class="text-decoration-none text-dark">
                             <div class="fw-medium mb-2">{{ Str::limit($task->title, 60) }}</div>
                         </a>
+
+                        @if($task->progress_percent > 0)
+                        <div class="mb-2">
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar {{ $task->progress_percent >= 100 ? 'bg-success' : 'bg-primary' }}" style="width: {{ $task->progress_percent }}%"></div>
+                            </div>
+                            <div class="small text-muted mt-1">{{ $task->progress_percent }}% complete</div>
+                        </div>
+                        @endif
 
                         {{-- Labels --}}
                         @if($task->labels->count() > 0)

@@ -38,6 +38,15 @@
                 <div class="col-md-2 text-end small text-muted">
                     Company #{{ $companyId }}
                 </div>
+
+                <div class="col-md-6">
+                    <label class="form-label form-label-sm">Quick search group</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="fundFlowSearch" class="form-control" placeholder="Filter sources/applications by group...">
+                        <button type="button" class="btn btn-outline-secondary" id="fundFlowSearchClear">Clear</button>
+                    </div>
+                </div>
             </form>
 
             <div class="mt-2 small text-muted">
@@ -46,6 +55,39 @@
                 applications roughly corresponds to P&amp;L impact for the period.
             </div>
         </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="card border-success-subtle">
+                <div class="card-body py-2">
+                    <div class="small text-muted">Total Sources</div>
+                    <div class="h5 mb-0 text-success-emphasis">{{ number_format($totalSources, 2) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-danger-subtle">
+                <div class="card-body py-2">
+                    <div class="small text-muted">Total Applications</div>
+                    <div class="h5 mb-0 text-danger-emphasis">{{ number_format($totalApps, 2) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card {{ $difference >= 0 ? 'border-primary-subtle' : 'border-warning-subtle' }}">
+                <div class="card-body py-2">
+                    <div class="small text-muted">Difference (Sources - Applications)</div>
+                    <div class="h5 mb-0 {{ $difference >= 0 ? 'text-primary' : 'text-warning-emphasis' }}">
+                        {{ number_format($difference, 2) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fundFlowNoMatch" class="alert alert-warning d-none py-2">
+        No rows match your search text.
     </div>
 
     <div class="row">
@@ -66,9 +108,12 @@
                             </thead>
                             <tbody>
                                 @forelse($sources as $row)
-                                    <tr>
+                                    <tr class="fund-flow-row" data-search-text="{{ strtolower($row['label'] ?? '') }}">
                                         <td class="small">
-                                            {{ $row['label'] }}
+                                            <a href="{{ route('accounting.accounts.index', ['group_id' => $row['group']->id]) }}"
+                                               class="text-decoration-none">
+                                                {{ $row['label'] }}
+                                            </a>
                                             @if(! empty($row['note']))
                                                 <span class="text-muted">({{ $row['note'] }})</span>
                                             @endif
@@ -86,7 +131,7 @@
                                 @endforelse
                             </tbody>
                             <tfoot>
-                                <tr class="table-dark text-white fw-semibold">
+                                <tr class="table-dark text-white fw-semibold fund-flow-total-row">
                                     <td class="small text-end">Total Sources</td>
                                     <td class="small text-end">{{ number_format($totalSources, 2) }}</td>
                                 </tr>
@@ -114,9 +159,12 @@
                             </thead>
                             <tbody>
                                 @forelse($applications as $row)
-                                    <tr>
+                                    <tr class="fund-flow-row" data-search-text="{{ strtolower($row['label'] ?? '') }}">
                                         <td class="small">
-                                            {{ $row['label'] }}
+                                            <a href="{{ route('accounting.accounts.index', ['group_id' => $row['group']->id]) }}"
+                                               class="text-decoration-none">
+                                                {{ $row['label'] }}
+                                            </a>
                                             @if(! empty($row['note']))
                                                 <span class="text-muted">({{ $row['note'] }})</span>
                                             @endif
@@ -134,7 +182,7 @@
                                 @endforelse
                             </tbody>
                             <tfoot>
-                                <tr class="table-dark text-white fw-semibold">
+                                <tr class="table-dark text-white fw-semibold fund-flow-total-row">
                                     <td class="small text-end">Total Applications</td>
                                     <td class="small text-end">{{ number_format($totalApps, 2) }}</td>
                                 </tr>
@@ -160,3 +208,39 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('fundFlowSearch');
+    const clearBtn = document.getElementById('fundFlowSearchClear');
+    const noMatch = document.getElementById('fundFlowNoMatch');
+    const rows = Array.from(document.querySelectorAll('.fund-flow-row'));
+    const totalRows = Array.from(document.querySelectorAll('.fund-flow-total-row'));
+
+    function applySearch() {
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        let visible = 0;
+
+        rows.forEach((row) => {
+            const txt = row.dataset.searchText || '';
+            const match = !query || txt.includes(query);
+            row.classList.toggle('d-none', !match);
+            if (match) visible += 1;
+        });
+
+        totalRows.forEach((row) => row.classList.toggle('d-none', !!query));
+        if (noMatch) noMatch.classList.toggle('d-none', !(query && visible === 0));
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applySearch);
+    if (clearBtn && searchInput) {
+        clearBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            applySearch();
+            searchInput.focus();
+        });
+    }
+});
+</script>
+@endpush

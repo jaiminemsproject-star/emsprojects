@@ -24,6 +24,50 @@
         </div>
     </div>
 
+    {{-- Overview --}}
+    <div class="row g-2 mb-3">
+        <div class="col-6 col-lg">
+            <div class="card border-0 bg-primary bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Total</small>
+                    <strong class="h5 mb-0">{{ $stats['total'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="card border-0 bg-warning bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Open</small>
+                    <strong class="h5 mb-0">{{ $stats['open'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="card border-0 bg-success bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Completed</small>
+                    <strong class="h5 mb-0">{{ $stats['completed'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="card border-0 bg-danger bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Overdue</small>
+                    <strong class="h5 mb-0">{{ $stats['overdue'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="card border-0 bg-info bg-opacity-10 h-100">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Due Today</small>
+                    <strong class="h5 mb-0">{{ $stats['due_today'] ?? 0 }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Filters --}}
     <div class="card mb-3">
         <div class="card-body py-2">
@@ -84,6 +128,30 @@
                     </select>
                 </div>
 
+                {{-- Project --}}
+                <div class="col-md-2">
+                    <select name="project" class="form-select form-select-sm">
+                        <option value="">All Projects</option>
+                        @foreach($projects as $project)
+                        <option value="{{ $project->id }}" {{ request('project') == $project->id ? 'selected' : '' }}>
+                            {{ $project->code }} - {{ $project->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- BOM --}}
+                <div class="col-md-2">
+                    <select name="bom" class="form-select form-select-sm" {{ $boms->isEmpty() ? 'disabled' : '' }}>
+                        <option value="">{{ $boms->isEmpty() ? 'Select Project for BOMs' : 'All BOMs' }}</option>
+                        @foreach($boms as $bom)
+                        <option value="{{ $bom->id }}" {{ request('bom') == $bom->id ? 'selected' : '' }}>
+                            {{ $bom->bom_number }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="col-auto">
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-search"></i>
@@ -95,6 +163,45 @@
             </form>
         </div>
     </div>
+
+    @if(request('q') || request('list') || request('status') || request('priority') || request('assignee') || request('project') || request('bom'))
+    <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+        <span class="small text-muted">Active filters:</span>
+        @if(request('q'))
+        <span class="badge text-bg-light">Search: {{ request('q') }}</span>
+        @endif
+        @if(request('list'))
+        <span class="badge text-bg-light">List: {{ optional($taskLists->firstWhere('id', (int) request('list')))->name ?? request('list') }}</span>
+        @endif
+        @if(request('status'))
+        <span class="badge text-bg-light">Status: {{ optional($statuses->firstWhere('id', (int) request('status')))->name ?? request('status') }}</span>
+        @endif
+        @if(request('priority'))
+        <span class="badge text-bg-light">Priority: {{ optional($priorities->firstWhere('id', (int) request('priority')))->name ?? request('priority') }}</span>
+        @endif
+        @if(request('assignee'))
+        <span class="badge text-bg-light">
+            Assignee:
+            {{ request('assignee') === 'me'
+                ? 'Me'
+                : (request('assignee') === 'unassigned'
+                    ? 'Unassigned'
+                    : (optional($users->firstWhere('id', (int) request('assignee')))->name ?? request('assignee'))) }}
+        </span>
+        @endif
+        @if(request('project'))
+        <span class="badge text-bg-light">
+            Project: {{ optional($projects->firstWhere('id', (int) request('project')))->code ?? request('project') }}
+        </span>
+        @endif
+        @if(request('bom'))
+        <span class="badge text-bg-light">
+            BOM: {{ optional($boms->firstWhere('id', (int) request('bom')))->bom_number ?? request('bom') }}
+        </span>
+        @endif
+        <a href="{{ route('tasks.index') }}" class="btn btn-link btn-sm p-0 text-decoration-none">Clear all</a>
+    </div>
+    @endif
 
     {{-- Quick Filters --}}
     <div class="mb-3">

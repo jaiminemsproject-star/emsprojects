@@ -41,6 +41,10 @@ class PurchaseIndentController extends Controller
             $query->where('status', $status);
         }
 
+        if ($proc = trim((string) $request->input('procurement_status', ''))) {
+            $query->where('procurement_status', $proc);
+        }
+
         if ($p = (int) $request->input('project_id')) {
             $query->where('project_id', $p);
         }
@@ -50,8 +54,28 @@ class PurchaseIndentController extends Controller
         }
 
         $indents = $query->paginate(25)->withQueryString();
+        $projects = Project::query()
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get(['id', 'code', 'name']);
 
-        return view('purchase_indents.index', compact('indents'));
+        $statusOptions = [
+            'draft' => 'Draft',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            'cancelled' => 'Cancelled',
+        ];
+
+        $procurementOptions = [
+            'open' => 'Open',
+            'rfq_created' => 'RFQ Created',
+            'partially_ordered' => 'Partially Ordered',
+            'ordered' => 'Ordered',
+            'closed' => 'Closed',
+            'cancelled' => 'Cancelled',
+        ];
+
+        return view('purchase_indents.index', compact('indents', 'projects', 'statusOptions', 'procurementOptions'));
     }
 
     public function create(): View

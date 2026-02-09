@@ -48,9 +48,16 @@ class StoreTaskRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'company_id' => 1,
+        $data = [
+            'company_id' => auth()->user()->company_id ?? 1,
             'is_milestone' => $this->boolean('is_milestone'),
-        ]);
+        ];
+
+        if ($this->filled('estimated_hours')) {
+            $hours = (float) $this->input('estimated_hours');
+            $data['estimated_minutes'] = max(0, (int) round($hours * 60));
+        }
+
+        $this->merge($data);
     }
 }

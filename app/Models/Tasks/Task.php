@@ -475,11 +475,23 @@ class Task extends Model
 
     public function getSubtaskCountAttribute(): int
     {
+        if (array_key_exists('subtask_count', $this->attributes)) {
+            return (int) $this->attributes['subtask_count'];
+        }
+
+        if (array_key_exists('children_count', $this->attributes)) {
+            return (int) $this->attributes['children_count'];
+        }
+
         return $this->children()->count();
     }
 
     public function getCompletedSubtaskCountAttribute(): int
     {
+        if (array_key_exists('completed_subtask_count', $this->attributes)) {
+            return (int) $this->attributes['completed_subtask_count'];
+        }
+
         return $this->children()->closed()->count();
     }
 

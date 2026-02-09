@@ -1,6 +1,10 @@
 @extends('layouts.erp')
 
 @section('content')
+@php
+    $taskIndexRoute = \Illuminate\Support\Facades\Route::has('tasks.index') ? 'tasks.index' : null;
+    $taskCreateRoute = \Illuminate\Support\Facades\Route::has('tasks.create') ? 'tasks.create' : null;
+@endphp
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -11,6 +15,22 @@
             <a href="{{ route('projects.production-dispatches.index', $project) }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
+
+            @can('tasks.view')
+                @if($taskIndexRoute)
+                    <a href="{{ route($taskIndexRoute, ['project' => $project->id, 'q' => $dispatch->dispatch_number]) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-list-task"></i> Related Tasks
+                    </a>
+                @endif
+            @endcan
+
+            @can('tasks.create')
+                @if($taskCreateRoute)
+                    <a href="{{ route($taskCreateRoute, ['project' => $project->id, 'title' => 'Dispatch '. $dispatch->dispatch_number .' follow-up', 'description' => 'Linked from Dispatch '. $dispatch->dispatch_number]) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Add Task
+                    </a>
+                @endif
+            @endcan
 
             @if($dispatch->isDraft())
                 @can('production.dispatch.update')

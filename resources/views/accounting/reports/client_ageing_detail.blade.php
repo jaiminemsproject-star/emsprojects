@@ -3,6 +3,10 @@
 @section('title', 'Client Ageing - Bills')
 
 @section('content')
+@php
+    $ledgerFrom = optional($asOfDate)->copy()->startOfMonth()->toDateString();
+    $ledgerTo = optional($asOfDate)->toDateString();
+@endphp
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-start mb-3">
         <div>
@@ -43,10 +47,24 @@
                 <a href="{{ route('accounting.reports.client-ageing', ['client_id' => $party->id, 'as_of_date' => optional($asOfDate)->toDateString(), 'status' => $status]) }}" class="btn btn-sm btn-outline-secondary">
                     <i class="bi bi-arrow-left"></i> Back
                 </a>
+                <a href="{{ route('accounting.reports.ledger', ['account_id' => $account->id, 'from_date' => $ledgerFrom, 'to_date' => $ledgerTo]) }}"
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-journal-text"></i> Ledger
+                </a>
             </div>
         </div>
 
         <div class="card-body p-0">
+            <div class="p-2 border-bottom">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="clientAgeingDetailSearch" class="form-control" placeholder="Search bill number...">
+                    <button type="button" class="btn btn-outline-secondary" id="clientAgeingDetailSearchClear">Clear</button>
+                </div>
+                <div id="clientAgeingDetailNoMatch" class="alert alert-warning d-none py-2 mb-0 mt-2">
+                    No bills match your search text.
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-sm table-bordered mb-0 align-middle">
                     <thead class="table-light">
@@ -64,7 +82,7 @@
                     <tbody>
                         @if(!empty($rows) && count($rows))
                             @foreach($rows as $r)
-                                <tr>
+                                <tr class="client-ageing-detail-row" data-search-text="{{ strtolower($r['bill_number'] ?? '') }}">
                                     <td class="small">{{ $r['bill_number'] }}</td>
                                     <td class="small">{{ optional($r['bill_date'])->toDateString() }}</td>
                                     <td class="small">{{ optional($r['due_date'])->toDateString() }}</td>
@@ -84,7 +102,7 @@
                         @endif
                     </tbody>
                     <tfoot>
-                        <tr class="table-light fw-semibold">
+                        <tr class="table-light fw-semibold client-ageing-detail-total-row">
                             <td colspan="3" class="text-end small">Total</td>
                             <td class="small text-end">{{ number_format($grandTotals['bill_amount'] ?? 0, 2) }}</td>
                             <td class="small text-end">{{ number_format($grandTotals['allocated'] ?? 0, 2) }}</td>
@@ -98,3 +116,39 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('clientAgeingDetailSearch');
+    const clearBtn = document.getElementById('clientAgeingDetailSearchClear');
+    const noMatch = document.getElementById('clientAgeingDetailNoMatch');
+    const rows = Array.from(document.querySelectorAll('.client-ageing-detail-row'));
+    const totalRow = document.querySelector('.client-ageing-detail-total-row');
+
+    function applySearch() {
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        let visible = 0;
+
+        rows.forEach((row) => {
+            const txt = row.dataset.searchText || '';
+            const match = !query || txt.includes(query);
+            row.classList.toggle('d-none', !match);
+            if (match) visible += 1;
+        });
+
+        if (totalRow) totalRow.classList.toggle('d-none', !!query);
+        if (noMatch) noMatch.classList.toggle('d-none', !(query && visible === 0));
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applySearch);
+    if (clearBtn && searchInput) {
+        clearBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            applySearch();
+            searchInput.focus();
+        });
+    }
+});
+</script>
+@endpush

@@ -193,19 +193,20 @@
                                 @endforeach
                             </select>
                         </div>
-                        @if(isset($boms) && $boms->count() > 0)
                         <div class="mb-3">
                             <label class="form-label">BOM</label>
-                            <select name="bom_id" class="form-select">
-                                <option value="">No BOM</option>
-                                @foreach($boms as $bom)
+                            <select name="bom_id" class="form-select" {{ ($boms ?? collect())->isEmpty() ? 'disabled' : '' }}>
+                                <option value="">{{ ($boms ?? collect())->isEmpty() ? 'Select a project to load BOMs' : 'No BOM' }}</option>
+                                @foreach(($boms ?? collect()) as $bom)
                                 <option value="{{ $bom->id }}" {{ old('bom_id', $task->bom_id ?? '') == $bom->id ? 'selected' : '' }}>
                                     {{ $bom->bom_number }}
                                 </option>
                                 @endforeach
                             </select>
+                            @if(($boms ?? collect())->isEmpty())
+                                <small class="text-muted">BOM options are loaded from the selected project.</small>
+                            @endif
                         </div>
-                        @endif
                     </div>
                 </div>
 

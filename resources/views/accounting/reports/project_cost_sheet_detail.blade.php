@@ -1,11 +1,14 @@
-@extends('layouts.app')
+@extends('layouts.erp')
 
 @section('title', 'Project Cost Sheet - ' . $project->name)
 
 @section('content')
+@php
+    $ledgerFrom = $dateFrom?->format('Y-m-d') ?? $dateTo->copy()->startOfMonth()->format('Y-m-d');
+    $ledgerTo = $dateTo->format('Y-m-d');
+@endphp
 <div class="container-fluid">
-    {{-- Header --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1">
@@ -17,7 +20,7 @@
             <small class="text-muted">Cost Sheet as of {{ $asOfDate->format('d-M-Y') }}</small>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('accounting.reports.project-cost-sheet.export', ['project' => $project, 'date_from' => $dateFrom?->format('Y-m-d'), 'date_to' => $dateTo->format('Y-m-d')]) }}" 
+            <a href="{{ route('accounting.reports.project-cost-sheet.export', ['project' => $project, 'date_from' => $dateFrom?->format('Y-m-d'), 'date_to' => $dateTo->format('Y-m-d')]) }}"
                class="btn btn-success btn-sm">
                 <i class="bi bi-download"></i> Export CSV
             </a>
@@ -27,80 +30,54 @@
         </div>
     </div>
 
-    {{-- Date Filter --}}
     <div class="card mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label form-label-sm">Date From</label>
-                    <input type="date" name="date_from" class="form-control form-control-sm" 
-                           value="{{ $dateFrom?->format('Y-m-d') }}">
+                    <input type="date" name="date_from" class="form-control form-control-sm" value="{{ $dateFrom?->format('Y-m-d') }}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label form-label-sm">Date To</label>
-                    <input type="date" name="date_to" class="form-control form-control-sm" 
-                           value="{{ $dateTo->format('Y-m-d') }}">
+                    <input type="date" name="date_to" class="form-control form-control-sm" value="{{ $dateTo->format('Y-m-d') }}">
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="bi bi-funnel"></i> Apply Filter
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel"></i> Apply Filter</button>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label form-label-sm">Quick search transactions</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" id="pcsdSearch" class="form-control" placeholder="Voucher/type/description/account...">
+                        <button type="button" id="pcsdSearchClear" class="btn btn-outline-secondary">Clear</button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    {{-- Cost Summary Cards --}}
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <div class="card border-primary">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-1">Material</h6>
-                    <h5 class="text-primary mb-0">₹ {{ number_format($costSummary['material'] ?? 0, 2) }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card border-info">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-1">Consumables</h6>
-                    <h5 class="text-info mb-0">₹ {{ number_format($costSummary['consumables'] ?? 0, 2) }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card border-warning">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-1">Subcontractor</h6>
-                    <h5 class="text-warning mb-0">₹ {{ number_format($costSummary['subcontractor'] ?? 0, 2) }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card border-secondary">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-1">Other Direct</h6>
-                    <h5 class="text-secondary mb-0">₹ {{ number_format($costSummary['other_direct'] ?? 0, 2) }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h6 class="mb-1">Total Project Cost</h6>
-                    <h3 class="mb-0">₹ {{ number_format($totalCost, 2) }}</h3>
-                </div>
-            </div>
-        </div>
+    <div class="row mb-4 g-3">
+        <div class="col-md-2"><div class="card border-primary h-100"><div class="card-body text-center">
+            <h6 class="text-muted mb-1">Material</h6><h5 class="text-primary mb-0">₹ {{ number_format($costSummary['material'] ?? 0, 2) }}</h5>
+        </div></div></div>
+        <div class="col-md-2"><div class="card border-info h-100"><div class="card-body text-center">
+            <h6 class="text-muted mb-1">Consumables</h6><h5 class="text-info mb-0">₹ {{ number_format($costSummary['consumables'] ?? 0, 2) }}</h5>
+        </div></div></div>
+        <div class="col-md-2"><div class="card border-warning h-100"><div class="card-body text-center">
+            <h6 class="text-muted mb-1">Subcontractor</h6><h5 class="text-warning mb-0">₹ {{ number_format($costSummary['subcontractor'] ?? 0, 2) }}</h5>
+        </div></div></div>
+        <div class="col-md-2"><div class="card border-secondary h-100"><div class="card-body text-center">
+            <h6 class="text-muted mb-1">Other Direct</h6><h5 class="text-secondary mb-0">₹ {{ number_format($costSummary['other_direct'] ?? 0, 2) }}</h5>
+        </div></div></div>
+        <div class="col-md-4"><div class="card bg-success text-white h-100"><div class="card-body text-center">
+            <h6 class="mb-1">Total Project Cost</h6><h3 class="mb-0">₹ {{ number_format($totalCost, 2) }}</h3>
+        </div></div></div>
     </div>
 
     <div class="row">
-        {{-- Cost Breakdown Chart (Monthly) --}}
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Monthly Cost Trend</h5>
-                </div>
+                <div class="card-header"><h5 class="card-title mb-0">Monthly Cost Trend</h5></div>
                 <div class="card-body">
                     @if(count($monthlyBreakdown) > 0)
                         <canvas id="monthlyChart" height="200"></canvas>
@@ -111,12 +88,9 @@
             </div>
         </div>
 
-        {{-- Cost Distribution Pie Chart --}}
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Cost Distribution</h5>
-                </div>
+                <div class="card-header"><h5 class="card-title mb-0">Cost Distribution</h5></div>
                 <div class="card-body">
                     @if($totalCost > 0)
                         <canvas id="distributionChart" height="200"></canvas>
@@ -128,14 +102,14 @@
         </div>
     </div>
 
-    {{-- Detailed Transactions --}}
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">Cost Transaction Details</h5>
+            <span class="small text-muted">{{ count($costDetails) }} transaction(s)</span>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-sm mb-0">
+                <table class="table table-hover table-sm mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>Date</th>
@@ -147,11 +121,24 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr id="pcsdNoMatchRow" class="d-none">
+                            <td colspan="6" class="text-center py-4 text-muted">No transactions match the search text.</td>
+                        </tr>
                         @forelse($costDetails as $detail)
-                            <tr>
+                            @php
+                                $searchText = strtolower(trim(
+                                    ($detail['voucher_date'] ?? '') . ' ' .
+                                    ($detail['voucher_no'] ?? '') . ' ' .
+                                    ($detail['voucher_type'] ?? '') . ' ' .
+                                    ($detail['description'] ?? '') . ' ' .
+                                    ($detail['account_name'] ?? '') . ' ' .
+                                    ($detail['account_code'] ?? '')
+                                ));
+                            @endphp
+                            <tr class="pcsd-row" data-row-text="{{ $searchText }}">
                                 <td>{{ \Carbon\Carbon::parse($detail['voucher_date'])->format('d-M-Y') }}</td>
                                 <td>
-                                    <a href="{{ route('accounting.vouchers.show', $detail['voucher_id']) }}">
+                                    <a href="{{ route('accounting.vouchers.show', $detail['voucher_id']) }}" class="text-decoration-none">
                                         {{ $detail['voucher_no'] }}
                                     </a>
                                 </td>
@@ -160,9 +147,15 @@
                                         {{ ucfirst(str_replace('_', ' ', $detail['voucher_type'])) }}
                                     </span>
                                 </td>
-                                <td>{{ Str::limit($detail['description'], 50) }}</td>
+                                <td>{{ Str::limit($detail['description'], 70) }}</td>
                                 <td>
-                                    <small>{{ $detail['account_name'] }}</small>
+                                    @if(!empty($detail['account_id']))
+                                        <a href="{{ route('accounting.reports.ledger', ['account_id' => $detail['account_id'], 'from_date' => $ledgerFrom, 'to_date' => $ledgerTo, 'project_id' => $project->id]) }}" class="text-decoration-none">
+                                            <small>{{ $detail['account_name'] }}</small>
+                                        </a>
+                                    @else
+                                        <small>{{ $detail['account_name'] }}</small>
+                                    @endif
                                     <br>
                                     <small class="text-muted">{{ $detail['account_code'] }}</small>
                                 </td>
@@ -170,19 +163,17 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">
-                                    No transactions found for this project.
-                                </td>
+                                <td colspan="6" class="text-center py-4 text-muted">No transactions found for this project.</td>
                             </tr>
                         @endforelse
                     </tbody>
                     @if(count($costDetails) > 0)
-                    <tfoot class="table-secondary">
-                        <tr class="fw-bold">
-                            <td colspan="5">TOTAL</td>
-                            <td class="text-end">₹ {{ number_format(collect($costDetails)->sum('amount'), 2) }}</td>
-                        </tr>
-                    </tfoot>
+                        <tfoot class="table-secondary">
+                            <tr class="fw-bold">
+                                <td colspan="5">TOTAL</td>
+                                <td class="text-end">₹ {{ number_format(collect($costDetails)->sum('amount'), 2) }}</td>
+                            </tr>
+                        </tfoot>
                     @endif
                 </table>
             </div>
@@ -194,7 +185,34 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Monthly Chart
+    const searchInput = document.getElementById('pcsdSearch');
+    const searchClear = document.getElementById('pcsdSearchClear');
+    const rows = Array.from(document.querySelectorAll('.pcsd-row'));
+    const noMatchRow = document.getElementById('pcsdNoMatchRow');
+
+    if (searchInput && rows.length) {
+        const applySearch = function () {
+            const needle = (searchInput.value || '').trim().toLowerCase();
+            let visible = 0;
+            rows.forEach((row) => {
+                const hay = (row.dataset.rowText || row.textContent || '').toLowerCase();
+                const show = needle === '' || hay.includes(needle);
+                row.classList.toggle('d-none', !show);
+                if (show) visible++;
+            });
+            if (noMatchRow) noMatchRow.classList.toggle('d-none', needle === '' || visible > 0);
+        };
+
+        searchInput.addEventListener('input', applySearch);
+        if (searchClear) {
+            searchClear.addEventListener('click', function () {
+                searchInput.value = '';
+                applySearch();
+            });
+        }
+        applySearch();
+    }
+
     @if(count($monthlyBreakdown) > 0)
     const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
     new Chart(monthlyCtx, {
@@ -211,16 +229,12 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
+            plugins: { legend: { display: false } },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: function(value) {
-                            return '₹ ' + value.toLocaleString();
-                        }
+                        callback: function(value) { return '₹ ' + value.toLocaleString(); }
                     }
                 }
             }
@@ -228,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     @endif
 
-    // Distribution Pie Chart
     @if($totalCost > 0)
     const distCtx = document.getElementById('distributionChart').getContext('2d');
     new Chart(distCtx, {
@@ -250,14 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ]
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
     @endif
 });

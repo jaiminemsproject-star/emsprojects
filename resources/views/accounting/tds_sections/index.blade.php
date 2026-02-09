@@ -4,6 +4,10 @@
 
 @section('content')
 <div class="container-fluid">
+    @php
+        $sectionRows = method_exists($sections, 'getCollection') ? $sections->getCollection() : collect($sections);
+        $activeCount = $sectionRows->where('is_active', true)->count();
+    @endphp
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">TDS Sections</h1>
         @can('accounting.accounts.update')
@@ -19,6 +23,33 @@
     @if(session('error'))
         <div class="alert alert-danger py-2">{{ session('error') }}</div>
     @endif
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="small text-muted">Rows on this page</div>
+                    <div class="h6 mb-0">{{ $sections->count() }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="small text-muted">Active on this page</div>
+                    <div class="h6 mb-0">{{ $activeCount }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="small text-muted">Company ID</div>
+                    <div class="h6 mb-0">{{ $companyId }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="card mb-3">
         <div class="card-body">
@@ -38,6 +69,17 @@
         </div>
     </div>
 
+    <div class="card mb-3">
+        <div class="card-body py-3">
+            <label class="form-label form-label-sm">Quick search (visible rows)</label>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" id="tdsSecQuickSearch" class="form-control" placeholder="Code/name/description/status...">
+                <button type="button" id="tdsSecQuickSearchClear" class="btn btn-outline-secondary">Clear</button>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -53,8 +95,19 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr id="tdsSecNoMatchRow" class="d-none">
+                            <td colspan="6" class="text-center text-muted py-3">No sections match the search text.</td>
+                        </tr>
                         @forelse($sections as $section)
-                            <tr>
+                            @php
+                                $searchText = strtolower(trim(
+                                    ($section->code ?? '') . ' ' .
+                                    ($section->name ?? '') . ' ' .
+                                    ($section->description ?? '') . ' ' .
+                                    ($section->is_active ? 'active enabled' : 'inactive disabled')
+                                ));
+                            @endphp
+                            <tr class="tds-sec-row" data-row-text="{{ $searchText }}">
                                 <td class="fw-semibold">{{ $section->code }}</td>
                                 <td>{{ $section->name }}</td>
                                 <td class="text-end">{{ rtrim(rtrim(number_format((float) $section->default_rate, 4), '0'), '.') }}</td>
@@ -98,3 +151,36 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('tdsSecQuickSearch');
+    const clearBtn = document.getElementById('tdsSecQuickSearchClear');
+    const rows = Array.from(document.querySelectorAll('.tds-sec-row'));
+    const noMatch = document.getElementById('tdsSecNoMatchRow');
+    if (!input || !rows.length) return;
+
+    const applyFilter = function () {
+        const needle = (input.value || '').trim().toLowerCase();
+        let visible = 0;
+        rows.forEach((row) => {
+            const hay = (row.dataset.rowText || row.textContent || '').toLowerCase();
+            const show = needle === '' || hay.includes(needle);
+            row.classList.toggle('d-none', !show);
+            if (show) visible++;
+        });
+        if (noMatch) noMatch.classList.toggle('d-none', needle === '' || visible > 0);
+    };
+
+    input.addEventListener('input', applyFilter);
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            input.value = '';
+            applyFilter();
+        });
+    }
+    applyFilter();
+});
+</script>
+@endpush

@@ -3,6 +3,12 @@
 @section('title', 'Leave Application Details')
 
 @section('content')
+@php
+    $statusEnum = $leaveApplication->status instanceof \App\Enums\Hr\LeaveStatus ? $leaveApplication->status : null;
+    $statusValue = $statusEnum?->value ?? (is_string($leaveApplication->status) ? $leaveApplication->status : '');
+    $statusLabel = $statusEnum?->label() ?? ucfirst(str_replace('_', ' ', $statusValue));
+    $statusColor = $statusEnum?->color() ?? 'secondary';
+@endphp
 <div class="container-fluid py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -28,20 +34,7 @@
             <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">Application Details</h6>
-                    @switch($leaveApplication->status)
-                        @case('pending')
-                            <span class="badge bg-warning text-dark">Pending Approval</span>
-                            @break
-                        @case('approved')
-                            <span class="badge bg-success">Approved</span>
-                            @break
-                        @case('rejected')
-                            <span class="badge bg-danger">Rejected</span>
-                            @break
-                        @case('cancelled')
-                            <span class="badge bg-secondary">Cancelled</span>
-                            @break
-                    @endswitch
+                    <span class="badge bg-{{ $statusColor }} {{ $statusValue === 'pending' ? 'text-dark' : '' }}">{{ $statusLabel }}</span>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -120,7 +113,7 @@
             </div>
 
             {{-- Approval Details --}}
-            @if($leaveApplication->status !== 'pending' && $leaveApplication->status !== 'draft')
+            @if(!in_array($statusValue, ['pending', 'draft'], true))
                 <div class="card">
                     <div class="card-header">
                         <h6 class="mb-0">Approval Details</h6>
@@ -129,7 +122,7 @@
                         <table class="table table-sm table-borderless mb-0">
                             <tr>
                                 <td class="text-muted" style="width: 30%;">
-                                    {{ $leaveApplication->status === 'approved' ? 'Approved By:' : ($leaveApplication->status === 'rejected' ? 'Rejected By:' : 'Action By:') }}
+                                    {{ $statusValue === 'approved' ? 'Approved By:' : ($statusValue === 'rejected' ? 'Rejected By:' : 'Action By:') }}
                                 </td>
                                 <td>{{ $leaveApplication->approvedBy->name ?? '-' }}</td>
                             </tr>
@@ -156,7 +149,7 @@
                     <h6 class="mb-0">Actions</h6>
                 </div>
                 <div class="card-body">
-                    @if($leaveApplication->status === 'pending')
+                    @if($statusValue === 'pending')
                         <form method="POST" action="{{ route('hr.leave-applications.approve', $leaveApplication) }}" class="mb-3">
                             @csrf
                             <div class="mb-2">
@@ -186,7 +179,7 @@
                         </a>
                     @endif
 
-                    @if(in_array($leaveApplication->status, ['pending', 'approved']))
+                    @if(in_array($statusValue, ['pending', 'approved'], true))
                         <form method="POST" action="{{ route('hr.leave-applications.cancel', $leaveApplication) }}">
                             @csrf
                             <button type="submit" class="btn btn-outline-secondary btn-sm w-100" 
@@ -215,9 +208,9 @@
 
                         @if($leaveApplication->approved_on)
                             <div class="timeline-item">
-                                <div class="timeline-marker {{ $leaveApplication->status === 'approved' ? 'bg-success' : ($leaveApplication->status === 'rejected' ? 'bg-danger' : 'bg-secondary') }}"></div>
+                                <div class="timeline-marker {{ $statusValue === 'approved' ? 'bg-success' : ($statusValue === 'rejected' ? 'bg-danger' : 'bg-secondary') }}"></div>
                                 <div class="timeline-content">
-                                    <div class="small text-muted">{{ ucfirst($leaveApplication->status) }}</div>
+                                    <div class="small text-muted">{{ $statusLabel }}</div>
                                     <div>{{ $leaveApplication->approved_on->format('d M Y H:i') }}</div>
                                 </div>
                             </div>

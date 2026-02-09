@@ -4,6 +4,9 @@
 
 @section('content')
 <div class="container-fluid">
+    @php
+        $primaryCount = collect($flatGroups)->where('is_primary', true)->count();
+    @endphp
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="h4 mb-0">Account Groups</h1>
@@ -23,6 +26,33 @@
         <div class="alert alert-danger py-2">{{ session('error') }}</div>
     @endif
 
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="small text-muted">Total groups</div>
+                    <div class="h6 mb-0">{{ count($flatGroups) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="small text-muted">Primary groups</div>
+                    <div class="h6 mb-0">{{ $primaryCount }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="small text-muted">Search scope</div>
+                    <div class="h6 mb-0">Code / Name / Nature</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body">
             <form method="GET" class="row g-2 mb-3">
@@ -39,6 +69,15 @@
                 </div>
             </form>
 
+            <div class="mb-3">
+                <label class="form-label form-label-sm">Quick search (visible rows)</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="agQuickSearch" class="form-control" placeholder="Type to filter current results...">
+                    <button type="button" id="agQuickSearchClear" class="btn btn-outline-secondary">Clear</button>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-sm table-striped mb-0 align-middle">
                     <thead>
@@ -53,8 +92,20 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr id="agNoMatchRow" class="d-none">
+                            <td colspan="7" class="text-center text-muted py-4">No groups match the search text.</td>
+                        </tr>
                         @forelse($flatGroups as $g)
-                            <tr>
+                            @php
+                                $searchText = strtolower(trim(
+                                    ($g->code ?? '') . ' ' .
+                                    ($g->name ?? '') . ' ' .
+                                    ($g->indent_name ?? '') . ' ' .
+                                    ($g->nature ?? '') . ' ' .
+                                    ($g->parent?->name ?? '')
+                                ));
+                            @endphp
+                            <tr class="ag-row" data-row-text="{{ $searchText }}">
                                 <td class="fw-semibold">{{ $g->code }}</td>
                                 <td>{{ $g->indent_name ?? $g->name }}</td>
                                 <td>
@@ -107,3 +158,36 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('agQuickSearch');
+    const clearBtn = document.getElementById('agQuickSearchClear');
+    const rows = Array.from(document.querySelectorAll('.ag-row'));
+    const noMatch = document.getElementById('agNoMatchRow');
+    if (!input || !rows.length) return;
+
+    const applyFilter = function () {
+        const needle = (input.value || '').trim().toLowerCase();
+        let visible = 0;
+        rows.forEach((row) => {
+            const hay = (row.dataset.rowText || row.textContent || '').toLowerCase();
+            const show = needle === '' || hay.includes(needle);
+            row.classList.toggle('d-none', !show);
+            if (show) visible++;
+        });
+        if (noMatch) noMatch.classList.toggle('d-none', needle === '' || visible > 0);
+    };
+
+    input.addEventListener('input', applyFilter);
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            input.value = '';
+            applyFilter();
+        });
+    }
+    applyFilter();
+});
+</script>
+@endpush

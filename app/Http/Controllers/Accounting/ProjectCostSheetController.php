@@ -10,6 +10,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * DEV-9: Project Cost Sheet Report Controller
@@ -42,8 +43,17 @@ class ProjectCostSheetController extends Controller
         $companyId = $this->defaultCompanyId();
         $asOfDate = $request->date('as_of_date') ?: now();
 
-        // Get all active projects
-        $projects = Project::where('is_active', true)
+        // Get active projects in a schema-safe way:
+        // - newer schemas may have projects.is_active
+        // - legacy/current schema uses projects.status
+        $projectsQuery = Project::query();
+        if (Schema::hasColumn('projects', 'is_active')) {
+            $projectsQuery->where('is_active', true);
+        } elseif (Schema::hasColumn('projects', 'status')) {
+            $projectsQuery->where('status', 'active');
+        }
+
+        $projects = $projectsQuery
             ->orderBy('name')
             ->get();
 
@@ -429,6 +439,5 @@ class ProjectCostSheetController extends Controller
         })->toArray();
     }
 }
-
 
 

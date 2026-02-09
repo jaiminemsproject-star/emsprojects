@@ -3,6 +3,18 @@
 @section('title', 'DPR')
 
 @section('content')
+@php
+    $taskIndexRoute = \Illuminate\Support\Facades\Route::has('tasks.index') ? 'tasks.index' : null;
+    $taskCreateRoute = \Illuminate\Support\Facades\Route::has('tasks.create') ? 'tasks.create' : null;
+    $isScoped = !empty($projectId);
+    $listUrl = $isScoped ? url('/projects/'.$projectId.'/production-dprs') : url('/production/production-dprs');
+    $submitUrl = $isScoped
+        ? url('/projects/'.$projectId.'/production-dprs/'.$dpr->id.'/submit')
+        : url('/production/production-dprs/'.$dpr->id.'/submit');
+    $approveUrl = $isScoped
+        ? url('/projects/'.$projectId.'/production-dprs/'.$dpr->id.'/approve')
+        : url('/production/production-dprs/'.$dpr->id.'/approve');
+@endphp
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -21,9 +33,25 @@
                 Status: <strong>{{ strtoupper($dpr->status) }}</strong>
             </div>
         </div>
-        <a class="btn btn-outline-secondary" href="{{ url('/projects/'.$projectId.'/production-dprs') }}">
-            <i class="bi bi-arrow-left"></i> Back
-        </a>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="{{ $listUrl }}">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            @can('tasks.view')
+                @if($taskIndexRoute && $isScoped)
+                    <a class="btn btn-outline-secondary" href="{{ route($taskIndexRoute, ['project' => $projectId, 'q' => 'DPR #'.$dpr->id]) }}">
+                        <i class="bi bi-list-task"></i> Related Tasks
+                    </a>
+                @endif
+            @endcan
+            @can('tasks.create')
+                @if($taskCreateRoute && $isScoped)
+                    <a class="btn btn-outline-primary" href="{{ route($taskCreateRoute, ['project' => $projectId, 'title' => 'DPR #'.$dpr->id.' follow-up', 'description' => 'Linked from DPR #'.$dpr->id.' (Plan '.$dpr->plan_number.', Activity '.$dpr->activity_name.')']) }}">
+                        <i class="bi bi-plus-circle"></i> Add Task
+                    </a>
+                @endif
+            @endcan
+        </div>
     </div>
 
     @if(session('success'))
@@ -61,7 +89,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ url('/projects/'.$projectId.'/production-dprs/'.$dpr->id.'/submit') }}">
+    <form method="POST" action="{{ $submitUrl }}">
         @csrf
 
         <div class="card mb-3">
@@ -228,43 +256,8 @@
     </form>
 
     @if($dpr->status === 'submitted')
-        <form id="approveForm" method="POST" action="{{ url('/projects/'.$projectId.'/production-dprs/'.$dpr->id.'/approve') }}">
+        <form id="approveForm" method="POST" action="{{ $approveUrl }}">
             @csrf
-
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="fw-semibold">Geofence</div>
-                        <div class="text-muted small" id="geoStatusText">
-                            Tap “Capture Location” to record GPS before submitting.
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="btnGeo">
-                        <i class="bi bi-geo-alt"></i> Capture Location
-                    </button>
-                </div>
-
-                <input type="hidden" name="geo_latitude" id="geo_latitude" value="{{ old('geo_latitude') }}">
-                <input type="hidden" name="geo_longitude" id="geo_longitude" value="{{ old('geo_longitude') }}">
-                <input type="hidden" name="geo_accuracy_m" id="geo_accuracy_m" value="{{ old('geo_accuracy_m') }}">
-                <input type="hidden" name="geo_status" id="geo_status" value="{{ old('geo_status','captured') }}">
-
-                @can('production.geofence.override')
-                    <div class="mt-3 border-top pt-3">
-                        <div class="fw-semibold text-warning"><i class="bi bi-shield-exclamation"></i> Geofence Override</div>
-                        <div class="text-muted small">
-                            If you are outside the geofence, you can submit only with an override reason.
-                        </div>
-                        <textarea name="geo_override_reason"
-                                  class="form-control form-control-sm mt-2"
-                                  rows="2"
-                                  placeholder="Override reason (required only if outside geofence)">{{ old('geo_override_reason') }}</textarea>
-                    </div>
-                @endcan
-            </div>
-        </div>
-
         </form>
     @endif
 </div>
@@ -307,8 +300,6 @@
 @endpush
 
 @endsection
-
-
 
 
 

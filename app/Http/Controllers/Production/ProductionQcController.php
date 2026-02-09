@@ -20,21 +20,45 @@ class ProductionQcController extends Controller
         $this->middleware('permission:production.qc.perform');
     }
 
-    public function index(Project $project)
+    public function index(Request $request, ?Project $project = null)
     {
-        $pending = ProductionQcCheck::query()
-            ->where('project_id', $project->id)
-            ->where('result', 'pending')
-            ->with(['plan', 'activity', 'planItemActivity.planItem'])
-            ->orderBy('id')
-            ->paginate(25);
+        $projectId = $project?->id ?: (int) $request->integer('project_id');
+        $currentProject = $project;
 
-        return view('projects.production_qc.index', compact('project', 'pending'));
+        if (! $currentProject && $projectId > 0) {
+            $currentProject = Project::query()->find($projectId);
+        }
+
+        $pendingQuery = ProductionQcCheck::query()
+            ->where('result', 'pending')
+            ->with(['plan.project', 'activity', 'planItemActivity.planItem'])
+            ->orderBy('id');
+
+        if ($projectId > 0) {
+            $pendingQuery->where('project_id', $projectId);
+        }
+
+        $pending = $pendingQuery->paginate(25)->withQueryString();
+
+        $projects = Project::query()
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get(['id', 'code', 'name']);
+
+        return view('projects.production_qc.index', [
+            'project' => $currentProject,
+            'projectId' => $projectId > 0 ? $projectId : null,
+            'projects' => $projects,
+            'pending' => $pending,
+        ]);
     }
 
-    public function update(Request $request, Project $project, ProductionQcCheck $qc)
+    public function update(Request $request, ProductionQcCheck $qc, ?Project $project = null)
     {
-        if ((int)$qc->project_id !== (int)$project->id) abort(404);
+        $projectId = $project?->id ?: (int) $qc->project_id;
+        if ($project && (int) $qc->project_id !== (int) $project->id) {
+            abort(404);
+        }
 
         $data = $request->validate([
             'result' => ['required', 'in:passed,failed'],
@@ -102,7 +126,7 @@ class ProductionQcController extends Controller
         }
 
         ProductionAudit::log(
-            $project->id,
+            $projectId,
             $event,
             'ProductionQcCheck',
             $qc->id,
@@ -113,6 +137,4 @@ class ProductionQcController extends Controller
         return back()->with('success', 'QC updated.');
     }
 }
-
-
 

@@ -7,6 +7,8 @@
     $routeProject = request()->route('project');
     // If route param is numeric, $routeProject is "1" (string). If model-bound, it's an object.
     $currentProjectId = is_object($routeProject) ? (int)($routeProject->id ?? 0) : (int)($routeProject ?? 0);
+    $taskIndexRoute = \Illuminate\Support\Facades\Route::has('tasks.index') ? 'tasks.index' : null;
+    $taskCreateRoute = \Illuminate\Support\Facades\Route::has('tasks.create') ? 'tasks.create' : null;
 @endphp
 
 <div class="container-fluid">
@@ -22,6 +24,23 @@
                 <span class="text-muted small">Open a project first to create plan from BOM.</span>
             @endif
         @endcan
+
+        @if($currentProjectId > 0)
+            @can('tasks.view')
+                @if($taskIndexRoute)
+                    <a href="{{ route($taskIndexRoute, ['project' => $currentProjectId]) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-list-task"></i> Project Tasks
+                    </a>
+                @endif
+            @endcan
+            @can('tasks.create')
+                @if($taskCreateRoute)
+                    <a href="{{ route($taskCreateRoute, ['project' => $currentProjectId, 'title' => 'Production planning follow-up']) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Add Task
+                    </a>
+                @endif
+            @endcan
+        @endif
     </div>
 
     @if(session('success'))

@@ -111,6 +111,7 @@ class CashFlowReportController extends Controller
         // Movements in the period for cash/bank ledgers
         $rawLines = DB::table('voucher_lines as vl')
             ->join('vouchers as v', 'v.id', '=', 'vl.voucher_id')
+            ->join('accounts as a', 'a.id', '=', 'vl.account_id')
             ->where('v.company_id', $companyId)
             ->where('v.status', 'posted')
             ->whereIn('vl.account_id', $cashAccountIds)
@@ -122,11 +123,15 @@ class CashFlowReportController extends Controller
                 'v.voucher_type',
                 'v.voucher_date',
                 'v.narration',
+                'a.id as account_id',
+                'a.code as account_code',
+                'a.name as account_name',
                 'vl.debit',
                 'vl.credit'
             )
             ->orderBy('v.voucher_date')
             ->orderBy('v.id')
+            ->orderBy('vl.line_no')
             ->get();
 
         $ignoreTypes = Config::get('accounting.cashflow_ignore_types', ['contra']);
@@ -166,10 +171,14 @@ class CashFlowReportController extends Controller
             $totalOutflow += $outflow;
 
             $detailLines[] = [
+                'voucher_id'  => $line->voucher_id,
                 'date'        => $line->voucher_date,
                 'voucher_no'  => $line->voucher_no,
                 'voucher_type'=> $type,
                 'narration'   => $line->narration,
+                'account_id'  => $line->account_id,
+                'account_code'=> $line->account_code,
+                'account_name'=> $line->account_name,
                 'debit'       => $debit,
                 'credit'      => $credit,
                 'inflow'      => $inflow,

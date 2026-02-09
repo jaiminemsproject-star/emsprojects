@@ -46,6 +46,7 @@ class PurchaseRfqController extends Controller
     {
         $q = trim((string) $request->get('q', ''));
         $status = trim((string) $request->get('status', ''));
+        $projectId = (int) $request->get('project_id', 0);
 
         $query = PurchaseRfq::query()
             ->with(['project', 'department', 'indent'])
@@ -62,7 +63,15 @@ class PurchaseRfqController extends Controller
             $query->where('status', $status);
         }
 
+        if ($projectId > 0) {
+            $query->where('project_id', $projectId);
+        }
+
         $rfqs = $query->paginate(25)->withQueryString();
+        $projects = Project::query()
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get(['id', 'code', 'name']);
 
         $statusOptions = [
             'draft'        => 'Draft',
@@ -72,7 +81,7 @@ class PurchaseRfqController extends Controller
             'cancelled'    => 'Cancelled',
         ];
 
-        return view('purchase_rfqs.index', compact('rfqs', 'q', 'status', 'statusOptions'));
+        return view('purchase_rfqs.index', compact('rfqs', 'q', 'status', 'statusOptions', 'projects', 'projectId'));
     }
 
     public function create(Request $request): View

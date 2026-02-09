@@ -78,6 +78,14 @@
                     </thead>
                     <tbody>
                         @forelse($applications as $app)
+                            @php
+                                $statusValue = $app->status instanceof \BackedEnum
+                                    ? $app->status->value
+                                    : (string) $app->status;
+                                $statusLabel = $app->status instanceof \App\Enums\Hr\LeaveStatus
+                                    ? $app->status->label()
+                                    : ucfirst(str_replace('_', ' ', $statusValue));
+                            @endphp
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -113,9 +121,9 @@
                                 </td>
                                 <td>{{ Str::limit($app->reason, 30) }}</td>
                                 <td class="text-center">
-                                    @switch($app->status)
+                                    @switch($statusValue)
                                         @case('pending')
-                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            <span class="badge bg-warning text-dark">Pending Approval</span>
                                             @break
                                         @case('approved')
                                             <span class="badge bg-success">Approved</span>
@@ -127,7 +135,7 @@
                                             <span class="badge bg-secondary">Cancelled</span>
                                             @break
                                         @default
-                                            <span class="badge bg-light text-dark">{{ ucfirst($app->status) }}</span>
+                                            <span class="badge bg-light text-dark">{{ $statusLabel }}</span>
                                     @endswitch
                                 </td>
                                 <td class="text-end">
@@ -135,13 +143,13 @@
                                        class="btn btn-sm btn-outline-info" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    @if(in_array($app->status, ['pending', 'draft']))
+                                    @if(in_array($statusValue, ['pending', 'draft'], true))
                                         <a href="{{ route('hr.leave-applications.edit', $app) }}" 
                                            class="btn btn-sm btn-outline-primary" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     @endif
-                                    @if($app->status === 'pending')
+                                    @if($statusValue === 'pending')
                                         <form method="POST" action="{{ route('hr.leave-applications.approve', $app) }}" 
                                               class="d-inline">
                                             @csrf

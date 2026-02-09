@@ -20,10 +20,6 @@
             <i class="bi bi-arrow-left"></i> Back
         </a>
     </div>
-	<a href="{{ route('production-plans.route.edit', [$plan->id, $item->id]) }}"
-   class="btn btn-sm btn-outline-primary">
-   Route
-	</a>
 
     @if($plan->remarks)
         <div class="alert alert-light border">

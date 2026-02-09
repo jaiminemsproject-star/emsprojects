@@ -33,6 +33,8 @@ Route::middleware(['auth'])->prefix('tasks')->name('tasks.')->group(function () 
     Route::patch('/{task}/status', [TaskController::class, 'updateStatus'])->name('update-status');
     Route::patch('/{task}/assignee', [TaskController::class, 'updateAssignee'])->name('update-assignee');
     Route::post('/{task}/duplicate', [TaskController::class, 'duplicate'])->name('duplicate');
+    Route::post('/{task}/watch', [TaskController::class, 'watch'])->name('watch');
+    Route::post('/{task}/unwatch', [TaskController::class, 'unwatch'])->name('unwatch');
     Route::post('/{task}/archive', [TaskController::class, 'archive'])->name('archive');
     Route::post('/{task}/unarchive', [TaskController::class, 'unarchive'])->name('unarchive');
     Route::post('/bulk-update', [TaskController::class, 'bulkUpdate'])->name('bulk-update');
@@ -45,6 +47,10 @@ Route::middleware(['auth'])->prefix('tasks')->name('tasks.')->group(function () 
     // Time Entries
     Route::post('/{task}/time-entries', [TaskTimeEntryController::class, 'store'])->name('time-entries.store');
     Route::delete('/{task}/time-entries/{timeEntry}', [TaskTimeEntryController::class, 'destroy'])->name('time-entries.destroy');
+
+    // Checklists
+    Route::post('/{task}/checklists/{checklist}/items/{item}/toggle', [TaskChecklistController::class, 'toggleItem'])
+        ->name('checklists.items.toggle');
 });
 
 Route::middleware(['auth'])->prefix('task-lists')->name('task-lists.')->group(function () {

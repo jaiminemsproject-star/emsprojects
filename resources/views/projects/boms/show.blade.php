@@ -1,6 +1,12 @@
 @extends('layouts.erp')
 
 @section('content')
+@php
+    $taskIndexRoute = \Illuminate\Support\Facades\Route::has('tasks.index') ? 'tasks.index' : null;
+    $taskBoardRoute = \Illuminate\Support\Facades\Route::has('task-board.index') ? 'task-board.index' : null;
+    $taskCreateRoute = \Illuminate\Support\Facades\Route::has('tasks.create') ? 'tasks.create' : null;
+@endphp
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h4 class="mb-0">BOM {{ $bom->bom_number }}</h4>
@@ -83,6 +89,26 @@
                 </form>
             @endif
         @endcan
+
+        @can('tasks.view')
+            @if($taskIndexRoute)
+                <a href="{{ route($taskIndexRoute, ['project' => $project->id, 'bom' => $bom->id]) }}" class="btn btn-outline-secondary">
+                    BOM Tasks
+                </a>
+            @endif
+            @if($taskBoardRoute)
+                <a href="{{ route($taskBoardRoute, ['project' => $project->id, 'bom' => $bom->id]) }}" class="btn btn-outline-secondary">
+                    Task Board
+                </a>
+            @endif
+        @endcan
+        @can('tasks.create')
+            @if($taskCreateRoute)
+                <a href="{{ route($taskCreateRoute, ['project' => $project->id, 'bom' => $bom->id, 'title' => 'BOM '. $bom->bom_number .' follow-up']) }}" class="btn btn-outline-primary">
+                    Add BOM Task
+                </a>
+            @endif
+        @endcan
     </div>
 </div>
 
@@ -145,6 +171,78 @@
                 </table>
             </div>
         @endif
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>BOM Task Snapshot</span>
+        @if($taskIndexRoute && auth()->user()->can('tasks.view'))
+            <a href="{{ route($taskIndexRoute, ['project' => $project->id, 'bom' => $bom->id]) }}" class="btn btn-sm btn-outline-secondary">View All</a>
+        @endif
+    </div>
+    <div class="card-body">
+        @can('tasks.view')
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-md-3">
+                    <div class="border rounded p-2">
+                        <small class="text-muted d-block">Total</small>
+                        <strong>{{ $taskStats['total'] ?? 0 }}</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="border rounded p-2">
+                        <small class="text-muted d-block">Open</small>
+                        <strong class="text-warning">{{ $taskStats['open'] ?? 0 }}</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="border rounded p-2">
+                        <small class="text-muted d-block">Completed</small>
+                        <strong class="text-success">{{ $taskStats['completed'] ?? 0 }}</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="border rounded p-2">
+                        <small class="text-muted d-block">Overdue</small>
+                        <strong class="text-danger">{{ $taskStats['overdue'] ?? 0 }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            @if($recentTasks->isEmpty())
+                <div class="text-muted small">No tasks are linked with this BOM.</div>
+            @else
+                <div class="list-group list-group-flush">
+                    @foreach($recentTasks as $task)
+                        <div class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    @if(\Illuminate\Support\Facades\Route::has('tasks.show'))
+                                        <a class="text-decoration-none fw-medium" href="{{ route('tasks.show', $task) }}">
+                                            {{ $task->task_number }} - {{ $task->title }}
+                                        </a>
+                                    @else
+                                        <span class="fw-medium">{{ $task->task_number }} - {{ $task->title }}</span>
+                                    @endif
+                                    <div class="small text-muted">
+                                        {{ $task->assignee?->name ?? 'Unassigned' }}
+                                        @if($task->due_date)
+                                            | Due {{ $task->due_date->format('d M Y') }}
+                                        @endif
+                                    </div>
+                                </div>
+                                @if($task->status)
+                                    <span class="badge" style="background-color: {{ $task->status->color }}">{{ $task->status->name }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        @else
+            <div class="text-muted small">Task details are hidden due to permission settings.</div>
+        @endcan
     </div>
 </div>
 

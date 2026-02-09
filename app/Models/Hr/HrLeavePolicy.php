@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class HrLeavePolicy extends Model
 {
@@ -16,25 +17,32 @@ class HrLeavePolicy extends Model
         'code',
         'name',
         'description',
-        'effective_from',
-        'effective_to',
-        'applicable_employee_types',
-        'applicable_grades',
-        'applicable_departments',
-        'applicable_designations',
+        'leave_year_type',
+        'year_start_date',
+        'allow_leave_in_probation',
+        'probation_allowed_leave_types',
+        'allow_backdated_application',
+        'max_backdate_days',
+        'allow_future_application',
+        'max_future_days',
+        'sandwich_rule_enabled',
+        'sandwich_min_gap_days',
+        'approval_levels',
+        'skip_level_on_absence',
         'is_default',
         'is_active',
     ];
 
     protected $casts = [
-        'effective_from' => 'date',
-        'effective_to' => 'date',
-        'applicable_employee_types' => 'array',
-        'applicable_grades' => 'array',
-        'applicable_departments' => 'array',
-        'applicable_designations' => 'array',
+        'year_start_date' => 'date',
+        'probation_allowed_leave_types' => 'array',
         'is_default' => 'boolean',
         'is_active' => 'boolean',
+        'allow_leave_in_probation' => 'boolean',
+        'allow_backdated_application' => 'boolean',
+        'allow_future_application' => 'boolean',
+        'sandwich_rule_enabled' => 'boolean',
+        'skip_level_on_absence' => 'boolean',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -47,6 +55,11 @@ class HrLeavePolicy extends Model
     public function details(): HasMany
     {
         return $this->hasMany(HrLeavePolicyDetail::class, 'hr_leave_policy_id');
+    }
+
+    public function entitlements(): HasMany
+    {
+        return $this->details();
     }
 
     public function leaveTypes(): BelongsToMany
@@ -64,6 +77,18 @@ class HrLeavePolicy extends Model
             'max_encashment_days',
             'is_active',
         ])->withTimestamps();
+    }
+
+    public function leaveType(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            HrLeaveType::class,
+            HrLeavePolicyDetail::class,
+            'hr_leave_policy_id',
+            'id',
+            'id',
+            'hr_leave_type_id'
+        );
     }
 
     public function employees(): HasMany
@@ -85,12 +110,7 @@ class HrLeavePolicy extends Model
 
     public function scopeEffective($query, $date = null)
     {
-        $date = $date ?? now();
-        return $query->where('effective_from', '<=', $date)
-                     ->where(function ($q) use ($date) {
-                         $q->whereNull('effective_to')
-                           ->orWhere('effective_to', '>=', $date);
-                     });
+        return $query;
     }
 
     // ==================== ACCESSORS ====================
@@ -99,15 +119,6 @@ class HrLeavePolicy extends Model
     {
         if (!$this->is_active) {
             return 'Inactive';
-        }
-
-        $now = now();
-        if ($this->effective_from > $now) {
-            return 'Upcoming';
-        }
-
-        if ($this->effective_to && $this->effective_to < $now) {
-            return 'Expired';
         }
 
         return 'Active';
@@ -131,34 +142,6 @@ class HrLeavePolicy extends Model
      */
     public function isApplicableFor(HrEmployee $employee): bool
     {
-        // Check employee type
-        if ($this->applicable_employee_types && count($this->applicable_employee_types) > 0) {
-            if (!in_array($employee->employee_type, $this->applicable_employee_types)) {
-                return false;
-            }
-        }
-
-        // Check grade
-        if ($this->applicable_grades && count($this->applicable_grades) > 0) {
-            if (!in_array($employee->hr_grade_id, $this->applicable_grades)) {
-                return false;
-            }
-        }
-
-        // Check department
-        if ($this->applicable_departments && count($this->applicable_departments) > 0) {
-            if (!in_array($employee->department_id, $this->applicable_departments)) {
-                return false;
-            }
-        }
-
-        // Check designation
-        if ($this->applicable_designations && count($this->applicable_designations) > 0) {
-            if (!in_array($employee->hr_designation_id, $this->applicable_designations)) {
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -178,5 +161,21 @@ class HrLeavePolicy extends Model
         return static::where('is_default', true)
                      ->where('is_active', true)
                      ->first();
+    }
+
+    // Backward-compatible aliases used by older controller/view code.
+    public function getEffectiveFromAttribute()
+    {
+        return $this->year_start_date;
+    }
+
+    public function setEffectiveFromAttribute($value): void
+    {
+        $this->attributes['year_start_date'] = $value;
+    }
+
+    public function getApplicableEmployeeTypesAttribute()
+    {
+        return null;
     }
 }
