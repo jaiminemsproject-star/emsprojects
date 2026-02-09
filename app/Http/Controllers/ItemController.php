@@ -30,41 +30,75 @@ class ItemController extends Controller
         $this->middleware('permission:core.item.delete')->only(['destroy']);
     }
 
-    public function index(Request $request)
-    {
-        $query = Item::with(['type', 'category', 'subcategory', 'uom', 'expenseAccount']);
+  public function index(Request $request)
+{
+    $query = Item::with([
+        'type',
+        'category',
+        'subcategory',
+        'uom',
+        'expenseAccount'
+    ]);
 
-        if ($search = trim($request->get('q', ''))) {
-            $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', '%' . $search . '%')
-                    ->orWhere('name', 'like', '%' . $search . '%')
-                    ->orWhere('short_name', 'like', '%' . $search . '%');
-            });
-        }
-
-        if ($typeId = $request->get('material_type_id')) {
-            $query->where('material_type_id', $typeId);
-        }
-
-        if ($catId = $request->get('material_category_id')) {
-            $query->where('material_category_id', $catId);
-        }
-
-        if ($subcatId = $request->get('material_subcategory_id')) {
-            $query->where('material_subcategory_id', $subcatId);
-        }
-
-        $items = $query
-            ->orderBy('code')
-            ->paginate(25)
-            ->withQueryString();
-
-        $types         = MaterialType::orderBy('code')->get();
-        $categories    = MaterialCategory::orderBy('code')->get();
-        $subcategories = MaterialSubcategory::orderBy('code')->get();
-
-        return view('items.index', compact('items', 'types', 'categories', 'subcategories'));
+    /* ------------------------------
+     | Code filter
+     |------------------------------*/
+    if ($request->filled('code')) {
+        $query->where('code', 'like', '%' . trim($request->code) . '%');
     }
+
+    /* ------------------------------
+     | Name filter
+     |------------------------------*/
+    if ($request->filled('name')) {
+        $query->where('name', 'like', '%' . trim($request->name) . '%');
+    }
+
+    /* ------------------------------
+     | Short Name filter
+     |------------------------------*/
+    if ($request->filled('short_name')) {
+        $query->where('short_name', 'like', '%' . trim($request->short_name) . '%');
+    }
+
+    /* ------------------------------
+     | Type filter
+     |------------------------------*/
+    if ($request->filled('material_type_id')) {
+        $query->where('material_type_id', (int) $request->material_type_id);
+    }
+
+    /* ------------------------------
+     | Category filter
+     |------------------------------*/
+    if ($request->filled('material_category_id')) {
+        $query->where('material_category_id', (int) $request->material_category_id);
+    }
+
+    /* ------------------------------
+     | Subcategory filter
+     |------------------------------*/
+    if ($request->filled('material_subcategory_id')) {
+        $query->where('material_subcategory_id', (int) $request->material_subcategory_id);
+    }
+
+    $items = $query
+        ->orderBy('code')
+        ->paginate(10)
+        ->withQueryString();
+
+    /* ------------------------------
+     | Dropdown data
+     |------------------------------*/
+    $types         = MaterialType::orderBy('code')->get();
+    $categories    = MaterialCategory::orderBy('code')->get();
+    $subcategories = MaterialSubcategory::orderBy('code')->get();
+
+    return view(
+        'items.index',
+        compact('items', 'types', 'categories', 'subcategories')
+    );
+}
 
     public function create()
     {

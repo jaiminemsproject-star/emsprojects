@@ -9,24 +9,24 @@ namespace App\Models\Accounting {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $reversal_reason
      * @property \Illuminate\Support\Carbon|null $reversed_at
-     * @property int|null $reversed_by
-     * @property int|null $reversal_voucher_id
-     * @property int|null $reversal_of_voucher_id
+     * @property mixed $reversed_by
+     * @property mixed $reversal_voucher_id
+     * @property mixed $reversal_of_voucher_id
      * @property \Illuminate\Support\Carbon|null $posted_at
-     * @property int|null $posted_by
-     * @property int|null $created_by
+     * @property mixed $posted_by
+     * @property mixed $created_by
      * @property string $status
      * @property float $amount_base
      * @property float $exchange_rate
-     * @property int|null $currency_id
-     * @property int|null $cost_center_id
-     * @property int|null $project_id
+     * @property mixed $currency_id
+     * @property mixed $cost_center_id
+     * @property mixed $project_id
      * @property string|null $narration
      * @property string|null $reference
      * @property \Illuminate\Support\Carbon $voucher_date
      * @property string $voucher_type
      * @property string $voucher_no
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Company $company
      * @property-read \App\Models\Project $project
@@ -375,9 +375,9 @@ namespace App\Models\Accounting {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $related_model_id
+     * @property mixed $related_model_id
      * @property string|null $related_model_type
-     * @property int|null $credit_days
+     * @property mixed $credit_days
      * @property float|null $credit_limit
      * @property boolean $is_gst_applicable
      * @property string|null $pan
@@ -391,8 +391,8 @@ namespace App\Models\Accounting {
      * @property string $type
      * @property string|null $code
      * @property string $name
-     * @property int $account_group_id
-     * @property int $company_id
+     * @property mixed $account_group_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Accounting\AccountGroup $group
      * @property-read \App\Models\Accounting\Account $relatedModel
@@ -735,12 +735,12 @@ namespace App\Models\Accounting {
      * @property \Illuminate\Support\Carbon|null $allocation_date
      * @property float $amount
      * @property string $mode
-     * @property int $bill_id
+     * @property mixed $bill_id
      * @property string $bill_type
-     * @property int $account_id
-     * @property int $voucher_line_id
-     * @property int $voucher_id
-     * @property int $company_id
+     * @property mixed $account_id
+     * @property mixed $voucher_line_id
+     * @property mixed $voucher_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Accounting\Voucher $voucher
      * @property-read \App\Models\Accounting\VoucherLine $voucherLine
@@ -1073,11 +1073,11 @@ namespace App\Models\Accounting {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property bool $pad_width
-     * @property int $next_number
+     * @property mixed $pad_width
+     * @property mixed $next_number
      * @property string $prefix
      * @property string $series_key
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @method static \Illuminate\Database\Eloquent\Builder<AccountCodeSequence>|AccountCodeSequence whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<AccountCodeSequence>|AccountCodeSequence whereCompanyId($value)
@@ -1402,13 +1402,13 @@ namespace App\Models\Accounting {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $sort_order
+     * @property mixed $sort_order
      * @property bool $is_primary
      * @property string $nature
-     * @property int|null $parent_id
+     * @property mixed $parent_id
      * @property string|null $code
      * @property string $name
-     * @property int|null $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Accounting\AccountGroup $parent
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Accounting\AccountGroup> $children
@@ -2072,11 +2072,11 @@ namespace App\Models\Accounting {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property boolean $is_active
-     * @property int|null $parent_id
-     * @property int|null $project_id
+     * @property mixed $parent_id
+     * @property mixed $project_id
      * @property string|null $code
      * @property string $name
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Project $project
      * @property-read \App\Models\Accounting\CostCenter $parent
@@ -2735,7 +2735,7 @@ namespace App\Models\Accounting {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property float $rate_to_base
      * @property \Illuminate\Support\Carbon $rate_date
-     * @property int $currency_id
+     * @property mixed $currency_id
      * @property int $id
      * @property-read \App\Models\Accounting\Currency $currency
      * @method static \Illuminate\Database\Eloquent\Builder<ExchangeRate>|ExchangeRate whereId($value)
@@ -3060,13 +3060,13 @@ namespace App\Models\Accounting {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $cancelled_at
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $posted_at
-     * @property int|null $posted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $posted_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string $status
-     * @property int|null $voucher_id
+     * @property mixed $voucher_id
      * @property float $total_amount
      * @property float $total_tax
      * @property float $total_igst
@@ -3077,9 +3077,9 @@ namespace App\Models\Accounting {
      * @property string|null $reference
      * @property \Illuminate\Support\Carbon $note_date
      * @property string $note_number
-     * @property int|null $purchase_bill_id
-     * @property int $supplier_id
-     * @property int $company_id
+     * @property mixed $purchase_bill_id
+     * @property mixed $supplier_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Party $supplier
      * @property-read \App\Models\PurchaseBill $purchaseBill
@@ -3434,9 +3434,9 @@ namespace App\Models\Accounting {
      * @property float $cgst_rate
      * @property float $basic_amount
      * @property string|null $description
-     * @property int $account_id
-     * @property int $line_no
-     * @property int $purchase_debit_note_id
+     * @property mixed $account_id
+     * @property mixed $line_no
+     * @property mixed $purchase_debit_note_id
      * @property int $id
      * @property-read \App\Models\Accounting\PurchaseDebitNote $note
      * @property-read \App\Models\Accounting\Account $account
@@ -3771,13 +3771,13 @@ namespace App\Models\Accounting {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $cancelled_at
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $posted_at
-     * @property int|null $posted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $posted_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string $status
-     * @property int|null $voucher_id
+     * @property mixed $voucher_id
      * @property float $total_amount
      * @property float $total_tax
      * @property float $total_igst
@@ -3788,9 +3788,9 @@ namespace App\Models\Accounting {
      * @property string|null $reference
      * @property \Illuminate\Support\Carbon $note_date
      * @property string $note_number
-     * @property int|null $client_ra_bill_id
-     * @property int $client_id
-     * @property int $company_id
+     * @property mixed $client_ra_bill_id
+     * @property mixed $client_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Party $client
      * @property-read \App\Models\ClientRaBill $clientRaBill
@@ -4145,9 +4145,9 @@ namespace App\Models\Accounting {
      * @property float $cgst_rate
      * @property float $basic_amount
      * @property string|null $description
-     * @property int $account_id
-     * @property int $line_no
-     * @property int $sales_credit_note_id
+     * @property mixed $account_id
+     * @property mixed $line_no
+     * @property mixed $sales_credit_note_id
      * @property int $id
      * @property-read \App\Models\Accounting\SalesCreditNote $note
      * @property-read \App\Models\Accounting\Account $account
@@ -4483,9 +4483,9 @@ namespace App\Models\Accounting {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property boolean $is_default
      * @property array|null $applies_to_document_types
-     * @property int|null $input_account_id
-     * @property int|null $output_account_id
-     * @property int $tax_master_id
+     * @property mixed $input_account_id
+     * @property mixed $output_account_id
+     * @property mixed $tax_master_id
      * @property int $id
      * @property-read \App\Models\Accounting\TaxMaster $tax
      * @property-read \App\Models\Accounting\Account $outputAccount
@@ -5148,18 +5148,18 @@ namespace App\Models\Accounting {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $certificate_date
      * @property string|null $certificate_no
      * @property float $tds_amount
      * @property float|null $tds_rate
      * @property string|null $tds_section
-     * @property int|null $party_account_id
-     * @property int|null $voucher_id
+     * @property mixed $party_account_id
+     * @property mixed $voucher_id
      * @property mixed $direction
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Accounting\Voucher $voucher
      * @property-read \App\Models\Accounting\Account $partyAccount
@@ -5498,7 +5498,7 @@ namespace App\Models\Accounting {
      * @property string|null $description
      * @property string $name
      * @property string $code
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $display_name
      * @property-read \App\Models\Company $company
@@ -5826,15 +5826,15 @@ namespace App\Models\Accounting {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $reference_id
+     * @property mixed $reference_id
      * @property string|null $reference_type
      * @property float $credit
      * @property float $debit
      * @property string|null $description
-     * @property int|null $cost_center_id
-     * @property int $account_id
-     * @property int $line_no
-     * @property int $voucher_id
+     * @property mixed $cost_center_id
+     * @property mixed $account_id
+     * @property mixed $line_no
+     * @property mixed $voucher_id
      * @property int $id
      * @property-read \App\Models\Accounting\Voucher $voucher
      * @property-read \App\Models\Accounting\Account $account
@@ -7211,19 +7211,19 @@ namespace App\Models {
     /**
      * App\Models\Project
      *
-     * @property int|null $wip_to_cogs_voucher_id
+     * @property mixed $wip_to_cogs_voucher_id
      * @property string|null $project_special_notes
      * @property string|null $freight_terms
-     * @property int|null $payment_terms_days
+     * @property mixed $payment_terms_days
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
+     * @property mixed $created_by
      * @property string|null $tpi_notes
      * @property string|null $tpi_contact_email
      * @property string|null $tpi_contact_phone
      * @property string|null $tpi_contact_name
-     * @property int|null $tpi_party_id
+     * @property mixed $tpi_party_id
      * @property string|null $site_contact_email
      * @property string|null $site_contact_phone
      * @property string|null $site_contact_name
@@ -7233,9 +7233,9 @@ namespace App\Models {
      * @property string $status
      * @property \Illuminate\Support\Carbon|null $end_date
      * @property \Illuminate\Support\Carbon|null $start_date
-     * @property int|null $quotation_id
-     * @property int|null $lead_id
-     * @property int|null $client_party_id
+     * @property mixed $quotation_id
+     * @property mixed $lead_id
+     * @property mixed $client_party_id
      * @property string $name
      * @property string $code
      * @property int $id
@@ -7599,12 +7599,12 @@ namespace App\Models {
      * @property array|null $new_values
      * @property array|null $old_values
      * @property string|null $subject_name
-     * @property int|null $subject_id
+     * @property mixed $subject_id
      * @property string|null $subject_type
      * @property string|null $description
      * @property string $action
      * @property string|null $user_name
-     * @property int|null $user_id
+     * @property mixed $user_id
      * @property int $id
      * @property-read mixed $action_label
      * @property-read mixed $action_color
@@ -7952,12 +7952,12 @@ namespace App\Models {
      * @property array|null $metadata
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $closed_at
-     * @property int|null $closed_by
+     * @property mixed $closed_by
      * @property \Illuminate\Support\Carbon|null $requested_at
-     * @property int|null $requested_by
-     * @property int|null $current_step
+     * @property mixed $requested_by
+     * @property mixed $current_step
      * @property string $status
-     * @property int $approvable_id
+     * @property mixed $approvable_id
      * @property string $approvable_type
      * @property string|null $permission_name
      * @property string $action
@@ -8308,15 +8308,15 @@ namespace App\Models {
      * @property array|null $metadata
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $acted_at
-     * @property int|null $acted_by
+     * @property mixed $acted_by
      * @property \Illuminate\Support\Carbon|null $status_changed_at
      * @property string $status
-     * @property int|null $approver_role_id
-     * @property int|null $approver_user_id
+     * @property mixed $approver_role_id
+     * @property mixed $approver_user_id
      * @property boolean $is_mandatory
      * @property string|null $name
-     * @property int $step_number
-     * @property int $approval_request_id
+     * @property mixed $step_number
+     * @property mixed $approval_request_id
      * @property int $id
      * @property-read \App\Models\ApprovalRequest $request
      * @property-read \App\Models\User $approverUser
@@ -8655,13 +8655,13 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $uploaded_by
-     * @property int|null $size
+     * @property mixed $uploaded_by
+     * @property mixed $size
      * @property string|null $mime_type
      * @property string $path
      * @property string $original_name
      * @property string|null $category
-     * @property int $attachable_id
+     * @property mixed $attachable_id
      * @property string $attachable_type
      * @property int $id
      * @property-read \App\Models\Attachment $attachable
@@ -8994,13 +8994,13 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property array|null $metadata
-     * @property int|null $finalized_by
+     * @property mixed $finalized_by
      * @property \Illuminate\Support\Carbon|null $finalized_date
      * @property float $total_weight
      * @property \App\Enums\BomStatus $status
-     * @property int $version
+     * @property mixed $version
      * @property string $bom_number
-     * @property int $project_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read mixed $assembly_weights
      * @property-read mixed $category_summary
@@ -9341,28 +9341,22 @@ namespace App\Models {
      * @property \App\Enums\BomItemMaterialSource|null $material_source
      * @property \App\Enums\BomItemProcurementType|null $procurement_type
      * @property float $scrap_percentage
-     * @property float|null $total_weld_length_m
-     * @property float|null $unit_weld_length_m
-     * @property float|null $total_cut_length_m
-     * @property float|null $unit_cut_length_m
-     * @property float|null $total_area_m2
-     * @property float|null $unit_area_m2
      * @property float|null $total_weight
      * @property float|null $unit_weight
      * @property float $quantity
      * @property array|null $dimensions
-     * @property int|null $uom_id
-     * @property int|null $item_id
+     * @property mixed $uom_id
+     * @property mixed $item_id
      * @property \App\Enums\BomItemMaterialCategory $material_category
      * @property string|null $drawing_revision
      * @property string|null $drawing_number
-     * @property int $sequence_no
+     * @property mixed $sequence_no
      * @property string|null $assembly_type
      * @property string|null $description
      * @property string|null $item_code
-     * @property int $level
-     * @property int|null $parent_item_id
-     * @property int $bom_id
+     * @property mixed $level
+     * @property mixed $parent_item_id
+     * @property mixed $bom_id
      * @property int $id
      * @property-read mixed $grade
      * @property-read mixed $indented_description
@@ -9390,12 +9384,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereQuantity($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereUnitWeight($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereTotalWeight($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereUnitAreaM2($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereTotalAreaM2($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereUnitCutLengthM($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereTotalCutLengthM($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereUnitWeldLengthM($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereTotalWeldLengthM($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereScrapPercentage($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereProcurementType($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomItem>|BomItem whereMaterialSource($value)
@@ -9722,8 +9710,8 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property array|null $metadata
      * @property float $total_weight
      * @property string $status
@@ -10072,29 +10060,23 @@ namespace App\Models {
      * @property \App\Enums\BomItemMaterialSource|null $material_source
      * @property \App\Enums\BomItemProcurementType|null $procurement_type
      * @property float $scrap_percentage
-     * @property float|null $total_weld_length_m
-     * @property float|null $unit_weld_length_m
-     * @property float|null $total_cut_length_m
-     * @property float|null $unit_cut_length_m
-     * @property float|null $total_area_m2
-     * @property float|null $unit_area_m2
      * @property float|null $total_weight
      * @property float|null $unit_weight
      * @property float $quantity
      * @property array|null $dimensions
      * @property string|null $grade
-     * @property int|null $uom_id
-     * @property int|null $item_id
+     * @property mixed $uom_id
+     * @property mixed $item_id
      * @property \App\Enums\BomItemMaterialCategory $material_category
      * @property string|null $drawing_revision
      * @property string|null $drawing_number
      * @property string|null $assembly_type
      * @property string $description
      * @property string|null $item_code
-     * @property int $sequence_no
-     * @property int $level
-     * @property int|null $parent_item_id
-     * @property int $bom_template_id
+     * @property mixed $sequence_no
+     * @property mixed $level
+     * @property mixed $parent_item_id
+     * @property mixed $bom_template_id
      * @property int $id
      * @property-read mixed $indented_description
      * @property-read mixed $formatted_dimensions
@@ -10122,12 +10104,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereQuantity($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereUnitWeight($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereTotalWeight($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereUnitAreaM2($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereTotalAreaM2($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereUnitCutLengthM($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereTotalCutLengthM($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereUnitWeldLengthM($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereTotalWeldLengthM($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereScrapPercentage($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereProcurementType($value)
      * @method static \Illuminate\Database\Eloquent\Builder<BomTemplateItem>|BomTemplateItem whereMaterialSource($value)
@@ -10451,16 +10427,16 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string|null $remarks
-     * @property int|null $approved_by
+     * @property mixed $approved_by
      * @property \Illuminate\Support\Carbon|null $approved_at
      * @property mixed $status
      * @property \Illuminate\Support\Carbon|null $einvoice_generated_at
      * @property string|null $qr_code
      * @property string|null $irn
-     * @property int|null $voucher_id
+     * @property mixed $voucher_id
      * @property float $receivable_amount
      * @property float $total_amount
      * @property float $tds_amount
@@ -10484,17 +10460,17 @@ namespace App\Models {
      * @property mixed $revenue_type
      * @property string|null $po_number
      * @property string|null $contract_number
-     * @property int|null $contract_id
+     * @property mixed $contract_id
      * @property \Illuminate\Support\Carbon|null $period_to
      * @property \Illuminate\Support\Carbon|null $period_from
-     * @property int $ra_sequence
+     * @property mixed $ra_sequence
      * @property \Illuminate\Support\Carbon|null $due_date
      * @property \Illuminate\Support\Carbon $bill_date
      * @property string|null $invoice_number
      * @property string $ra_number
-     * @property int $project_id
-     * @property int $client_id
-     * @property int $company_id
+     * @property mixed $project_id
+     * @property mixed $client_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $revenue_type_label
      * @property-read \App\Models\Company $company
@@ -10885,13 +10861,13 @@ namespace App\Models {
      * @property float $current_qty
      * @property float $previous_qty
      * @property float $contracted_qty
-     * @property int|null $uom_id
+     * @property mixed $uom_id
      * @property string $description
-     * @property int|null $revenue_account_id
+     * @property mixed $revenue_account_id
      * @property string|null $boq_item_code
-     * @property int|null $boq_item_id
-     * @property int $line_no
-     * @property int $client_ra_bill_id
+     * @property mixed $boq_item_id
+     * @property mixed $line_no
+     * @property mixed $client_ra_bill_id
      * @property int $id
      * @property-read mixed $balance_qty
      * @property-read mixed $completion_percent
@@ -11582,18 +11558,18 @@ namespace App\Models {
      * @property string|null $notes
      * @property string|null $lost_reason
      * @property string $status
-     * @property int|null $department_id
-     * @property int $owner_id
+     * @property mixed $department_id
+     * @property mixed $owner_id
      * @property \Illuminate\Support\Carbon|null $expected_close_date
      * @property \Illuminate\Support\Carbon|null $lead_date
      * @property integer|null $probability
      * @property float|null $expected_value
-     * @property int|null $lead_stage_id
-     * @property int|null $lead_source_id
+     * @property mixed $lead_stage_id
+     * @property mixed $lead_source_id
      * @property string|null $contact_phone
      * @property string|null $contact_email
      * @property string|null $contact_name
-     * @property int|null $party_id
+     * @property mixed $party_id
      * @property string $title
      * @property string $code
      * @property int $id
@@ -11950,8 +11926,8 @@ namespace App\Models {
      * @property string|null $description
      * @property string|null $subject
      * @property string|null $type
-     * @property int $user_id
-     * @property int $lead_id
+     * @property mixed $user_id
+     * @property mixed $lead_id
      * @property int $id
      * @property-read \App\Models\CrmLead $lead
      * @property-read \App\Models\User $user
@@ -12614,7 +12590,7 @@ namespace App\Models {
      * @property boolean $is_closed
      * @property boolean $is_lost
      * @property boolean $is_won
-     * @property int $sort_order
+     * @property mixed $sort_order
      * @property string $name
      * @property string $code
      * @property int $id
@@ -12943,19 +12919,15 @@ namespace App\Models {
     /**
      * App\Models\CrmQuotation
      *
-     * @property string|null $terms_text
-     * @property int|null $standard_term_id
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $approved_by
-     * @property int $created_by
+     * @property mixed $approved_by
+     * @property mixed $created_by
      * @property \Illuminate\Support\Carbon|null $rejected_at
      * @property \Illuminate\Support\Carbon|null $accepted_at
      * @property \Illuminate\Support\Carbon|null $sent_at
      * @property string|null $project_special_notes
-     * @property string|null $exclusions
-     * @property string|null $scope_of_work
      * @property string|null $other_terms
      * @property string|null $delivery_terms
      * @property string|null $freight_terms
@@ -12968,13 +12940,10 @@ namespace App\Models {
      * @property float $total_amount
      * @property string $status
      * @property string|null $client_po_number
-     * @property float $profit_percent
-     * @property boolean $is_rate_only
-     * @property string $quote_mode
      * @property string $project_name
-     * @property int|null $party_id
-     * @property int $lead_id
-     * @property int $revision_no
+     * @property mixed $party_id
+     * @property mixed $lead_id
+     * @property mixed $revision_no
      * @property string $code
      * @property int $id
      * @property-read mixed $display_code
@@ -12992,9 +12961,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereLeadId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation wherePartyId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereProjectName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereQuoteMode($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereIsRateOnly($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereProfitPercent($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereClientPoNumber($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereStatus($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereTotalAmount($value)
@@ -13007,8 +12973,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereFreightTerms($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereDeliveryTerms($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereOtherTerms($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereScopeOfWork($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereExclusions($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereProjectSpecialNotes($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereSentAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereAcceptedAt($value)
@@ -13018,8 +12982,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereDeletedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereStandardTermId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation whereTermsText($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotation>|CrmQuotation query()
@@ -13333,28 +13295,6 @@ namespace App\Models {
     /**
      * App\Models\CrmQuotationBreakupTemplate
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property string $content
-     * @property integer $sort_order
-     * @property boolean $is_default
-     * @property boolean $is_active
-     * @property string $name
-     * @property string $code
-     * @property int $id
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereCode($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereIsActive($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereIsDefault($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereSortOrder($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereContent($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationBreakupTemplate>|CrmQuotationBreakupTemplate query()
@@ -13669,25 +13609,7 @@ namespace App\Models {
     /**
      * App\Models\CrmQuotationCostBreakup
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property integer $sort_order
-     * @property float $rate
-     * @property string $basis
-     * @property string $component_name
-     * @property string|null $component_code
-     * @property int $quotation_item_id
-     * @property int $id
      * @property-read \App\Models\CrmQuotationItem $quotationItem
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereQuotationItemId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereComponentCode($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereComponentName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereBasis($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereRate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereSortOrder($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationCostBreakup>|CrmQuotationCostBreakup query()
@@ -14003,15 +13925,14 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $sort_order
+     * @property mixed $sort_order
      * @property float $line_total
-     * @property float $direct_cost_unit
      * @property float $unit_price
-     * @property int|null $uom_id
+     * @property mixed $uom_id
      * @property float $quantity
      * @property string $description
-     * @property int|null $item_id
-     * @property int $quotation_id
+     * @property mixed $item_id
+     * @property mixed $quotation_id
      * @property int $id
      * @property-read \App\Models\CrmQuotation $quotation
      * @property-read \App\Models\Item $item
@@ -14025,7 +13946,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationItem>|CrmQuotationItem whereQuantity($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationItem>|CrmQuotationItem whereUomId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationItem>|CrmQuotationItem whereUnitPrice($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationItem>|CrmQuotationItem whereDirectCostUnit($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationItem>|CrmQuotationItem whereLineTotal($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationItem>|CrmQuotationItem whereSortOrder($value)
      * @method static \Illuminate\Database\Eloquent\Builder<CrmQuotationItem>|CrmQuotationItem whereCreatedAt($value)
@@ -14348,9 +14268,9 @@ namespace App\Models {
      * @property string|null $notes
      * @property float|null $used_weight_kg
      * @property float|null $used_area_m2
-     * @property int $quantity
-     * @property int $bom_item_id
-     * @property int $cutting_plan_plate_id
+     * @property mixed $quantity
+     * @property mixed $bom_item_id
+     * @property mixed $cutting_plan_plate_id
      * @property int $id
      * @property-read \App\Models\CuttingPlanPlate $plate
      * @property-read \App\Models\BomItem $bomItem
@@ -14682,12 +14602,12 @@ namespace App\Models {
      * @property string|null $source_type
      * @property float|null $gross_weight_kg
      * @property float|null $gross_area_m2
-     * @property int $length_mm
-     * @property int $width_mm
-     * @property int $thickness_mm
+     * @property mixed $length_mm
+     * @property mixed $width_mm
+     * @property mixed $thickness_mm
      * @property string|null $plate_label
-     * @property int|null $material_stock_piece_id
-     * @property int $cutting_plan_id
+     * @property mixed $material_stock_piece_id
+     * @property mixed $cutting_plan_id
      * @property int $id
      * @property-read mixed $area_m2
      * @property-read \App\Models\CuttingPlan $cuttingPlan
@@ -15024,11 +14944,11 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property integer $sort_order
      * @property boolean $is_active
-     * @property int|null $head_user_id
+     * @property mixed $head_user_id
      * @property string|null $description
      * @property string $name
      * @property string $code
-     * @property int|null $parent_id
+     * @property mixed $parent_id
      * @property int $id
      * @property-read mixed $full_path
      * @property-read mixed $depth
@@ -15370,8 +15290,8 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $approved_by
-     * @property int|null $created_by
+     * @property mixed $approved_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property string|null $reason
      * @property string $status
@@ -15380,9 +15300,9 @@ namespace App\Models {
      * @property string|null $transport_mode
      * @property string|null $driver_name
      * @property string|null $vehicle_number
-     * @property int|null $to_party_id
-     * @property int|null $contractor_party_id
-     * @property int|null $project_id
+     * @property mixed $to_party_id
+     * @property mixed $contractor_party_id
+     * @property mixed $project_id
      * @property string $type
      * @property \Illuminate\Support\Carbon|null $gatepass_time
      * @property \Illuminate\Support\Carbon $gatepass_date
@@ -15734,20 +15654,20 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $store_stock_item_id
-     * @property int|null $store_issue_line_id
+     * @property mixed $store_stock_item_id
+     * @property mixed $store_issue_line_id
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $returned_on
      * @property float $returned_qty
      * @property \Illuminate\Support\Carbon|null $expected_return_date
      * @property boolean $is_returnable
      * @property float $qty
-     * @property int|null $machine_id
-     * @property int|null $uom_id
-     * @property int|null $item_id
+     * @property mixed $machine_id
+     * @property mixed $uom_id
+     * @property mixed $item_id
      * @property string|null $description
-     * @property int $line_no
-     * @property int $gate_pass_id
+     * @property mixed $line_no
+     * @property mixed $gate_pass_id
      * @property int $id
      * @property-read \App\Models\GatePass $gatePass
      * @property-read \App\Models\Item $item
@@ -16094,7 +16014,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $effective_to
      * @property \Illuminate\Support\Carbon $effective_from
      * @property string|null $hsn_sac_code
-     * @property int $account_id
+     * @property mixed $account_id
      * @property int $id
      * @property-read \App\Models\Accounting\Account $account
      * @method static \Illuminate\Database\Eloquent\Builder<GstAccountRate>|GstAccountRate whereId($value)
@@ -16428,7 +16348,7 @@ namespace App\Models {
      * @property float $cgst_rate
      * @property \Illuminate\Support\Carbon|null $effective_to
      * @property \Illuminate\Support\Carbon $effective_from
-     * @property int $item_id
+     * @property mixed $item_id
      * @property int $id
      * @property-read \App\Models\Item $item
      * @method static \Illuminate\Database\Eloquent\Builder<GstTaxRate>|GstTaxRate whereId($value)
@@ -16759,11 +16679,9 @@ namespace App\Models {
      * @property array|null $brands
      * @property string|null $description
      * @property string|null $size
-     * @property string|null $accounting_usage_override
-     * @property int|null $inventory_account_id
-     * @property int|null $asset_account_id
-     * @property int|null $expense_account_id
-     * @property float|null $surface_area_per_meter
+     * @property mixed $inventory_account_id
+     * @property mixed $asset_account_id
+     * @property mixed $expense_account_id
      * @property float|null $weight_per_meter
      * @property float|null $density
      * @property string|null $thickness
@@ -16774,10 +16692,10 @@ namespace App\Models {
      * @property string|null $short_name
      * @property string $name
      * @property string $code
-     * @property int $uom_id
-     * @property int|null $material_subcategory_id
-     * @property int $material_category_id
-     * @property int $material_type_id
+     * @property mixed $uom_id
+     * @property mixed $material_subcategory_id
+     * @property mixed $material_category_id
+     * @property mixed $material_type_id
      * @property int $id
      * @property-read mixed $current_gst_rate_percent
      * @property-read \App\Models\MaterialType $type
@@ -16804,11 +16722,9 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereThickness($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereDensity($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereWeightPerMeter($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereSurfaceAreaPerMeter($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereExpenseAccountId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereAssetAccountId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereInventoryAccountId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereAccountingUsageOverride($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereSize($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereDescription($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Item>|Item whereBrands($value)
@@ -17136,7 +17052,7 @@ namespace App\Models {
      * @property string|null $user_agent
      * @property string $ip_address
      * @property string $email
-     * @property int|null $user_id
+     * @property mixed $user_id
      * @property int $id
      * @property-read mixed $browser
      * @property-read mixed $platform
@@ -17471,8 +17387,8 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property boolean $is_active
      * @property string|null $remarks
      * @property string|null $description
@@ -17480,39 +17396,35 @@ namespace App\Models {
      * @property string|null $calibration_certificate_path
      * @property string|null $manual_document_path
      * @property string|null $calibration_agency
-     * @property int $calibration_alert_days
+     * @property mixed $calibration_alert_days
      * @property \Illuminate\Support\Carbon|null $next_calibration_due_date
      * @property \Illuminate\Support\Carbon|null $last_calibration_date
-     * @property int|null $calibration_frequency_months
+     * @property mixed $calibration_frequency_months
      * @property boolean $requires_calibration
      * @property integer $maintenance_alert_days
      * @property \Illuminate\Support\Carbon|null $next_maintenance_due_date
      * @property \Illuminate\Support\Carbon|null $last_maintenance_date
      * @property integer $maintenance_frequency_days
      * @property \Illuminate\Support\Carbon|null $assigned_date
-     * @property int|null $current_project_id
-     * @property int|null $current_worker_user_id
-     * @property int|null $current_contractor_party_id
-     * @property int|null $current_assignment_id
+     * @property mixed $current_project_id
+     * @property mixed $current_worker_user_id
+     * @property mixed $current_contractor_party_id
      * @property mixed $current_assignment_type
      * @property boolean $is_issued
      * @property mixed $status
-     * @property int|null $department_id
+     * @property mixed $department_id
      * @property string|null $current_location
      * @property float $operating_hours_total
      * @property \Illuminate\Support\Carbon|null $warranty_expiry_date
      * @property integer $warranty_months
-     * @property int|null $purchase_bill_line_id
-     * @property int|null $purchase_bill_id
      * @property string|null $purchase_invoice_no
-     * @property string|null $accounting_treatment
      * @property float $purchase_price
      * @property \Illuminate\Support\Carbon|null $purchase_date
-     * @property int|null $supplier_party_id
+     * @property mixed $supplier_party_id
      * @property mixed $fuel_type
      * @property string|null $power_rating
      * @property string|null $rated_capacity
-     * @property int|null $year_of_manufacture
+     * @property mixed $year_of_manufacture
      * @property string|null $spec
      * @property string|null $grade
      * @property string|null $model
@@ -17521,9 +17433,9 @@ namespace App\Models {
      * @property string|null $short_name
      * @property string $name
      * @property string $code
-     * @property int|null $material_subcategory_id
-     * @property int $material_category_id
-     * @property int $material_type_id
+     * @property mixed $material_subcategory_id
+     * @property mixed $material_category_id
+     * @property mixed $material_type_id
      * @property int $id
      * @property-read \App\Models\MaterialType $materialType
      * @property-read \App\Models\MaterialCategory $category
@@ -17564,10 +17476,7 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereSupplierPartyId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine wherePurchaseDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine wherePurchasePrice($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereAccountingTreatment($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine wherePurchaseInvoiceNo($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine wherePurchaseBillId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine wherePurchaseBillLineId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereWarrantyMonths($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereWarrantyExpiryDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereOperatingHoursTotal($value)
@@ -17576,7 +17485,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereStatus($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereIsIssued($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereCurrentAssignmentType($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereCurrentAssignmentId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereCurrentContractorPartyId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereCurrentWorkerUserId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Machine>|Machine whereCurrentProjectId($value)
@@ -17922,33 +17830,25 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $return_voucher_id
-     * @property int|null $issue_voucher_id
-     * @property int|null $returned_by
-     * @property int|null $issued_by
+     * @property mixed $returned_by
+     * @property mixed $issued_by
      * @property string|null $return_remarks
      * @property string|null $issue_remarks
-     * @property string|null $extended_reason
      * @property mixed $status
      * @property float|null $meter_reading_at_return
      * @property float|null $meter_reading_at_issue
-     * @property float $damage_loss_amount
-     * @property float $damage_recovery_amount
-     * @property string|null $damage_borne_by
-     * @property string $return_disposition
      * @property mixed $condition_at_return
      * @property mixed $condition_at_issue
      * @property \Illuminate\Support\Carbon|null $actual_return_date
-     * @property integer|null $expected_duration_days
      * @property \Illuminate\Support\Carbon|null $expected_return_date
      * @property \Illuminate\Support\Carbon $assigned_date
-     * @property int|null $project_id
-     * @property int|null $worker_user_id
+     * @property mixed $project_id
+     * @property mixed $worker_user_id
      * @property string|null $contractor_person_name
-     * @property int|null $contractor_party_id
+     * @property mixed $contractor_party_id
      * @property mixed $assignment_type
      * @property string $assignment_number
-     * @property int $machine_id
+     * @property mixed $machine_id
      * @property int $id
      * @property-read mixed $operating_hours_used
      * @property-read \App\Models\Machine $machine
@@ -17969,24 +17869,16 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereProjectId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereAssignedDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereExpectedReturnDate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereExpectedDurationDays($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereActualReturnDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereConditionAtIssue($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereConditionAtReturn($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereReturnDisposition($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereDamageBorneBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereDamageRecoveryAmount($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereDamageLossAmount($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereMeterReadingAtIssue($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereMeterReadingAtReturn($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereStatus($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereExtendedReason($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereIssueRemarks($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereReturnRemarks($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereIssuedBy($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereReturnedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereIssueVoucherId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereReturnVoucherId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineAssignment>|MachineAssignment newModelQuery()
@@ -18305,7 +18197,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remarks
-     * @property int|null $maintenance_log_id
+     * @property mixed $maintenance_log_id
      * @property mixed $status
      * @property float $estimated_cost
      * @property float $production_loss_hours
@@ -18315,18 +18207,18 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $repair_completed_at
      * @property \Illuminate\Support\Carbon|null $repair_started_at
      * @property array|null $maintenance_team_assigned
-     * @property int|null $acknowledged_by
+     * @property mixed $acknowledged_by
      * @property \Illuminate\Support\Carbon|null $acknowledged_at
      * @property string|null $immediate_action_taken
      * @property string $problem_description
      * @property string|null $operation_during_breakdown
-     * @property int|null $project_id
+     * @property mixed $project_id
      * @property mixed $severity
      * @property mixed $breakdown_type
-     * @property int $reported_by
+     * @property mixed $reported_by
      * @property \Illuminate\Support\Carbon $reported_at
      * @property string $breakdown_number
-     * @property int $machine_id
+     * @property mixed $machine_id
      * @property int $id
      * @property-read \App\Models\Machine $machine
      * @property-read \App\Models\Project $project
@@ -18678,9 +18570,9 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
-     * @property int|null $verified_by
-     * @property int|null $performed_by
+     * @property mixed $created_by
+     * @property mixed $verified_by
+     * @property mixed $performed_by
      * @property mixed $status
      * @property float $calibration_cost
      * @property string|null $report_file_path
@@ -18696,7 +18588,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $due_date
      * @property \Illuminate\Support\Carbon $calibration_date
      * @property string $calibration_number
-     * @property int $machine_id
+     * @property mixed $machine_id
      * @property int $id
      * @property-read \App\Models\Machine $machine
      * @property-read \App\Models\User $performer
@@ -19042,8 +18934,8 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $completed_by
-     * @property int|null $created_by
+     * @property mixed $completed_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property float $downtime_hours
      * @property float $total_cost
@@ -19052,7 +18944,7 @@ namespace App\Models {
      * @property float $labor_cost
      * @property mixed $priority
      * @property mixed $status
-     * @property int|null $external_vendor_party_id
+     * @property mixed $external_vendor_party_id
      * @property array|null $technician_user_ids
      * @property string|null $recommendations
      * @property string|null $findings
@@ -19065,11 +18957,8 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $scheduled_date
      * @property mixed $maintenance_type
      * @property string $log_number
-     * @property int|null $worker_user_id
-     * @property int|null $contractor_party_id
-     * @property int|null $machine_assignment_id
-     * @property int|null $maintenance_plan_id
-     * @property int $machine_id
+     * @property mixed $maintenance_plan_id
+     * @property mixed $machine_id
      * @property int $id
      * @property-read \App\Models\Machine $machine
      * @property-read \App\Models\MachineMaintenancePlan $plan
@@ -19081,9 +18970,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereMachineId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereMaintenancePlanId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereMachineAssignmentId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereContractorPartyId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereWorkerUserId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereLogNumber($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereMaintenanceType($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MachineMaintenanceLog>|MachineMaintenanceLog whereScheduledDate($value)
@@ -19424,7 +19310,7 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $next_scheduled_date
      * @property \Illuminate\Support\Carbon|null $last_executed_date
@@ -19439,7 +19325,7 @@ namespace App\Models {
      * @property mixed $maintenance_type
      * @property string $plan_name
      * @property string $plan_code
-     * @property int $machine_id
+     * @property mixed $machine_id
      * @property int $id
      * @property-read \App\Models\Machine $machine
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MachineMaintenanceLog> $maintenanceLogs
@@ -19786,11 +19672,11 @@ namespace App\Models {
      * @property float $total_cost
      * @property float $unit_cost
      * @property float $qty_consumed
-     * @property int $uom_id
-     * @property int $item_id
-     * @property int $store_issue_id
-     * @property int $machine_id
-     * @property int $machine_maintenance_log_id
+     * @property mixed $uom_id
+     * @property mixed $item_id
+     * @property mixed $store_issue_id
+     * @property mixed $machine_id
+     * @property mixed $machine_maintenance_log_id
      * @property int $id
      * @property-read \App\Models\MachineMaintenanceLog $maintenanceLog
      * @property-read \App\Models\Machine $machine
@@ -20127,7 +20013,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $last_tested_at
      * @property string|null $smtp_username
      * @property string|null $smtp_encryption
-     * @property int $smtp_port
+     * @property mixed $smtp_port
      * @property string|null $smtp_host
      * @property string|null $reply_to
      * @property string $code
@@ -20140,12 +20026,12 @@ namespace App\Models {
      * @property string|null $password
      * @property string|null $username
      * @property string|null $encryption
-     * @property int|null $port
+     * @property mixed $port
      * @property string|null $host
      * @property string|null $usage
      * @property string $name
-     * @property int|null $department_id
-     * @property int|null $company_id
+     * @property mixed $department_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $smtp_password
      * @property-read \App\Models\Company $company
@@ -20496,7 +20382,7 @@ namespace App\Models {
      * @property string|null $body_html
      * @property string|null $body
      * @property string $subject
-     * @property int|null $mail_profile_id
+     * @property mixed $mail_profile_id
      * @property string $type
      * @property string $name
      * @property string $code
@@ -20831,11 +20717,11 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property bool $is_active
-     * @property int $sort_order
+     * @property mixed $sort_order
      * @property string|null $description
      * @property string $name
      * @property string $code
-     * @property int $material_type_id
+     * @property mixed $material_type_id
      * @property int $id
      * @property-read \App\Models\MaterialType $type
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MaterialSubcategory> $subcategories
@@ -21168,18 +21054,18 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remarks
      * @property string|null $qc_at
-     * @property int|null $qc_by
-     * @property int|null $created_by
+     * @property mixed $qc_by
+     * @property mixed $created_by
      * @property string $status
      * @property string|null $weighbridge_receipt_no
      * @property string|null $vehicle_number
      * @property string|null $challan_number
      * @property \Illuminate\Support\Carbon|null $invoice_date
      * @property string|null $invoice_number
-     * @property int|null $client_party_id
-     * @property int|null $project_id
-     * @property int|null $supplier_id
-     * @property int|null $purchase_order_id
+     * @property mixed $client_party_id
+     * @property mixed $project_id
+     * @property mixed $supplier_id
+     * @property mixed $purchase_order_id
      * @property string|null $po_number
      * @property boolean $is_client_material
      * @property \Illuminate\Support\Carbon|null $receipt_date
@@ -21533,19 +21419,19 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remarks
      * @property string $status
-     * @property int $uom_id
+     * @property mixed $uom_id
      * @property float|null $received_weight_kg
-     * @property int $qty_pcs
+     * @property mixed $qty_pcs
      * @property string|null $grade
      * @property string|null $section_profile
-     * @property int|null $length_mm
-     * @property int|null $width_mm
-     * @property int|null $thickness_mm
+     * @property mixed $length_mm
+     * @property mixed $width_mm
+     * @property mixed $thickness_mm
      * @property string $material_category
-     * @property int|null $purchase_order_item_id
+     * @property mixed $purchase_order_item_id
      * @property string|null $brand
-     * @property int $item_id
-     * @property int $material_receipt_id
+     * @property mixed $item_id
+     * @property mixed $material_receipt_id
      * @property int $id
      * @property-read \App\Models\MaterialReceipt $receipt
      * @property-read \App\Models\Item $item
@@ -21893,12 +21779,12 @@ namespace App\Models {
      * @property string|null $location
      * @property string|null $source_reference
      * @property string|null $source_type
-     * @property int|null $reserved_for_bom_id
-     * @property int|null $reserved_for_project_id
+     * @property mixed $reserved_for_bom_id
+     * @property mixed $reserved_for_project_id
      * @property \App\Enums\MaterialStockPieceStatus $status
-     * @property int|null $mother_piece_id
-     * @property int|null $origin_bom_id
-     * @property int|null $origin_project_id
+     * @property mixed $mother_piece_id
+     * @property mixed $origin_bom_id
+     * @property mixed $origin_project_id
      * @property string|null $mtc_number
      * @property string|null $heat_number
      * @property string|null $plate_number
@@ -21908,7 +21794,7 @@ namespace App\Models {
      * @property integer|null $width_mm
      * @property integer|null $thickness_mm
      * @property \App\Enums\BomItemMaterialCategory $material_category
-     * @property int $item_id
+     * @property mixed $item_id
      * @property int $id
      * @property-read \App\Models\Item $item
      * @property-read \App\Models\Project $originProject
@@ -22262,14 +22148,14 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property boolean $is_active
      * @property integer $sort_order
-     * @property int|null $inventory_account_id
-     * @property int|null $asset_account_id
-     * @property int|null $expense_account_id
+     * @property mixed $inventory_account_id
+     * @property mixed $asset_account_id
+     * @property mixed $expense_account_id
      * @property string|null $description
      * @property string $name
      * @property string|null $item_code_prefix
      * @property string $code
-     * @property int $material_category_id
+     * @property mixed $material_category_id
      * @property int $id
      * @property-read \App\Models\MaterialCategory $category
      * @property-read \App\Models\Accounting\Account $expenseAccount
@@ -22606,7 +22492,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property boolean $is_active
-     * @property int $sort_order
+     * @property mixed $sort_order
      * @property string $accounting_usage
      * @property string|null $description
      * @property string $name
@@ -22936,18 +22822,6 @@ namespace App\Models {
     /**
      * App\Models\MaterialVendorReturn
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
-     * @property string|null $remarks
-     * @property string|null $reason
-     * @property int|null $voucher_id
-     * @property int|null $project_id
-     * @property int|null $to_party_id
-     * @property \Illuminate\Support\Carbon $return_date
-     * @property string|null $vendor_return_number
-     * @property int $material_receipt_id
-     * @property int $id
      * @property-read \App\Models\MaterialReceipt $materialReceipt
      * @property-read \App\Models\Party $toParty
      * @property-read \App\Models\Project $project
@@ -22955,18 +22829,6 @@ namespace App\Models {
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MaterialVendorReturnLine> $lines
      * @property-read int|null $lines_count
      * @property-read \App\Models\User $createdBy
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereMaterialReceiptId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereVendorReturnNumber($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereReturnDate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereToPartyId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereProjectId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereVoucherId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereReason($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereRemarks($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturn>|MaterialVendorReturn query()
@@ -23280,32 +23142,10 @@ namespace App\Models {
     /**
      * App\Models\MaterialVendorReturnLine
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $remarks
-     * @property float $returned_weight_kg
-     * @property integer $returned_qty_pcs
-     * @property string|null $material_category
-     * @property int $item_id
-     * @property int $store_stock_item_id
-     * @property int $material_receipt_line_id
-     * @property int $material_vendor_return_id
-     * @property int $id
      * @property-read \App\Models\MaterialVendorReturn $vendorReturn
      * @property-read \App\Models\MaterialReceiptLine $materialReceiptLine
      * @property-read \App\Models\StoreStockItem $stockItem
      * @property-read \App\Models\Item $item
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereMaterialVendorReturnId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereMaterialReceiptLineId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereStoreStockItemId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereItemId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereMaterialCategory($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereReturnedQtyPcs($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereReturnedWeightKg($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereRemarks($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<MaterialVendorReturnLine>|MaterialVendorReturnLine query()
@@ -23628,7 +23468,7 @@ namespace App\Models {
      * @property string|null $account_name
      * @property string|null $branch
      * @property string $bank_name
-     * @property int $party_id
+     * @property mixed $party_id
      * @property int $id
      * @property-read \App\Models\Party $party
      * @method static \Illuminate\Database\Eloquent\Builder<PartyBank>|PartyBank whereId($value)
@@ -23955,41 +23795,7 @@ namespace App\Models {
     /**
      * App\Models\PartyBranch
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $gst_raw_json
-     * @property string|null $gst_state_code
-     * @property string|null $gst_status
-     * @property string|null $gst_trade_name
-     * @property string|null $gst_legal_name
-     * @property string|null $country
-     * @property string|null $pincode
-     * @property string|null $state
-     * @property string|null $city
-     * @property string|null $address_line2
-     * @property string|null $address_line1
-     * @property string|null $gstin
-     * @property string|null $branch_name
-     * @property int $party_id
-     * @property int $id
      * @property-read \App\Models\Party $party
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch wherePartyId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereBranchName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereGstin($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereAddressLine1($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereAddressLine2($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereCity($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereState($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch wherePincode($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereCountry($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereGstLegalName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereGstTradeName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereGstStatus($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereGstStateCode($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereGstRawJson($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<PartyBranch>|PartyBranch query()
@@ -24310,7 +24116,7 @@ namespace App\Models {
      * @property string|null $phone
      * @property string|null $designation
      * @property string $name
-     * @property int $party_id
+     * @property mixed $party_id
      * @property int $id
      * @property-read \App\Models\Party $party
      * @method static \Illuminate\Database\Eloquent\Builder<PartyContact>|PartyContact whereId($value)
@@ -24637,7 +24443,7 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon $created_at
      * @property string $password
-     * @property int $user_id
+     * @property mixed $user_id
      * @property int $id
      * @property-read \App\Models\User $user
      * @method static \Illuminate\Database\Eloquent\Builder<PasswordHistory>|PasswordHistory whereId($value)
@@ -24959,14 +24765,14 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string $status
      * @property string|null $reversal_reason
-     * @property int|null $reversed_by
+     * @property mixed $reversed_by
      * @property string|null $reversed_at
-     * @property int|null $reversal_voucher_id
-     * @property int|null $voucher_id
+     * @property mixed $reversal_voucher_id
+     * @property mixed $voucher_id
      * @property float $exchange_rate
      * @property string $currency
      * @property string|null $tcs_section
@@ -24975,7 +24781,6 @@ namespace App\Models {
      * @property string|null $tds_section
      * @property float $tds_amount
      * @property float $tds_rate
-     * @property float $round_off
      * @property float $total_amount
      * @property float $total_rcm_igst
      * @property float $total_rcm_sgst
@@ -24988,17 +24793,13 @@ namespace App\Models {
      * @property float $total_discount
      * @property float $total_basic
      * @property string|null $remarks
-     * @property string|null $challan_number
      * @property string|null $reference_no
      * @property \Illuminate\Support\Carbon|null $due_date
-     * @property \Illuminate\Support\Carbon|null $posting_date
      * @property \Illuminate\Support\Carbon $bill_date
      * @property string $bill_number
-     * @property int|null $project_id
-     * @property int|null $purchase_order_id
-     * @property int|null $supplier_branch_id
-     * @property int $supplier_id
-     * @property int $company_id
+     * @property mixed $purchase_order_id
+     * @property mixed $supplier_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $gross_payable
      * @property-read mixed $net_payable
@@ -25019,15 +24820,11 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereCompanyId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereSupplierId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereSupplierBranchId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill wherePurchaseOrderId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereProjectId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereBillNumber($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereBillDate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill wherePostingDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereDueDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereReferenceNo($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereChallanNumber($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereRemarks($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTotalBasic($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTotalDiscount($value)
@@ -25040,7 +24837,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTotalRcmSgst($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTotalRcmIgst($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTotalAmount($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereRoundOff($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTdsRate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTdsAmount($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBill>|PurchaseBill whereTdsSection($value)
@@ -25374,7 +25170,7 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $line_no
+     * @property mixed $line_no
      * @property float $total_amount
      * @property float $igst_amount
      * @property float $sgst_amount
@@ -25384,9 +25180,8 @@ namespace App\Models {
      * @property float $basic_amount
      * @property string|null $description
      * @property boolean $is_reverse_charge
-     * @property integer|null $project_id
-     * @property int $account_id
-     * @property int $purchase_bill_id
+     * @property mixed $account_id
+     * @property mixed $purchase_bill_id
      * @property int $id
      * @property-read \App\Models\PurchaseBill $bill
      * @property-read \App\Models\Accounting\Account $account
@@ -25394,7 +25189,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBillExpenseLine>|PurchaseBillExpenseLine whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBillExpenseLine>|PurchaseBillExpenseLine wherePurchaseBillId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBillExpenseLine>|PurchaseBillExpenseLine whereAccountId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBillExpenseLine>|PurchaseBillExpenseLine whereProjectId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBillExpenseLine>|PurchaseBillExpenseLine whereIsReverseCharge($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBillExpenseLine>|PurchaseBillExpenseLine whereDescription($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseBillExpenseLine>|PurchaseBillExpenseLine whereBasicAmount($value)
@@ -25722,8 +25516,8 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $line_no
-     * @property int|null $account_id
+     * @property mixed $line_no
+     * @property mixed $account_id
      * @property float $total_amount
      * @property float $igst_amount
      * @property float $sgst_amount
@@ -25735,11 +25529,11 @@ namespace App\Models {
      * @property float $discount_percent
      * @property float $rate
      * @property float $qty
-     * @property int|null $uom_id
-     * @property int $item_id
-     * @property int|null $material_receipt_line_id
-     * @property int|null $material_receipt_id
-     * @property int $purchase_bill_id
+     * @property mixed $uom_id
+     * @property mixed $item_id
+     * @property mixed $material_receipt_line_id
+     * @property mixed $material_receipt_id
+     * @property mixed $purchase_bill_id
      * @property int $id
      * @property-read \App\Models\PurchaseBill $bill
      * @property-read \App\Models\Item $item
@@ -26087,14 +25881,14 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remarks
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $cancelled_at
      * @property mixed $status
      * @property \Illuminate\Support\Carbon|null $required_by_date
-     * @property int|null $approved_by
-     * @property int|null $created_by
-     * @property int|null $department_id
-     * @property int|null $project_id
+     * @property mixed $approved_by
+     * @property mixed $created_by
+     * @property mixed $department_id
+     * @property mixed $project_id
      * @property string $code
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseIndentItem> $items
@@ -26435,7 +26229,7 @@ namespace App\Models {
      * App\Models\PurchaseIndentItem
      *
      * @property string $fulfillment_status
-     * @property int|null $closed_by
+     * @property mixed $closed_by
      * @property \Illuminate\Support\Carbon|null $closed_at
      * @property boolean $is_closed
      * @property string|null $receipt_status
@@ -26443,7 +26237,7 @@ namespace App\Models {
      * @property float $po_qty_total
      * @property float $rfq_qty_total
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property string|null $cancelled_at
      * @property string|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
@@ -26451,7 +26245,7 @@ namespace App\Models {
      * @property string|null $remarks
      * @property string|null $description
      * @property string|null $grade
-     * @property int|null $uom_id
+     * @property mixed $uom_id
      * @property float $order_qty
      * @property float|null $qty_pcs
      * @property float|null $weight_per_piece_kg
@@ -26460,12 +26254,12 @@ namespace App\Models {
      * @property float|null $thickness_mm
      * @property float|null $width_mm
      * @property float|null $length_mm
-     * @property int|null $origin_id
+     * @property mixed $origin_id
      * @property string $origin_type
-     * @property int $line_no
+     * @property mixed $line_no
      * @property string|null $brand
-     * @property int $item_id
-     * @property int $purchase_indent_id
+     * @property mixed $item_id
+     * @property mixed $purchase_indent_id
      * @property int $id
      * @property-read \App\Models\PurchaseIndent $indent
      * @property-read \App\Models\Item $item
@@ -26817,30 +26611,29 @@ namespace App\Models {
      * App\Models\PurchaseOrder
      *
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $cancelled_at
      * @property string|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $approved_at
-     * @property int|null $approved_by
-     * @property int|null $created_by
+     * @property mixed $approved_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property string $status
      * @property float|null $total_amount
      * @property string|null $terms_text
-     * @property int|null $standard_term_id
+     * @property mixed $standard_term_id
      * @property string|null $freight_terms
      * @property integer|null $delivery_terms_days
      * @property integer|null $payment_terms_days
      * @property \Illuminate\Support\Carbon|null $expected_delivery_date
      * @property \Illuminate\Support\Carbon|null $po_date
-     * @property int|null $purchase_indent_id
-     * @property int|null $purchase_rfq_id
-     * @property int|null $vendor_branch_id
-     * @property int|null $vendor_party_id
-     * @property int|null $department_id
-     * @property int|null $project_id
+     * @property mixed $purchase_indent_id
+     * @property mixed $purchase_rfq_id
+     * @property mixed $vendor_party_id
+     * @property mixed $department_id
+     * @property mixed $project_id
      * @property string $code
      * @property int $id
      * @property-read \App\Models\Project $project
@@ -26861,7 +26654,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseOrder>|PurchaseOrder whereProjectId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseOrder>|PurchaseOrder whereDepartmentId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseOrder>|PurchaseOrder whereVendorPartyId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<PurchaseOrder>|PurchaseOrder whereVendorBranchId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseOrder>|PurchaseOrder wherePurchaseRfqId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseOrder>|PurchaseOrder wherePurchaseIndentId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<PurchaseOrder>|PurchaseOrder wherePoDate($value)
@@ -27197,7 +26989,7 @@ namespace App\Models {
      * App\Models\PurchaseOrderItem
      *
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $cancelled_at
      * @property string|null $deleted_at
      * @property float|null $grn_tolerance_percent
@@ -27217,7 +27009,7 @@ namespace App\Models {
      * @property float|null $rate
      * @property string|null $description
      * @property string|null $grade
-     * @property int|null $uom_id
+     * @property mixed $uom_id
      * @property float $quantity_received
      * @property float|null $quantity
      * @property float $qty_pcs_received
@@ -27226,13 +27018,13 @@ namespace App\Models {
      * @property float|null $thickness_mm
      * @property float|null $width_mm
      * @property float|null $length_mm
-     * @property int|null $line_no
+     * @property mixed $line_no
      * @property string|null $brand
-     * @property int|null $item_id
-     * @property int|null $purchase_indent_item_id
-     * @property int|null $purchase_rfq_vendor_id
-     * @property int|null $purchase_rfq_item_id
-     * @property int $purchase_order_id
+     * @property mixed $item_id
+     * @property mixed $purchase_indent_item_id
+     * @property mixed $purchase_rfq_vendor_id
+     * @property mixed $purchase_rfq_item_id
+     * @property mixed $purchase_order_id
      * @property int $id
      * @property-read \App\Models\PurchaseOrder $purchaseOrder
      * @property-read \App\Models\Item $item
@@ -27592,7 +27384,7 @@ namespace App\Models {
      * App\Models\PurchaseRfq
      *
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $cancelled_at
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
@@ -27600,14 +27392,14 @@ namespace App\Models {
      * @property string|null $remarks
      * @property string $status
      * @property string|null $freight_terms
-     * @property int|null $delivery_terms_days
-     * @property int|null $payment_terms_days
+     * @property mixed $delivery_terms_days
+     * @property mixed $payment_terms_days
      * @property \Illuminate\Support\Carbon|null $due_date
      * @property \Illuminate\Support\Carbon|null $rfq_date
-     * @property int|null $created_by
-     * @property int|null $department_id
-     * @property int|null $project_id
-     * @property int|null $purchase_indent_id
+     * @property mixed $created_by
+     * @property mixed $department_id
+     * @property mixed $project_id
+     * @property mixed $purchase_indent_id
      * @property string $code
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseRfqItem> $items
@@ -27957,8 +27749,8 @@ namespace App\Models {
      * @property array|null $meta
      * @property string|null $message
      * @property string $action
-     * @property int|null $user_id
-     * @property int $purchase_rfq_id
+     * @property mixed $user_id
+     * @property mixed $purchase_rfq_id
      * @property int $id
      * @property-read \App\Models\User $user
      * @property-read \App\Models\PurchaseRfq $rfq
@@ -28285,27 +28077,27 @@ namespace App\Models {
      *
      * @property float|null $allocated_indent_qty
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $cancelled_at
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $description
-     * @property int|null $selected_quote_id
-     * @property int|null $selected_vendor_id
-     * @property int|null $purchase_indent_item_id
+     * @property mixed $selected_quote_id
+     * @property mixed $selected_vendor_id
+     * @property mixed $purchase_indent_item_id
      * @property string|null $grade
-     * @property int|null $uom_id
+     * @property mixed $uom_id
      * @property float|null $qty_pcs
      * @property float $quantity
      * @property float|null $weight_per_meter_kg
      * @property float|null $thickness_mm
      * @property float|null $width_mm
      * @property float|null $length_mm
-     * @property int $line_no
+     * @property mixed $line_no
      * @property string|null $brand
-     * @property int $item_id
-     * @property int $purchase_rfq_id
+     * @property mixed $item_id
+     * @property mixed $purchase_rfq_id
      * @property int $id
      * @property-read \App\Models\PurchaseRfq $rfq
      * @property-read \App\Models\Item $item
@@ -28652,21 +28444,21 @@ namespace App\Models {
      * App\Models\PurchaseRfqVendor
      *
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $cancelled_at
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $freight_terms
-     * @property int|null $delivery_terms_days
-     * @property int|null $payment_terms_days
+     * @property mixed $delivery_terms_days
+     * @property mixed $payment_terms_days
      * @property string|null $contact_phone
      * @property string|null $contact_name
      * @property string|null $email
      * @property string|null $sent_at
      * @property string $status
-     * @property int $vendor_party_id
-     * @property int $purchase_rfq_id
+     * @property mixed $vendor_party_id
+     * @property mixed $purchase_rfq_id
      * @property int $id
      * @property-read \App\Models\PurchaseRfq $rfq
      * @property-read \App\Models\Party $vendor
@@ -29002,10 +28794,10 @@ namespace App\Models {
     /**
      * App\Models\PurchaseRfqVendorQuote
      *
-     * @property int|null $revised_by
+     * @property mixed $revised_by
      * @property \Illuminate\Support\Carbon|null $revised_at
      * @property string|null $cancel_reason
-     * @property int|null $cancelled_by
+     * @property mixed $cancelled_by
      * @property \Illuminate\Support\Carbon|null $cancelled_at
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
@@ -29022,8 +28814,8 @@ namespace App\Models {
      * @property string|null $vendor_quote_no
      * @property boolean $is_active
      * @property integer $revision_no
-     * @property int $purchase_rfq_item_id
-     * @property int $purchase_rfq_vendor_id
+     * @property mixed $purchase_rfq_item_id
+     * @property mixed $purchase_rfq_vendor_id
      * @property int $id
      * @property-read \App\Models\PurchaseRfqVendor $rfqVendor
      * @property-read \App\Models\PurchaseRfqItem $rfqItem
@@ -29369,9 +29161,9 @@ namespace App\Models {
      * @property string|null $name
      * @property string|null $grade
      * @property string $section_profile
-     * @property int|null $item_id
-     * @property int $bom_id
-     * @property int $project_id
+     * @property mixed $item_id
+     * @property mixed $bom_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read mixed $total_planned_length_mm
      * @property-read mixed $total_planned_length_meters
@@ -29707,9 +29499,9 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remarks
-     * @property int $quantity
-     * @property int $length_mm
-     * @property int $section_plan_id
+     * @property mixed $quantity
+     * @property mixed $length_mm
+     * @property mixed $section_plan_id
      * @property int $id
      * @property-read mixed $total_length_mm
      * @property-read mixed $total_length_meters
@@ -30036,13 +29828,13 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string $content
-     * @property int $sort_order
+     * @property mixed $sort_order
      * @property bool $is_default
      * @property bool $is_active
-     * @property int $version
+     * @property mixed $version
      * @property string|null $sub_module
      * @property string $module
      * @property string $name
@@ -30380,17 +30172,17 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $accounting_posted_at
-     * @property int|null $accounting_posted_by
+     * @property mixed $accounting_posted_by
      * @property string $accounting_status
-     * @property int|null $voucher_id
-     * @property int|null $created_by
+     * @property mixed $voucher_id
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property string $status
-     * @property int|null $issued_to_user_id
+     * @property mixed $issued_to_user_id
      * @property string|null $contractor_person_name
-     * @property int|null $contractor_party_id
-     * @property int|null $store_requisition_id
-     * @property int|null $project_id
+     * @property mixed $contractor_party_id
+     * @property mixed $store_requisition_id
+     * @property mixed $project_id
      * @property \Illuminate\Support\Carbon $issue_date
      * @property string|null $issue_number
      * @property int $id
@@ -30735,12 +30527,12 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remarks
      * @property float|null $issued_weight_kg
-     * @property int $issued_qty_pcs
-     * @property int $uom_id
-     * @property int $item_id
-     * @property int $store_stock_item_id
-     * @property int|null $store_requisition_line_id
-     * @property int $store_issue_id
+     * @property mixed $issued_qty_pcs
+     * @property mixed $uom_id
+     * @property mixed $item_id
+     * @property mixed $store_stock_item_id
+     * @property mixed $store_requisition_line_id
+     * @property mixed $store_issue_id
      * @property int $id
      * @property-read \App\Models\StoreIssue $issue
      * @property-read \App\Models\StoreRequisitionLine $requisitionLine
@@ -31073,14 +30865,14 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property boolean $is_active
      * @property float $target_qty
      * @property float $min_qty
-     * @property int|null $project_id
+     * @property mixed $project_id
      * @property string|null $brand
-     * @property int $item_id
+     * @property mixed $item_id
      * @property int $id
      * @property-read \App\Models\Item $item
      * @property-read \App\Models\Project $project
@@ -31413,14 +31205,14 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $approved_at
-     * @property int|null $approved_by
-     * @property int|null $created_by
+     * @property mixed $approved_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property string $status
-     * @property int|null $requested_by_user_id
+     * @property mixed $requested_by_user_id
      * @property string|null $contractor_person_name
-     * @property int|null $contractor_party_id
-     * @property int|null $project_id
+     * @property mixed $contractor_party_id
+     * @property mixed $project_id
      * @property \Illuminate\Support\Carbon $requisition_date
      * @property string|null $requisition_number
      * @property int $id
@@ -31765,9 +31557,9 @@ namespace App\Models {
      * @property float $issued_qty
      * @property float $required_qty
      * @property string|null $description
-     * @property int $uom_id
-     * @property int $item_id
-     * @property int $store_requisition_id
+     * @property mixed $uom_id
+     * @property mixed $item_id
+     * @property mixed $store_requisition_id
      * @property int $id
      * @property-read \App\Models\StoreRequisition $requisition
      * @property-read \App\Models\Item $item
@@ -32100,18 +31892,17 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $accounting_posted_at
-     * @property int|null $accounting_posted_by
+     * @property mixed $accounting_posted_by
      * @property string $accounting_status
-     * @property int|null $voucher_id
-     * @property int|null $created_by
+     * @property mixed $voucher_id
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property string|null $reason
      * @property string $status
      * @property string|null $contractor_person_name
-     * @property int|null $contractor_party_id
-     * @property int|null $gate_pass_id
-     * @property int|null $store_issue_id
-     * @property int|null $project_id
+     * @property mixed $contractor_party_id
+     * @property mixed $store_issue_id
+     * @property mixed $project_id
      * @property \Illuminate\Support\Carbon $return_date
      * @property string|null $return_number
      * @property int $id
@@ -32127,7 +31918,6 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<StoreReturn>|StoreReturn whereReturnDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StoreReturn>|StoreReturn whereProjectId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StoreReturn>|StoreReturn whereStoreIssueId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StoreReturn>|StoreReturn whereGatePassId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StoreReturn>|StoreReturn whereContractorPartyId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StoreReturn>|StoreReturn whereContractorPersonName($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StoreReturn>|StoreReturn whereStatus($value)
@@ -32459,15 +32249,15 @@ namespace App\Models {
      * @property string|null $remarks
      * @property float|null $damaged_weight_kg
      * @property float|null $returned_weight_kg
-     * @property int $damaged_qty_pcs
-     * @property int $returned_qty_pcs
-     * @property int|null $uom_id
+     * @property mixed $damaged_qty_pcs
+     * @property mixed $returned_qty_pcs
+     * @property mixed $uom_id
      * @property string|null $brand
-     * @property int $item_id
-     * @property int|null $scrap_stock_item_id
-     * @property int $store_stock_item_id
-     * @property int|null $store_issue_line_id
-     * @property int $store_return_id
+     * @property mixed $item_id
+     * @property mixed $scrap_stock_item_id
+     * @property mixed $store_stock_item_id
+     * @property mixed $store_issue_line_id
+     * @property mixed $store_return_id
      * @property int $id
      * @property-read \App\Models\StoreReturn $storeReturn
      * @property-read \App\Models\StoreIssueLine $issueLine
@@ -32807,13 +32597,13 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string $status
      * @property string|null $accounting_posted_at
-     * @property int|null $accounting_posted_by
+     * @property mixed $accounting_posted_by
      * @property string $accounting_status
-     * @property int|null $voucher_id
-     * @property int|null $created_by
+     * @property mixed $voucher_id
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property string|null $reason
-     * @property int|null $project_id
+     * @property mixed $project_id
      * @property string|null $reference_number
      * @property string $adjustment_type
      * @property string $adjustment_date
@@ -33155,12 +32945,12 @@ namespace App\Models {
      * @property string|null $remarks
      * @property float|null $quantity_pcs
      * @property float|null $quantity
-     * @property int|null $project_id
-     * @property int|null $uom_id
+     * @property mixed $project_id
+     * @property mixed $uom_id
      * @property string|null $brand
-     * @property int $item_id
-     * @property int|null $store_stock_item_id
-     * @property int $store_stock_adjustment_id
+     * @property mixed $item_id
+     * @property mixed $store_stock_item_id
+     * @property mixed $store_stock_adjustment_id
      * @property int $id
      * @property-read \App\Models\StoreStockAdjustment $adjustment
      * @property-read \App\Models\StoreStockItem $stockItem
@@ -33497,7 +33287,7 @@ namespace App\Models {
      * @property string|null $remarks
      * @property string|null $location
      * @property string $status
-     * @property int|null $opening_rate_uom_id
+     * @property mixed $opening_rate_uom_id
      * @property float|null $opening_unit_rate
      * @property string|null $source_reference
      * @property string|null $source_type
@@ -33510,18 +33300,18 @@ namespace App\Models {
      * @property string|null $plate_number
      * @property string|null $grade
      * @property string|null $section_profile
-     * @property int|null $length_mm
-     * @property int|null $width_mm
-     * @property int|null $thickness_mm
+     * @property mixed $length_mm
+     * @property mixed $width_mm
+     * @property mixed $thickness_mm
      * @property string $material_category
-     * @property int|null $mother_stock_item_id
+     * @property mixed $mother_stock_item_id
      * @property bool $is_remnant
      * @property boolean $is_client_material
-     * @property int|null $client_party_id
-     * @property int|null $project_id
+     * @property mixed $client_party_id
+     * @property mixed $project_id
      * @property string|null $brand
-     * @property int $item_id
-     * @property int|null $material_receipt_line_id
+     * @property mixed $item_id
+     * @property mixed $material_receipt_line_id
      * @property int $id
      * @property-read \App\Models\MaterialReceiptLine $receiptLine
      * @property-read \App\Models\Item $item
@@ -33874,13 +33664,13 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string|null $remarks
-     * @property int|null $approved_by
+     * @property mixed $approved_by
      * @property \Illuminate\Support\Carbon|null $approved_at
      * @property mixed $status
-     * @property int|null $voucher_id
+     * @property mixed $voucher_id
      * @property float $total_amount
      * @property float $tds_amount
      * @property float $tds_rate
@@ -33902,17 +33692,17 @@ namespace App\Models {
      * @property float $previous_amount
      * @property float $gross_amount
      * @property string|null $work_order_number
-     * @property int|null $work_order_id
+     * @property mixed $work_order_id
      * @property \Illuminate\Support\Carbon|null $period_to
      * @property \Illuminate\Support\Carbon|null $period_from
-     * @property int $ra_sequence
+     * @property mixed $ra_sequence
      * @property \Illuminate\Support\Carbon|null $due_date
      * @property \Illuminate\Support\Carbon $bill_date
      * @property string|null $bill_number
      * @property string $ra_number
-     * @property int $project_id
-     * @property int $subcontractor_id
-     * @property int $company_id
+     * @property mixed $project_id
+     * @property mixed $subcontractor_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Company $company
      * @property-read \App\Models\Party $subcontractor
@@ -34295,12 +34085,12 @@ namespace App\Models {
      * @property float $current_qty
      * @property float $previous_qty
      * @property float $contracted_qty
-     * @property int|null $uom_id
+     * @property mixed $uom_id
      * @property string $description
      * @property string|null $boq_item_code
-     * @property int|null $boq_item_id
-     * @property int $line_no
-     * @property int $subcontractor_ra_bill_id
+     * @property mixed $boq_item_id
+     * @property mixed $line_no
+     * @property mixed $subcontractor_ra_bill_id
      * @property int $id
      * @property-read mixed $balance_qty
      * @property-read mixed $completion_percent
@@ -34967,7 +34757,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property bool $is_active
-     * @property bool $decimal_places
+     * @property mixed $decimal_places
      * @property string|null $category
      * @property string $name
      * @property string $code
@@ -35668,10 +35458,10 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon $created_at
      * @property string|null $reason
-     * @property int|null $performed_by
+     * @property mixed $performed_by
      * @property mixed $action
-     * @property int $role_id
-     * @property int $user_id
+     * @property mixed $role_id
+     * @property mixed $user_id
      * @property int $id
      * @property-read \App\Models\User $user
      * @property-read \Spatie\Permission\Models\Role $role
@@ -36010,24 +35800,24 @@ namespace App\Models\Hr {
      * @property float $week_off_ot_multiplier
      * @property bool $allow_week_off_work
      * @property bool $ot_needs_approval
-     * @property int $ot_max_hours_per_month
-     * @property int $ot_max_hours_per_day
-     * @property int $ot_min_minutes
+     * @property mixed $ot_max_hours_per_month
+     * @property mixed $ot_max_hours_per_day
+     * @property mixed $ot_min_minutes
      * @property bool $ot_allowed
      * @property bool $mark_absent_on_no_punch
-     * @property int $absent_after_late_minutes
+     * @property mixed $absent_after_late_minutes
      * @property float $min_hours_for_half_day
      * @property float $min_hours_for_full_day
-     * @property int $half_day_after_early_minutes
-     * @property int $half_day_after_late_minutes
+     * @property mixed $half_day_after_early_minutes
+     * @property mixed $half_day_after_late_minutes
      * @property float $late_deduction_from_leave
-     * @property int $max_late_instances_per_month
-     * @property int $late_deduction_per_instance
-     * @property int $grace_period_minutes
+     * @property mixed $max_late_instances_per_month
+     * @property mixed $late_deduction_per_instance
+     * @property mixed $grace_period_minutes
      * @property string|null $description
      * @property string $name
      * @property string $code
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Hr\HrEmployee> $employees
      * @property-read int|null $employees_count
@@ -36375,7 +36165,7 @@ namespace App\Models\Hr {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property boolean $is_valid
      * @property bool $is_processed
@@ -36388,7 +36178,7 @@ namespace App\Models\Hr {
      * @property mixed $source
      * @property mixed $punch_type
      * @property \Illuminate\Support\Carbon $punch_time
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read mixed $formatted_time
      * @property-read mixed $punch_type_label
@@ -36738,13 +36528,13 @@ namespace App\Models\Hr {
      * @property float $max_salary
      * @property float $min_salary
      * @property integer $level
-     * @property int|null $hr_grade_id
-     * @property int|null $department_id
+     * @property mixed $hr_grade_id
+     * @property mixed $department_id
      * @property string|null $description
      * @property string|null $short_name
      * @property string $name
      * @property string $code
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $full_name
      * @property-read mixed $salary_range
@@ -37088,8 +36878,8 @@ namespace App\Models\Hr {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $returned_to
-     * @property int|null $issued_by
+     * @property mixed $returned_to
+     * @property mixed $issued_by
      * @property string|null $remarks
      * @property mixed $condition_at_return
      * @property mixed $condition_at_issue
@@ -37104,7 +36894,7 @@ namespace App\Models\Hr {
      * @property string|null $asset_code
      * @property string $asset_name
      * @property string $asset_type
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read \App\Models\Hr\HrEmployee $employee
      * @property-read \App\Models\User $issuer
@@ -37446,7 +37236,7 @@ namespace App\Models\Hr {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $verified_at
-     * @property int|null $verified_by
+     * @property mixed $verified_by
      * @property boolean $is_verified
      * @property string|null $cancelled_cheque_path
      * @property boolean $is_active
@@ -37457,7 +37247,7 @@ namespace App\Models\Hr {
      * @property string $account_number
      * @property string|null $branch_name
      * @property string $bank_name
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read \App\Models\Hr\HrEmployee $employee
      * @property-read \App\Models\User $verifier
@@ -37807,7 +37597,7 @@ namespace App\Models\Hr {
      * @property \Illuminate\Support\Carbon|null $date_of_birth
      * @property mixed $relationship
      * @property string $name
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read \App\Models\Hr\HrEmployee $employee
      * @method static \Illuminate\Database\Eloquent\Builder<HrEmployeeDependent>|HrEmployeeDependent whereId($value)
@@ -38142,10 +37932,10 @@ namespace App\Models\Hr {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $uploaded_by
+     * @property mixed $uploaded_by
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $verified_at
-     * @property int|null $verified_by
+     * @property mixed $verified_by
      * @property boolean $is_verified
      * @property string|null $mime_type
      * @property integer $file_size
@@ -38157,7 +37947,7 @@ namespace App\Models\Hr {
      * @property string|null $document_number
      * @property string $document_name
      * @property mixed $document_type
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read mixed $is_expired
      * @property-read mixed $is_expiring_soon
@@ -38520,14 +38310,14 @@ namespace App\Models\Hr {
      * @property float|null $last_ctc
      * @property string|null $reporting_to
      * @property string|null $location
-     * @property int $experience_months
+     * @property mixed $experience_months
      * @property boolean $is_current
      * @property \Illuminate\Support\Carbon|null $to_date
      * @property \Illuminate\Support\Carbon $from_date
      * @property string|null $department
      * @property string $designation
      * @property string $company_name
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read mixed $duration
      * @property-read mixed $duration_in_months
@@ -38888,7 +38678,7 @@ namespace App\Models\Hr {
      * @property string $relationship
      * @property string $name
      * @property mixed $nomination_for
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read \App\Models\Hr\HrEmployee $employee
      * @method static \Illuminate\Database\Eloquent\Builder<HrEmployeeNominee>|HrEmployeeNominee whereId($value)
@@ -39226,7 +39016,7 @@ namespace App\Models\Hr {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remarks
      * @property string|null $verified_at
-     * @property int|null $verified_by
+     * @property mixed $verified_by
      * @property boolean $is_verified
      * @property string|null $certificate_path
      * @property string|null $roll_number
@@ -39238,7 +39028,7 @@ namespace App\Models\Hr {
      * @property string|null $specialization
      * @property string $degree_name
      * @property mixed $qualification_type
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read mixed $qualification_type_label
      * @property-read mixed $full_qualification
@@ -39594,7 +39384,7 @@ namespace App\Models\Hr {
      * @property string|null $trainer_name
      * @property string|null $training_type
      * @property string $training_name
-     * @property int $hr_employee_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read \App\Models\Hr\HrEmployee $employee
      * @method static \Illuminate\Database\Eloquent\Builder<HrEmployeeTraining>|HrEmployeeTraining whereId($value)
@@ -39949,7 +39739,7 @@ namespace App\Models\Hr {
      * @property string|null $description
      * @property string $name
      * @property string $code
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $full_name
      * @property-read mixed $basic_range
@@ -40307,8 +40097,8 @@ namespace App\Models\Hr {
      * @property float $credited
      * @property float $opening_balance
      * @property integer $year
-     * @property int $hr_leave_type_id
-     * @property int $hr_employee_id
+     * @property mixed $hr_leave_type_id
+     * @property mixed $hr_employee_id
      * @property int $id
      * @property-read mixed $available_balance
      * @property-read mixed $total_credited
@@ -40650,7 +40440,7 @@ namespace App\Models\Hr {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property boolean $is_active
-     * @property int $sort_order
+     * @property mixed $sort_order
      * @property string $color_code
      * @property integer $applicable_after_months
      * @property array|null $applicable_genders
@@ -40679,7 +40469,7 @@ namespace App\Models\Hr {
      * @property string|null $short_name
      * @property string $name
      * @property string $code
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $display_name
      * @property-read mixed $full_name
@@ -41061,7 +40851,7 @@ namespace App\Models\Hr {
      * @property string|null $short_name
      * @property string $name
      * @property string $code
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $type_label
      * @property-read mixed $type_color
@@ -41429,7 +41219,7 @@ namespace App\Models\Hr {
      * @property string|null $address
      * @property string $name
      * @property string $code
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $full_address
      * @property-read mixed $coordinates
@@ -41768,8 +41558,8 @@ namespace App\Models\Production {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property boolean $is_active
      * @property boolean $requires_qc
      * @property boolean $requires_machine
@@ -42118,10 +41908,10 @@ namespace App\Models\Production {
      * @property float|null $weight_kg
      * @property string|null $assembly_type
      * @property string $assembly_mark
-     * @property int|null $production_dpr_line_id
-     * @property int|null $production_plan_item_id
-     * @property int|null $production_plan_id
-     * @property int $project_id
+     * @property mixed $production_dpr_line_id
+     * @property mixed $production_plan_item_id
+     * @property mixed $production_plan_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Production\ProductionAssemblyComponent> $components
      * @property-read int|null $components_count
@@ -42452,8 +42242,8 @@ namespace App\Models\Production {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $production_piece_id
-     * @property int $production_assembly_id
+     * @property mixed $production_piece_id
+     * @property mixed $production_assembly_id
      * @property int $id
      * @property-read \App\Models\Production\ProductionAssembly $assembly
      * @property-read \App\Models\Production\ProductionPiece $piece
@@ -42779,13 +42569,13 @@ namespace App\Models\Production {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $user_agent
      * @property string|null $ip_address
-     * @property int|null $user_id
+     * @property mixed $user_id
      * @property array|null $meta
      * @property string|null $message
-     * @property int|null $entity_id
+     * @property mixed $entity_id
      * @property string|null $entity_type
      * @property string $event
-     * @property int|null $project_id
+     * @property mixed $project_id
      * @property int $id
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionAuditLog>|ProductionAuditLog whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionAuditLog>|ProductionAuditLog whereProjectId($value)
@@ -43115,9 +42905,9 @@ namespace App\Models\Production {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $finalized_at
-     * @property int|null $finalized_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $finalized_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property float $grand_total
      * @property float $igst_total
@@ -43132,8 +42922,8 @@ namespace App\Models\Production {
      * @property \Illuminate\Support\Carbon|null $period_from
      * @property \Illuminate\Support\Carbon|null $bill_date
      * @property string $bill_number
-     * @property int $contractor_party_id
-     * @property int $project_id
+     * @property mixed $contractor_party_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read \App\Models\Project $project
      * @property-read \App\Models\Party $contractor
@@ -43484,12 +43274,12 @@ namespace App\Models\Production {
      * @property float $sgst_amount
      * @property float $cgst_amount
      * @property float $amount
-     * @property int|null $rate_uom_id
+     * @property mixed $rate_uom_id
      * @property float $rate
-     * @property int|null $qty_uom_id
+     * @property mixed $qty_uom_id
      * @property float $qty
-     * @property int|null $production_activity_id
-     * @property int $production_bill_id
+     * @property mixed $production_activity_id
+     * @property mixed $production_bill_id
      * @property int $id
      * @property-read \App\Models\Production\ProductionBill $bill
      * @property-read \App\Models\Production\ProductionActivity $activity
@@ -43823,50 +43613,12 @@ namespace App\Models\Production {
     /**
      * App\Models\Production\ProductionDispatch
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property \Illuminate\Support\Carbon|null $finalized_at
-     * @property int|null $finalized_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property string|null $remarks
-     * @property float $total_weight_kg
-     * @property float $total_qty
-     * @property string|null $transporter_name
-     * @property string|null $lr_number
-     * @property string|null $vehicle_number
-     * @property mixed $status
-     * @property \Illuminate\Support\Carbon|null $dispatch_date
-     * @property string $dispatch_number
-     * @property int|null $client_party_id
-     * @property int|null $production_plan_id
-     * @property int $project_id
-     * @property int $id
      * @property-read \App\Models\Project $project
      * @property-read \App\Models\Production\ProductionPlan $plan
      * @property-read \App\Models\Party $client
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Production\ProductionDispatchLine> $lines
      * @property-read int|null $lines_count
      * @property-read \App\Models\User $finalizedBy
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereProjectId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereProductionPlanId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereClientPartyId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereDispatchNumber($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereDispatchDate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereStatus($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereVehicleNumber($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereLrNumber($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereTransporterName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereTotalQty($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereTotalWeightKg($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereRemarks($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereFinalizedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereFinalizedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatch>|ProductionDispatch query()
@@ -44180,29 +43932,9 @@ namespace App\Models\Production {
     /**
      * App\Models\Production\ProductionDispatchLine
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property array|null $source_meta
-     * @property string|null $remarks
-     * @property float $weight_kg
-     * @property int|null $uom_id
-     * @property float $qty
-     * @property int|null $production_plan_item_id
-     * @property int $production_dispatch_id
-     * @property int $id
      * @property-read \App\Models\Production\ProductionDispatch $dispatch
      * @property-read \App\Models\Production\ProductionPlanItem $planItem
      * @property-read \App\Models\Uom $uom
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereProductionDispatchId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereProductionPlanItemId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereQty($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereUomId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereWeightKg($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereRemarks($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereSourceMeta($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDispatchLine>|ProductionDispatchLine query()
@@ -44518,28 +44250,26 @@ namespace App\Models\Production {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $approved_at
-     * @property int|null $approved_by
+     * @property mixed $approved_by
      * @property \Illuminate\Support\Carbon|null $submitted_at
-     * @property int|null $submitted_by
+     * @property mixed $submitted_by
      * @property mixed $status
      * @property string|null $geo_override_reason
      * @property string|null $geo_status
      * @property float|null $geo_accuracy_m
      * @property float|null $geo_longitude
      * @property float|null $geo_latitude
-     * @property int|null $machine_id
-     * @property int|null $worker_user_id
-     * @property int|null $contractor_party_id
+     * @property mixed $machine_id
+     * @property mixed $worker_user_id
+     * @property mixed $contractor_party_id
      * @property string|null $shift
      * @property \Illuminate\Support\Carbon $dpr_date
-     * @property int|null $mother_stock_item_id
-     * @property int|null $cutting_plan_id
-     * @property int $production_activity_id
-     * @property int $production_plan_id
+     * @property mixed $production_activity_id
+     * @property mixed $production_plan_id
      * @property int $id
      * @property-read \App\Models\Production\ProductionPlan $plan
      * @property-read \App\Models\Production\ProductionActivity $activity
@@ -44553,8 +44283,6 @@ namespace App\Models\Production {
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereProductionPlanId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereProductionActivityId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereCuttingPlanId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereMotherStockItemId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereDprDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereShift($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionDpr>|ProductionDpr whereContractorPartyId($value)
@@ -44892,16 +44620,16 @@ namespace App\Models\Production {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property float|null $efficiency_metric
      * @property float|null $minutes_spent
-     * @property int|null $qty_uom_id
+     * @property mixed $qty_uom_id
      * @property float $qty
      * @property string|null $traceability_done_at
      * @property bool $traceability_done
      * @property string|null $remarks
      * @property boolean $is_completed
-     * @property int|null $production_assembly_id
-     * @property int|null $production_plan_item_activity_id
-     * @property int|null $production_plan_item_id
-     * @property int $production_dpr_id
+     * @property mixed $production_assembly_id
+     * @property mixed $production_plan_item_activity_id
+     * @property mixed $production_plan_item_id
+     * @property mixed $production_dpr_id
      * @property int $id
      * @property-read \App\Models\Production\ProductionDpr $dpr
      * @property-read \App\Models\Production\ProductionPlanItem $planItem
@@ -45242,16 +44970,16 @@ namespace App\Models\Production {
      * @property string|null $heat_number
      * @property string|null $plate_number
      * @property float|null $weight_kg
-     * @property int|null $length_mm
-     * @property int|null $width_mm
-     * @property int|null $thickness_mm
+     * @property mixed $length_mm
+     * @property mixed $width_mm
+     * @property mixed $thickness_mm
      * @property string|null $piece_tag
      * @property string $piece_number
-     * @property int|null $mother_stock_item_id
-     * @property int|null $production_dpr_line_id
-     * @property int|null $production_plan_item_id
-     * @property int|null $production_plan_id
-     * @property int $project_id
+     * @property mixed $mother_stock_item_id
+     * @property mixed $production_dpr_line_id
+     * @property mixed $production_plan_item_id
+     * @property mixed $production_plan_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read \App\Models\Project $project
      * @property-read \App\Models\StoreStockItem $motherStock
@@ -45588,16 +45316,16 @@ namespace App\Models\Production {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property \Illuminate\Support\Carbon|null $approved_at
-     * @property int|null $approved_by
+     * @property mixed $approved_by
      * @property mixed $status
      * @property string|null $remarks
      * @property \Illuminate\Support\Carbon|null $plan_date
      * @property string $plan_number
-     * @property int|null $bom_id
-     * @property int $project_id
+     * @property mixed $bom_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read \App\Models\Project $project
      * @property-read \App\Models\Bom $bom
@@ -45933,11 +45661,8 @@ namespace App\Models\Production {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property mixed $status
-     * @property float|null $unit_weld_length_m
-     * @property float|null $unit_cut_length_m
-     * @property float|null $unit_area_m2
      * @property float|null $planned_weight_kg
-     * @property int|null $uom_id
+     * @property mixed $uom_id
      * @property float $planned_qty
      * @property integer $sequence_no
      * @property integer $level
@@ -45947,8 +45672,8 @@ namespace App\Models\Production {
      * @property string|null $description
      * @property string|null $item_code
      * @property mixed $item_type
-     * @property int|null $bom_item_id
-     * @property int $production_plan_id
+     * @property mixed $bom_item_id
+     * @property mixed $production_plan_id
      * @property int $id
      * @property-read \App\Models\Production\ProductionPlan $plan
      * @property-read \App\Models\BomItem $bomItem
@@ -45969,9 +45694,6 @@ namespace App\Models\Production {
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem wherePlannedQty($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem whereUomId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem wherePlannedWeightKg($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem whereUnitAreaM2($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem whereUnitCutLengthM($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem whereUnitWeldLengthM($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem whereStatus($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItem>|ProductionPlanItem whereUpdatedAt($value)
@@ -46292,19 +46014,18 @@ namespace App\Models\Production {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $qc_remarks
      * @property string|null $qc_at
-     * @property int|null $qc_by
+     * @property mixed $qc_by
      * @property mixed $qc_status
      * @property mixed $status
      * @property \Illuminate\Support\Carbon|null $planned_date
-     * @property int|null $rate_uom_id
+     * @property mixed $rate_uom_id
      * @property float $rate
-     * @property integer|null $machine_id
-     * @property int|null $worker_user_id
-     * @property int|null $contractor_party_id
+     * @property mixed $worker_user_id
+     * @property mixed $contractor_party_id
      * @property boolean $is_enabled
      * @property integer $sequence_no
-     * @property int $production_activity_id
-     * @property int $production_plan_item_id
+     * @property mixed $production_activity_id
+     * @property mixed $production_plan_item_id
      * @property int $id
      * @property-read \App\Models\Production\ProductionPlanItem $planItem
      * @property-read \App\Models\Production\ProductionActivity $activity
@@ -46319,7 +46040,6 @@ namespace App\Models\Production {
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItemActivity>|ProductionPlanItemActivity whereIsEnabled($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItemActivity>|ProductionPlanItemActivity whereContractorPartyId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItemActivity>|ProductionPlanItemActivity whereWorkerUserId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItemActivity>|ProductionPlanItemActivity whereMachineId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItemActivity>|ProductionPlanItemActivity whereRate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItemActivity>|ProductionPlanItemActivity whereRateUomId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ProductionPlanItemActivity>|ProductionPlanItemActivity wherePlannedDate($value)
@@ -46646,16 +46366,16 @@ namespace App\Models\Production {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property \Illuminate\Support\Carbon|null $checked_at
-     * @property int|null $checked_by
+     * @property mixed $checked_by
      * @property string|null $remarks
      * @property mixed $result
-     * @property int|null $production_dpr_line_id
-     * @property int|null $production_dpr_id
-     * @property int|null $production_plan_item_activity_id
-     * @property int|null $production_plan_item_id
-     * @property int $production_activity_id
-     * @property int $production_plan_id
-     * @property int $project_id
+     * @property mixed $production_dpr_line_id
+     * @property mixed $production_dpr_id
+     * @property mixed $production_plan_item_activity_id
+     * @property mixed $production_plan_item_id
+     * @property mixed $production_activity_id
+     * @property mixed $production_plan_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read \App\Models\User $checkedBy
      * @property-read \App\Models\Production\ProductionPlanItemActivity $planItemActivity
@@ -46994,14 +46714,14 @@ namespace App\Models\Production {
      * @property mixed $status
      * @property boolean $is_usable
      * @property float|null $weight_kg
-     * @property int|null $length_mm
-     * @property int|null $width_mm
-     * @property int|null $thickness_mm
-     * @property int|null $remnant_stock_item_id
-     * @property int|null $mother_stock_item_id
-     * @property int|null $production_dpr_line_id
-     * @property int|null $production_plan_id
-     * @property int|null $project_id
+     * @property mixed $length_mm
+     * @property mixed $width_mm
+     * @property mixed $thickness_mm
+     * @property mixed $remnant_stock_item_id
+     * @property mixed $mother_stock_item_id
+     * @property mixed $production_dpr_line_id
+     * @property mixed $production_plan_id
+     * @property mixed $project_id
      * @property int $id
      * @property-read \App\Models\StoreStockItem $motherStock
      * @property-read \App\Models\StoreStockItem $remnantStock
@@ -47337,39 +47057,9 @@ namespace App\Models\Storage {
     /**
      * App\Models\Storage\StorageFile
      *
-     * @property \Illuminate\Support\Carbon|null $deleted_at
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property boolean $is_active
-     * @property string|null $description
-     * @property int|null $uploaded_by
-     * @property string|null $checksum
-     * @property integer $size
-     * @property string|null $mime_type
-     * @property string $path
-     * @property string $disk
-     * @property string $stored_name
-     * @property string $original_name
-     * @property int $storage_folder_id
-     * @property int $id
      * @property-read mixed $download_name
      * @property-read \App\Models\Storage\StorageFolder $folder
      * @property-read \App\Models\User $uploader
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereStorageFolderId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereOriginalName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereStoredName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereDisk($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile wherePath($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereMimeType($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereSize($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereChecksum($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereUploadedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereDescription($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereIsActive($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereUpdatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile whereDeletedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFile>|StorageFile query()
@@ -47683,18 +47373,6 @@ namespace App\Models\Storage {
     /**
      * App\Models\Storage\StorageFolder
      *
-     * @property \Illuminate\Support\Carbon|null $deleted_at
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property boolean $is_active
-     * @property integer $sort_order
-     * @property string|null $description
-     * @property string $name
-     * @property int|null $project_id
-     * @property int|null $parent_id
-     * @property int $id
      * @property-read \App\Models\Storage\StorageFolder $parent
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Storage\StorageFolder> $children
      * @property-read int|null $children_count
@@ -47705,18 +47383,6 @@ namespace App\Models\Storage {
      * @property-read \App\Models\Project $project
      * @property-read \App\Models\User $creator
      * @property-read \App\Models\User $updater
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereParentId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereProjectId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereDescription($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereSortOrder($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereIsActive($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereUpdatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder whereDeletedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFolder>|StorageFolder query()
@@ -48031,32 +47697,8 @@ namespace App\Models\Storage {
     /**
      * App\Models\Storage\StorageFolderUserAccess
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
-     * @property boolean $can_manage_access
-     * @property boolean $can_delete
-     * @property boolean $can_edit
-     * @property boolean $can_download
-     * @property boolean $can_upload
-     * @property boolean $can_view
-     * @property int $user_id
-     * @property int $storage_folder_id
-     * @property int $id
      * @property-read \App\Models\Storage\StorageFolder $folder
      * @property-read \App\Models\User $user
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereStorageFolderId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereUserId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCanView($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCanUpload($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCanDownload($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCanEdit($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCanDelete($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCanManageAccess($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<StorageFolderUserAccess>|StorageFolderUserAccess query()
@@ -48374,27 +48016,7 @@ namespace App\Models\Support {
     /**
      * App\Models\Support\SupportDigestLog
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $triggered_by
-     * @property string|null $error
-     * @property array|null $summary
-     * @property array|null $recipients
-     * @property \Illuminate\Support\Carbon|null $sent_at
-     * @property string $status
-     * @property \Illuminate\Support\Carbon $digest_date
-     * @property int $id
      * @property-read \App\Models\User $triggeredBy
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereDigestDate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereStatus($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereSentAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereRecipients($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereSummary($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereError($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereTriggeredBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestLog>|SupportDigestLog query()
@@ -48708,23 +48330,9 @@ namespace App\Models\Support {
     /**
      * App\Models\Support\SupportDigestRecipient
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
-     * @property boolean $is_active
-     * @property string|null $email
-     * @property int|null $user_id
-     * @property int $id
      * @property-read mixed $resolved_email
      * @property-read \App\Models\User $user
      * @property-read \App\Models\User $creator
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient whereUserId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient whereEmail($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient whereIsActive($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDigestRecipient>|SupportDigestRecipient query()
@@ -49038,33 +48646,11 @@ namespace App\Models\Support {
     /**
      * App\Models\Support\SupportDocument
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property boolean $is_active
-     * @property array|null $tags
-     * @property string|null $description
-     * @property string|null $code
-     * @property string $title
-     * @property int|null $support_folder_id
-     * @property int $id
      * @property-read \App\Models\Support\SupportFolder $folder
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Attachment> $attachments
      * @property-read int|null $attachments_count
      * @property-read \App\Models\User $creator
      * @property-read \App\Models\User $updater
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereSupportFolderId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereTitle($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereCode($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereDescription($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereTags($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereIsActive($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportDocument>|SupportDocument query()
@@ -49378,16 +48964,6 @@ namespace App\Models\Support {
     /**
      * App\Models\Support\SupportFolder
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property boolean $is_active
-     * @property int $sort_order
-     * @property string|null $description
-     * @property string $name
-     * @property int|null $parent_id
-     * @property int $id
      * @property-read \App\Models\Support\SupportFolder $parent
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Support\SupportFolder> $children
      * @property-read int|null $children_count
@@ -49395,16 +48971,6 @@ namespace App\Models\Support {
      * @property-read int|null $documents_count
      * @property-read \App\Models\User $creator
      * @property-read \App\Models\User $updater
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereParentId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereDescription($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereSortOrder($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereIsActive($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SupportFolder>|SupportFolder query()
@@ -49725,8 +49291,8 @@ namespace App\Models\Tasks {
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property array|null $custom_fields
      * @property boolean $is_archived
      * @property string|null $blocked_reason
@@ -49734,26 +49300,26 @@ namespace App\Models\Tasks {
      * @property boolean $is_milestone
      * @property integer $position
      * @property mixed $task_type
-     * @property int|null $linkable_id
+     * @property mixed $linkable_id
      * @property string|null $linkable_type
-     * @property int|null $bom_id
-     * @property int|null $project_id
+     * @property mixed $bom_id
+     * @property mixed $project_id
      * @property integer $progress_percent
      * @property integer $logged_minutes
      * @property integer|null $estimated_minutes
      * @property \Illuminate\Support\Carbon|null $completed_at
      * @property \Illuminate\Support\Carbon|null $due_date
      * @property \Illuminate\Support\Carbon|null $start_date
-     * @property int|null $reporter_id
-     * @property int|null $assignee_id
-     * @property int|null $priority_id
-     * @property int $status_id
+     * @property mixed $reporter_id
+     * @property mixed $assignee_id
+     * @property mixed $priority_id
+     * @property mixed $status_id
      * @property string|null $description
      * @property string $title
      * @property string $task_number
-     * @property int|null $parent_id
-     * @property int $task_list_id
-     * @property int $company_id
+     * @property mixed $parent_id
+     * @property mixed $task_list_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $estimated_hours
      * @property-read mixed $logged_hours
@@ -50175,8 +49741,8 @@ namespace App\Models\Tasks {
      * @property string|null $old_value
      * @property string|null $field_name
      * @property string $action
-     * @property int|null $user_id
-     * @property int $task_id
+     * @property mixed $user_id
+     * @property mixed $task_id
      * @property int $id
      * @property-read mixed $description
      * @property-read mixed $icon
@@ -50515,9 +50081,9 @@ namespace App\Models\Tasks {
      * @property string $mime_type
      * @property string $original_filename
      * @property string $filename
-     * @property int $user_id
-     * @property int|null $task_comment_id
-     * @property int $task_id
+     * @property mixed $user_id
+     * @property mixed $task_comment_id
+     * @property mixed $task_id
      * @property int $id
      * @property-read mixed $url
      * @property-read mixed $file_size_formatted
@@ -50855,7 +50421,7 @@ namespace App\Models\Tasks {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property integer $sort_order
      * @property string $title
-     * @property int $task_id
+     * @property mixed $task_id
      * @property int $id
      * @property-read mixed $total_items
      * @property-read mixed $completed_items
@@ -51186,12 +50752,12 @@ namespace App\Models\Tasks {
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property integer $sort_order
      * @property \Illuminate\Support\Carbon|null $due_date
-     * @property int|null $assignee_id
+     * @property mixed $assignee_id
      * @property \Illuminate\Support\Carbon|null $completed_at
-     * @property int|null $completed_by
+     * @property mixed $completed_by
      * @property boolean $is_completed
      * @property string $content
-     * @property int $task_checklist_id
+     * @property mixed $task_checklist_id
      * @property int $id
      * @property-read \App\Models\Tasks\TaskChecklist $checklist
      * @property-read \App\Models\User $completedByUser
@@ -51527,9 +51093,9 @@ namespace App\Models\Tasks {
      * @property boolean $is_pinned
      * @property boolean $is_internal
      * @property string $content
-     * @property int $user_id
-     * @property int|null $parent_id
-     * @property int $task_id
+     * @property mixed $user_id
+     * @property mixed $parent_id
+     * @property mixed $task_id
      * @property int $id
      * @property-read mixed $formatted_content
      * @property-read mixed $mentioned_users
@@ -51875,7 +51441,7 @@ namespace App\Models\Tasks {
      * @property string $color
      * @property string $slug
      * @property string $name
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $color_style
      * @property-read mixed $text_color
@@ -52210,24 +51776,24 @@ namespace App\Models\Tasks {
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property boolean $is_archived
      * @property boolean $is_active
      * @property integer $sort_order
-     * @property int|null $owner_id
+     * @property mixed $owner_id
      * @property mixed $visibility
-     * @property int|null $default_assignee_id
-     * @property int|null $default_priority_id
-     * @property int|null $default_status_id
-     * @property int|null $project_id
+     * @property mixed $default_assignee_id
+     * @property mixed $default_priority_id
+     * @property mixed $default_status_id
+     * @property mixed $project_id
      * @property string|null $icon
      * @property string $color
      * @property string|null $description
      * @property string $name
      * @property string $code
-     * @property int|null $parent_id
-     * @property int $company_id
+     * @property mixed $parent_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $task_count
      * @property-read mixed $open_task_count
@@ -52608,7 +52174,7 @@ namespace App\Models\Tasks {
      * @property string $color
      * @property string $slug
      * @property string $name
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $color_style
      * @property-read mixed $badge_class
@@ -52954,9 +52520,9 @@ namespace App\Models\Tasks {
      * @property mixed $view_type
      * @property array $filters
      * @property string $name
-     * @property int|null $task_list_id
-     * @property int $user_id
-     * @property int $company_id
+     * @property mixed $task_list_id
+     * @property mixed $user_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Company $company
      * @property-read \App\Models\User $user
@@ -53299,7 +52865,7 @@ namespace App\Models\Tasks {
      * @property string $color
      * @property string $slug
      * @property string $name
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read mixed $color_class
      * @property-read \App\Models\Company $company
@@ -53641,19 +53207,19 @@ namespace App\Models\Tasks {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $created_by
+     * @property mixed $created_by
      * @property boolean $is_active
      * @property array|null $default_labels
      * @property array|null $default_checklist
      * @property integer|null $default_estimated_minutes
      * @property mixed $task_type
-     * @property int|null $default_priority_id
-     * @property int|null $default_status_id
+     * @property mixed $default_priority_id
+     * @property mixed $default_status_id
      * @property string|null $description_template
      * @property string $title_template
      * @property string|null $description
      * @property string $name
-     * @property int $company_id
+     * @property mixed $company_id
      * @property int $id
      * @property-read \App\Models\Company $company
      * @property-read \App\Models\Tasks\TaskStatus $defaultStatus
@@ -53999,8 +53565,8 @@ namespace App\Models\Tasks {
      * @property \Illuminate\Support\Carbon|null $ended_at
      * @property \Illuminate\Support\Carbon $started_at
      * @property string|null $description
-     * @property int $user_id
-     * @property int $task_id
+     * @property mixed $user_id
+     * @property mixed $task_id
      * @property int $id
      * @property-read mixed $duration_hours
      * @property-read mixed $duration_formatted

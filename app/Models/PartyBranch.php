@@ -36,7 +36,9 @@ class PartyBranch extends Model
         });
     }
 
-    public function party(): BelongsTo
+ 
+
+      public function party(): BelongsTo
     {
         return $this->belongsTo(Party::class);
     }
