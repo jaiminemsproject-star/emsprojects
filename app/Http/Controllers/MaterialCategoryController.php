@@ -17,53 +17,82 @@ class MaterialCategoryController extends Controller
         $this->middleware('permission:core.material_category.update')->only(['edit', 'update']);
         $this->middleware('permission:core.material_category.delete')->only('destroy');
     }
-    public function index(Request $request)
-    {
-        $types = MaterialType::orderBy('sort_order')->orderBy('code')->get();
+   public function index(Request $request)
+{
+    $types = MaterialType::orderBy('sort_order')
+        ->orderBy('code')
+        ->get();
 
-        $query = MaterialCategory::with('type')
-            ->withCount('subcategories');
+    $query = MaterialCategory::with('type')
+        ->withCount('subcategories');
 
-        $q = trim((string) $request->get('q', ''));
-        if ($q !== '') {
-            $like = '%' . $q . '%';
-            $query->where(function ($qq) use ($like) {
-                $qq->where('code', 'like', $like)
-                    ->orWhere('name', 'like', $like)
-                    ->orWhere('description', 'like', $like);
-            });
-        }
-
-        $typeId = $request->get('material_type_id');
-        if ($typeId !== null && $typeId !== '') {
-            $query->where('material_type_id', (int) $typeId);
-        }
-
-        $status = $request->get('status');
-        if ($status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($status === 'inactive') {
-            $query->where('is_active', false);
-        }
-
-        $sort = (string) $request->get('sort', '');
-        $dir = strtolower((string) $request->get('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
-
-        $sortable = ['material_type_id', 'code', 'name', 'sort_order', 'is_active', 'subcategories_count', 'created_at'];
-
-        if ($sort !== '' && in_array($sort, $sortable, true)) {
-            $query->orderBy($sort, $dir);
-        } else {
-            // Preserve existing behaviour
-            $query->orderBy('material_type_id')
-                ->orderBy('sort_order')
-                ->orderBy('code');
-        }
-
-        $categories = $query->paginate(25)->withQueryString();
-
-        return view('material_categories.index', compact('categories', 'types'));
+    /* ------------------------------
+     | Code filter
+     |------------------------------*/
+    if ($request->filled('code')) {
+        $query->where('code', 'like', '%' . trim($request->code) . '%');
     }
+
+    /* ------------------------------
+     | Name filter
+     |------------------------------*/
+    if ($request->filled('name')) {
+        $query->where('name', 'like', '%' . trim($request->name) . '%');
+    }
+
+    /* ------------------------------
+     | Description filter
+     |------------------------------*/
+    if ($request->filled('description')) {
+        $query->where('description', 'like', '%' . trim($request->description) . '%');
+    }
+
+    /* ------------------------------
+     | Material Type filter
+     |------------------------------*/
+    if ($request->filled('material_type_id')) {
+        $query->where('material_type_id', (int) $request->material_type_id);
+    }
+
+    /* ------------------------------
+     | Status filter
+     |------------------------------*/
+    if ($request->status === 'active') {
+        $query->where('is_active', true);
+    } elseif ($request->status === 'inactive') {
+        $query->where('is_active', false);
+    }
+
+    /* ------------------------------
+     | Sorting
+     |------------------------------*/
+    $sort = (string) $request->get('sort', '');
+    $dir  = strtolower((string) $request->get('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+    $sortable = [
+        'material_type_id',
+        'code',
+        'name',
+        'sort_order',
+        'is_active',
+        'subcategories_count',
+        'created_at',
+    ];
+
+    if ($sort && in_array($sort, $sortable, true)) {
+        $query->orderBy($sort, $dir);
+    } else {
+        // default order (same as before)
+        $query->orderBy('material_type_id')
+              ->orderBy('sort_order')
+              ->orderBy('code');
+    }
+
+    $categories = $query->paginate(10)->withQueryString();
+
+    return view('material_categories.index', compact('categories', 'types'));
+}
+
 
     public function create()
     {

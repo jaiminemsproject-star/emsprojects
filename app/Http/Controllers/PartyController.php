@@ -30,48 +30,50 @@ class PartyController extends Controller
     /**
      * Display a listing of the parties.
      */
-    public function index(Request $request)
-    {
-        $query = Party::query()->withCount('branches');
+   public function index(Request $request)
+{
+    $query = Party::query()->withCount('branches');
 
-        // Type filters (Supplier / Contractor / Client)
-        $typeKeys = ['is_supplier', 'is_contractor', 'is_client'];
-        $enabledTypes = collect($typeKeys)
-            ->filter(fn ($k) => $request->boolean($k))
-            ->values()
-            ->all();
+    // Type filters (Supplier / Contractor / Client)
+    $typeKeys = ['is_supplier', 'is_contractor', 'is_client'];
+    $enabledTypes = collect($typeKeys)
+        ->filter(fn ($k) => $request->boolean($k))
+        ->values()
+        ->all();
 
-        if (count($enabledTypes)) {
-            $query->where(function ($q) use ($enabledTypes) {
-                foreach ($enabledTypes as $key) {
-                    $q->orWhere($key, true);
-                }
-            });
-        }
-
-        $search = $request->query('q');
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', '%' . $search . '%')
-                  ->orWhere('name', 'like', '%' . $search . '%')
-                  ->orWhere('legal_name', 'like', '%' . $search . '%')
-                  ->orWhere('gstin', 'like', '%' . $search . '%')
-                  ->orWhereHas('branches', function ($b) use ($search) {
-                      $b->where('gstin', 'like', '%' . $search . '%')
-                        ->orWhere('branch_name', 'like', '%' . $search . '%')
-                        ->orWhere('state', 'like', '%' . $search . '%')
-                        ->orWhere('city', 'like', '%' . $search . '%');
-                  });
-            });
-        }
-
-        $parties = $query->orderBy('code')->paginate(25)->withQueryString();
-
-        return view('parties.index', [
-            'parties' => $parties,
-            'search'  => $search,
-        ]);
+    if (!empty($enabledTypes)) {
+        $query->where(function ($q) use ($enabledTypes) {
+            foreach ($enabledTypes as $key) {
+                $q->orWhere($key, true);
+            }
+        });
     }
+
+    $search = trim((string) $request->query('q', ''));
+
+    if ($search !== '') {
+        $query->where(function ($q) use ($search) {
+            $q->where('code', 'like', "%{$search}%")
+              ->orWhere('name', 'like', "%{$search}%")
+              ->orWhere('legal_name', 'like', "%{$search}%")
+              ->orWhere('gstin', 'like', "%{$search}%")
+              ->orWhereHas('branches', function ($b) use ($search) {
+                  $b->where('gstin', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")   // ✅ FIXED
+                    ->orWhere('state', 'like', "%{$search}%")
+                    ->orWhere('city', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    $parties = $query
+        ->orderBy('code')
+        
+        ->paginate(25)
+        ->withQueryString();
+
+    return view('parties.index', compact('parties', 'search'));
+}
 
     /**
      * Show the form for creating a new party.

@@ -20,42 +20,47 @@ class UomController extends Controller
 {
     $query = Uom::query();
 
-    // 🔍 Code filter
+    // 🔍 Filters
     if ($request->filled('code')) {
         $query->where('code', 'like', '%' . trim($request->code) . '%');
     }
 
-    // 🔍 Name filter
     if ($request->filled('name')) {
         $query->where('name', 'like', '%' . trim($request->name) . '%');
     }
 
-    // 🔍 Category filter
+    // Category from SELECT (exact match)
     if ($request->filled('category')) {
-        $query->where('category', 'like', '%' . trim($request->category) . '%');
+        $query->where('category', $request->category);
     }
 
-    // 🔘 Status filter
+    // Status filter
     if ($request->filled('status')) {
         $query->where('is_active', $request->status === 'active');
     }
 
-    // 🔃 Sorting
+    // 🔃 Sorting (managed here)
     $sortable = ['code', 'name', 'category', 'decimal_places', 'is_active', 'created_at'];
-    $sort = $request->get('sort');
-    $dir  = $request->get('dir') === 'desc' ? 'desc' : 'asc';
 
-    if (in_array($sort, $sortable, true)) {
-        $query->orderBy($sort, $dir);
-    } else {
-        $query->orderBy('code');
+    $sort = $request->get('sort', 'created_at'); // default column
+    $dir  = $request->get('dir', 'desc');        // default DESC
+
+    if (! in_array($sort, $sortable, true)) {
+        $sort = 'created_at';
     }
 
-    // 📄 Pagination (keeps filters & sorting)
+    if (! in_array($dir, ['asc', 'desc'], true)) {
+        $dir = 'desc';
+    }
+
+    $query->orderBy($sort, $dir);
+
+    // 📄 Pagination
     $uoms = $query->paginate(10)->withQueryString();
 
     return view('uoms.index', compact('uoms'));
 }
+
 
 
     public function create()

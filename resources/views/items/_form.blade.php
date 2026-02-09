@@ -423,12 +423,18 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-between">
-        <a href="{{ route('items.index') }}" class="btn btn-secondary btn-sm">Cancel</a>
-        <button type="submit" class="btn btn-primary btn-sm">
-            {{ $isEdit ? 'Update Item' : 'Create Item' }}
-        </button>
-    </div>
+    <div class="d-flex gap-2 justify-content-end">
+    <a href="{{ route('items.index') }}"
+       class="btn btn-outline-secondary btn-sm">
+        Cancel
+    </a>
+
+    <button type="submit"
+            class="btn btn-primary btn-sm">
+        {{ $isEdit ? 'Update Item' : 'Create Item' }}
+    </button>
+</div>
+
 </form>
 
 @push('scripts')
