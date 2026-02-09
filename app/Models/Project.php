@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Storage\StorageFolder;
 use App\Models\Storage\StorageFolderUserAccess;
+use App\Models\Tasks\Task as ProjectTask;
 use Illuminate\Support\Facades\Schema;
 
 
@@ -97,6 +98,11 @@ class Project extends Model
   	public function boms(): HasMany
     {
         return $this->hasMany(Bom::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(ProjectTask::class);
     }
 	      
 	      

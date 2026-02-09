@@ -81,13 +81,6 @@
                                        class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form method="POST" action="{{ route('hr.leave-policies.duplicate', $policy) }}" 
-                                          class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Duplicate">
-                                            <i class="bi bi-copy"></i>
-                                        </button>
-                                    </form>
                                     @if($policy->employees_count == 0)
                                         <form method="POST" action="{{ route('hr.leave-policies.destroy', $policy) }}" 
                                               class="d-inline" onsubmit="return confirm('Delete this policy?')">

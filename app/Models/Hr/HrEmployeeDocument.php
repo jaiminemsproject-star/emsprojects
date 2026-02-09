@@ -19,18 +19,18 @@ class HrEmployeeDocument extends Model
         'file_name',
         'file_size',
         'mime_type',
-        'issued_by',
-        'issued_date',
+        'issuing_authority',
+        'issue_date',
         'expiry_date',
         'is_verified',
         'verified_by',
         'verified_at',
         'remarks',
-        'created_by',
+        'uploaded_by',
     ];
 
     protected $casts = [
-        'issued_date' => 'date',
+        'issue_date' => 'date',
         'expiry_date' => 'date',
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',
@@ -51,7 +51,12 @@ class HrEmployeeDocument extends Model
 
     public function createdByUser(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    public function uploader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'uploaded_by');
     }
 
     // ==================== SCOPES ====================
@@ -158,5 +163,36 @@ class HrEmployeeDocument extends Model
         $this->verified_by = null;
         $this->verified_at = null;
         return $this->save();
+    }
+
+    // Backward-compatible aliases for older code paths
+    public function getIssuedDateAttribute()
+    {
+        return $this->issue_date;
+    }
+
+    public function setIssuedDateAttribute($value): void
+    {
+        $this->attributes['issue_date'] = $value;
+    }
+
+    public function getIssuedByAttribute()
+    {
+        return $this->issuing_authority;
+    }
+
+    public function setIssuedByAttribute($value): void
+    {
+        $this->attributes['issuing_authority'] = $value;
+    }
+
+    public function getCreatedByAttribute()
+    {
+        return $this->uploaded_by;
+    }
+
+    public function setCreatedByAttribute($value): void
+    {
+        $this->attributes['uploaded_by'] = $value;
     }
 }

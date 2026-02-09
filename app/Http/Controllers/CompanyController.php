@@ -94,7 +94,6 @@ class CompanyController extends Controller
 
     public function update(UpdateCompanyRequest $request, Company $company)
     {
-        // dd($request->all());
         $data = $request->validated();
         $data['is_default'] = $request->boolean('is_default');
         $data['is_active'] = $request->boolean('is_active');

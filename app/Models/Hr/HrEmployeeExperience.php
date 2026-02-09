@@ -13,15 +13,22 @@ class HrEmployeeExperience extends Model
         'hr_employee_id',
         'company_name',
         'designation',
+        'department',
         'from_date',
         'to_date',
         'is_current',
-        'job_description',
+        'experience_months',
+        'location',
+        'reporting_to',
+        'job_responsibilities',
         'last_ctc',
         'reason_for_leaving',
         'reference_name',
         'reference_contact',
-        'document_path',
+        'reference_email',
+        'reference_verified',
+        'relieving_letter_path',
+        'experience_letter_path',
         'is_verified',
         'remarks',
     ];
@@ -32,6 +39,7 @@ class HrEmployeeExperience extends Model
         'is_current' => 'boolean',
         'last_ctc' => 'decimal:2',
         'is_verified' => 'boolean',
+        'reference_verified' => 'boolean',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -84,5 +92,26 @@ class HrEmployeeExperience extends Model
         $from = $this->from_date->format('M Y');
         $to = $this->is_current ? 'Present' : ($this->to_date ? $this->to_date->format('M Y') : '-');
         return "{$from} - {$to}";
+    }
+
+    // Backward-compatible aliases for older controller/view code.
+    public function getJobDescriptionAttribute()
+    {
+        return $this->job_responsibilities;
+    }
+
+    public function setJobDescriptionAttribute($value): void
+    {
+        $this->attributes['job_responsibilities'] = $value;
+    }
+
+    public function getDocumentPathAttribute()
+    {
+        return $this->experience_letter_path;
+    }
+
+    public function setDocumentPathAttribute($value): void
+    {
+        $this->attributes['experience_letter_path'] = $value;
     }
 }

@@ -213,11 +213,19 @@ class TaskList extends Model
 
     public function getTaskCountAttribute(): int
     {
+        if (array_key_exists('tasks_count', $this->attributes)) {
+            return (int) $this->attributes['tasks_count'];
+        }
+
         return $this->tasks()->count();
     }
 
     public function getOpenTaskCountAttribute(): int
     {
+        if (array_key_exists('open_tasks_count', $this->attributes)) {
+            return (int) $this->attributes['open_tasks_count'];
+        }
+
         return $this->tasks()
             ->whereHas('status', fn($q) => $q->where('is_closed', false))
             ->count();
@@ -225,6 +233,10 @@ class TaskList extends Model
 
     public function getCompletedTaskCountAttribute(): int
     {
+        if (array_key_exists('completed_tasks_count', $this->attributes)) {
+            return (int) $this->attributes['completed_tasks_count'];
+        }
+
         return $this->tasks()
             ->whereHas('status', fn($q) => $q->where('is_closed', true))
             ->count();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tasks;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bom;
 use App\Models\Project;
 use App\Models\Tasks\Task;
 use App\Models\Tasks\TaskLabel;
@@ -23,16 +24,28 @@ class TaskBoardController extends Controller
         $this->middleware('permission:tasks.view');
     }
 
+    protected function getCompanyId(): int
+    {
+        return auth()->user()->company_id ?? 1;
+    }
+
     /**
      * Main Kanban board view
      */
     public function index(Request $request): View
     {
+        $companyId = $this->getCompanyId();
         $taskListId = $request->get('list');
         $projectId = $request->get('project');
+        $bomId = $request->get('bom');
 
         $query = Task::with(['status', 'priority', 'assignee', 'labels', 'taskList', 'children'])
-            ->forCompany(1)
+            ->withCount([
+                'comments',
+                'children as subtask_count',
+                'children as completed_subtask_count' => fn($q) => $q->whereHas('status', fn($s) => $s->where('is_closed', true)),
+            ])
+            ->forCompany($companyId)
             ->notArchived()
             ->rootTasks();
 
@@ -42,6 +55,10 @@ class TaskBoardController extends Controller
 
         if ($projectId) {
             $query->forProject($projectId);
+        }
+
+        if ($bomId) {
+            $query->where('bom_id', $bomId);
         }
 
         // Apply filters
@@ -72,6 +89,12 @@ class TaskBoardController extends Controller
         }
 
         $tasks = $query->orderBy('position')->get();
+        $boardStats = [
+            'total' => $tasks->count(),
+            'open' => $tasks->filter(fn($task) => $task->isOpen())->count(),
+            'overdue' => $tasks->filter(fn($task) => $task->isOverdue())->count(),
+            'unassigned' => $tasks->whereNull('assignee_id')->count(),
+        ];
 
         // Group tasks by status for columns
         $tasksByStatus = $tasks->groupBy('status_id');
@@ -85,13 +108,20 @@ class TaskBoardController extends Controller
         $labels = TaskLabel::active()->orderBy('name')->get();
         $users = User::where('is_active', true)->orderBy('name')->get();
         $projects = Project::where('status', 'active')->orderBy('name')->get();
+        $selectedProjectId = (int) ($projectId ?: 0);
+        if ($selectedProjectId <= 0 && $bomId) {
+            $selectedProjectId = (int) (Bom::query()->where('id', (int) $bomId)->value('project_id') ?: 0);
+        }
+        $boms = $selectedProjectId > 0
+            ? Bom::query()->where('project_id', $selectedProjectId)->orderBy('bom_number')->get()
+            : collect();
 
         $currentList = $taskListId ? TaskList::find($taskListId) : null;
         $currentProject = $projectId ? Project::find($projectId) : null;
 
         return view('tasks.board.index', compact(
             'tasks', 'tasksByStatus', 'statuses', 'taskLists', 'priorities',
-            'labels', 'users', 'projects', 'currentList', 'currentProject'
+            'labels', 'users', 'projects', 'boms', 'currentList', 'currentProject', 'boardStats'
         ));
     }
 
@@ -107,8 +137,6 @@ class TaskBoardController extends Controller
         ]);
 
         $task = Task::findOrFail($request->task_id);
-        $oldStatusId = $task->status_id;
-
         DB::beginTransaction();
         try {
             // Update all positions in the target column
@@ -146,7 +174,12 @@ class TaskBoardController extends Controller
     public function getColumnTasks(Request $request, TaskStatus $status): JsonResponse
     {
         $query = Task::with(['priority', 'assignee', 'labels', 'children'])
-            ->forCompany(1)
+            ->withCount([
+                'comments',
+                'children as subtask_count',
+                'children as completed_subtask_count' => fn($q) => $q->whereHas('status', fn($s) => $s->where('is_closed', true)),
+            ])
+            ->forCompany($this->getCompanyId())
             ->notArchived()
             ->rootTasks()
             ->where('status_id', $status->id);
@@ -157,6 +190,10 @@ class TaskBoardController extends Controller
 
         if ($projectId = $request->get('project')) {
             $query->forProject($projectId);
+        }
+
+        if ($bomId = $request->get('bom')) {
+            $query->where('bom_id', $bomId);
         }
 
         $tasks = $query->orderBy('position')->get();
@@ -189,7 +226,7 @@ class TaskBoardController extends Controller
                 ->max('position') ?? 0;
 
             $task = Task::create([
-                'company_id' => 1,
+                'company_id' => $this->getCompanyId(),
                 'task_list_id' => $request->task_list_id,
                 'title' => $request->title,
                 'status_id' => $request->status_id,
@@ -250,7 +287,7 @@ class TaskBoardController extends Controller
      */
     public function stats(Request $request): JsonResponse
     {
-        $query = Task::forCompany(1)->notArchived();
+        $query = Task::forCompany($this->getCompanyId())->notArchived();
 
         if ($taskListId = $request->get('list')) {
             $query->forList($taskListId);
@@ -258,6 +295,10 @@ class TaskBoardController extends Controller
 
         if ($projectId = $request->get('project')) {
             $query->forProject($projectId);
+        }
+
+        if ($bomId = $request->get('bom')) {
+            $query->where('bom_id', $bomId);
         }
 
         $stats = [

@@ -148,7 +148,7 @@
                                                     $existingComp = isset($structure) ? $structure->components->firstWhere('id', $comp->id) : null;
                                                     $isSelected = $existingComp ? true : false;
                                                     $calcType = $existingComp->pivot->calculation_type ?? $comp->calculation_type ?? 'fixed';
-                                                    $calcValue = $existingComp->pivot->calculation_value ?? $comp->default_value ?? '';
+                                                    $calcValue = $existingComp->pivot->value ?? $comp->default_value ?? '';
                                                     $percentage = $existingComp->pivot->percentage ?? $comp->percentage ?? '';
                                                 @endphp
                                                 <tr>
@@ -199,7 +199,7 @@
                                                     $existingComp = isset($structure) ? $structure->components->firstWhere('id', $comp->id) : null;
                                                     $isSelected = $existingComp ? true : false;
                                                     $calcType = $existingComp->pivot->calculation_type ?? $comp->calculation_type ?? 'fixed';
-                                                    $calcValue = $existingComp->pivot->calculation_value ?? $comp->default_value ?? '';
+                                                    $calcValue = $existingComp->pivot->value ?? $comp->default_value ?? '';
                                                     $percentage = $existingComp->pivot->percentage ?? $comp->percentage ?? '';
                                                 @endphp
                                                 <tr>
@@ -250,7 +250,7 @@
                                                     $existingComp = isset($structure) ? $structure->components->firstWhere('id', $comp->id) : null;
                                                     $isSelected = $existingComp ? true : false;
                                                     $calcType = $existingComp->pivot->calculation_type ?? $comp->calculation_type ?? 'fixed';
-                                                    $calcValue = $existingComp->pivot->calculation_value ?? $comp->default_value ?? '';
+                                                    $calcValue = $existingComp->pivot->value ?? $comp->default_value ?? '';
                                                     $percentage = $existingComp->pivot->percentage ?? $comp->percentage ?? '';
                                                 @endphp
                                                 <tr>

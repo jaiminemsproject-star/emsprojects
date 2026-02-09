@@ -88,6 +88,33 @@
     </div>
 
     <div class="card mb-3">
+        <div class="card-body py-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label form-label-sm">Quick search summary rows</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" id="ivSummarySearch" class="form-control"
+                               placeholder="Filter by account code/name...">
+                        <button type="button" id="ivSummarySearchClear" class="btn btn-outline-secondary">Clear</button>
+                    </div>
+                </div>
+                @if($details)
+                    <div class="col-md-6">
+                        <label class="form-label form-label-sm">Quick search detail lines</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                            <input type="text" id="ivDetailSearch" class="form-control"
+                                   placeholder="Filter item/project/category/cost source...">
+                            <button type="button" id="ivDetailSearchClear" class="btn btn-outline-secondary">Clear</button>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
         <div class="card-header py-2 d-flex justify-content-between align-items-center">
             <div class="fw-semibold small">
                 Summary as on {{ optional($asOfDate)->toDateString() }}
@@ -120,13 +147,21 @@
                         $ledgerFrom = optional($asOfDate)->copy()->startOfMonth()->toDateString();
                     @endphp
                     <tbody>
+                        <tr id="ivSummaryNoMatch" class="d-none">
+                            <td colspan="8" class="text-center small text-muted py-3">No summary rows match the search text.</td>
+                        </tr>
                         @if(count($summaryRows))
                             @foreach($summaryRows as $row)
                                 @php
                                     $acc = $row['account'];
                                     $diff = (float) $row['difference'];
+                                    $summarySearchText = strtolower(trim(
+                                        ($acc?->code ?? '') . ' ' .
+                                        ($acc?->name ?? '') . ' ' .
+                                        (($acc ? '' : 'unknown unmapped inventory account'))
+                                    ));
                                 @endphp
-                                <tr>
+                                <tr class="iv-summary-row" data-summary-text="{{ $summarySearchText }}">
                                     <td class="small">{{ $acc?->code ?? 'N/A' }}</td>
                                     <td class="small">
                                         @if($acc)
@@ -205,6 +240,9 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr id="ivDetailNoMatch" class="d-none">
+                                <td colspan="10" class="text-center small text-muted py-3">No detail rows match the search text.</td>
+                            </tr>
                             @if(count($detailRows))
                                 @foreach($detailRows as $d)
                                     @php
@@ -212,8 +250,19 @@
                                         $project = $d['project'];
                                         $isClient = (bool) ($d['is_client_material'] ?? false);
                                         $cost = (string) ($d['cost_source'] ?? '');
+                                        $detailSearchText = strtolower(trim(
+                                            ($item?->code ?? '') . ' ' .
+                                            ($item?->name ?? '') . ' ' .
+                                            ($project?->code ?? '') . ' ' .
+                                            ($project?->name ?? '') . ' ' .
+                                            ($d['material_category'] ?? '') . ' ' .
+                                            ($d['grade'] ?? '') . ' ' .
+                                            ($d['qty_uom'] ?? '') . ' ' .
+                                            ($d['source_reference'] ?? '') . ' ' .
+                                            ($cost ?? '')
+                                        ));
                                     @endphp
-                                    <tr>
+                                    <tr class="iv-detail-row" data-detail-text="{{ $detailSearchText }}">
                                         <td class="small">{{ $d['stock_id'] }}</td>
                                         <td class="small">
                                             {{ $item?->code ? $item->code.' - ' : '' }}{{ $item?->name }}
@@ -272,3 +321,51 @@
     @endif
 </div>
 @endsection
+
+@push('styles')
+<style>
+.iv-summary-row:hover td,
+.iv-detail-row:hover td {
+    background: #f7faff;
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function initSearch(inputId, clearId, rowSelector, textKey, noMatchId) {
+        const input = document.getElementById(inputId);
+        const clearBtn = document.getElementById(clearId);
+        const noMatchRow = document.getElementById(noMatchId);
+        const rows = Array.from(document.querySelectorAll(rowSelector));
+        if (!input || !rows.length) return;
+
+        const applyFilter = function () {
+            const needle = (input.value || '').trim().toLowerCase();
+            let visible = 0;
+            rows.forEach((row) => {
+                const haystack = (row.dataset[textKey] || row.textContent || '').toLowerCase();
+                const show = needle === '' || haystack.includes(needle);
+                row.classList.toggle('d-none', !show);
+                if (show) visible++;
+            });
+            if (noMatchRow) noMatchRow.classList.toggle('d-none', needle === '' || visible > 0);
+        };
+
+        input.addEventListener('input', applyFilter);
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                input.value = '';
+                applyFilter();
+            });
+        }
+
+        applyFilter();
+    }
+
+    initSearch('ivSummarySearch', 'ivSummarySearchClear', '.iv-summary-row', 'summaryText', 'ivSummaryNoMatch');
+    initSearch('ivDetailSearch', 'ivDetailSearchClear', '.iv-detail-row', 'detailText', 'ivDetailNoMatch');
+});
+</script>
+@endpush

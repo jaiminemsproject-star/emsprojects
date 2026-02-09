@@ -3,6 +3,11 @@
 @section('title', 'Chart of Accounts')
 
 @section('content')
+@php
+    $visibleNodes = collect($tree ?? [])->filter(function ($node) use ($hasFilters) {
+        return !($hasFilters ?? false) || !empty($node['has_content']);
+    });
+@endphp
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
@@ -18,6 +23,13 @@
             @endcan
         </div>
     </div>
+
+    @if(session('success'))
+        <div class="alert alert-success py-2 mb-3">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger py-2 mb-3">{{ session('error') }}</div>
+    @endif
 
     <div class="card mb-3">
         <div class="card-body">
@@ -78,7 +90,7 @@
     <div class="card">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div class="small text-muted">
-                Expand a group to see its sub-groups and ledgers.
+                Expand a group to see sub-groups and ledgers.
             </div>
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="coaExpandAll">Expand all</button>
@@ -87,11 +99,17 @@
         </div>
 
         <div class="card-body">
-            @foreach($tree as $node)
-                @if(!(($hasFilters ?? false)) || !empty($node['has_content']))
+            @if($visibleNodes->isEmpty())
+                <div class="border rounded-3 p-4 text-center bg-body-tertiary">
+                    <div class="fw-semibold mb-1">No ledgers found</div>
+                    <div class="small text-muted">Try clearing filters or creating a new account.</div>
+                    <a href="{{ route('accounting.accounts.index') }}" class="btn btn-link btn-sm mt-2">Reset filters</a>
+                </div>
+            @else
+                @foreach($visibleNodes as $node)
                     @include('accounting.accounts._group_tree', ['node' => $node, 'depth' => 0, 'ledgerTypes' => $ledgerTypes])
-                @endif
-            @endforeach
+                @endforeach
+            @endif
         </div>
     </div>
 </div>
@@ -103,12 +121,30 @@
 .collapse.show {
     visibility: visible !important;
 }
+
+.coa-group {
+    border-left: 2px solid var(--bs-border-color-translucent);
+}
+
+.coa-group-header {
+    border-radius: .5rem;
+}
+
+.coa-toggle {
+    color: var(--bs-body-color);
+}
+
+.coa-toggle:focus {
+    box-shadow: none;
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const hasActiveFilters = @json((bool)($hasFilters ?? false));
+
     // Expand / Collapse all buttons
     const expandBtn   = document.getElementById('coaExpandAll');
     const collapseBtn = document.getElementById('coaCollapseAll');
@@ -121,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!target || !icon) return;
             const section = document.querySelector(target);
             const expanded = section && section.classList.contains('show');
-            icon.textContent = expanded ? '[−]' : '[+]';
+            icon.className = expanded ? 'coa-icon bi bi-dash-square-fill' : 'coa-icon bi bi-plus-square';
         });
     }
 
@@ -149,6 +185,15 @@ document.addEventListener('DOMContentLoaded', function () {
         section.addEventListener('shown.bs.collapse', setExpandedIcons);
         section.addEventListener('hidden.bs.collapse', setExpandedIcons);
     });
+
+    if (hasActiveFilters) {
+        allSections().forEach(section => {
+            const c = bootstrap.Collapse.getOrCreateInstance(section, { toggle: false });
+            c.show();
+        });
+    }
+
+    setExpandedIcons();
 });
 </script>
 @endpush

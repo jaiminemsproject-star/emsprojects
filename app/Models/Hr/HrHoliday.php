@@ -11,28 +11,21 @@ class HrHoliday extends Model
     protected $table = 'hr_holidays';
 
     protected $fillable = [
-        'company_id',
         'hr_holiday_calendar_id',
         'name',
-        'holiday_date',        // This is the correct column name
+        'holiday_date',
         'holiday_type',
+        'is_paid',
         'is_optional',
-        'is_restricted',
-        'applicable_religions',
-        'applicable_genders',
-        'applicable_locations',
         'description',
         'is_active',
     ];
 
     protected $casts = [
         'holiday_date' => 'date',
+        'is_paid' => 'boolean',
         'is_optional' => 'boolean',
-        'is_restricted' => 'boolean',
         'is_active' => 'boolean',
-        'applicable_religions' => 'array',
-        'applicable_genders' => 'array',
-        'applicable_locations' => 'array',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -75,7 +68,7 @@ class HrHoliday extends Model
 
     public function scopePublic($query)
     {
-        return $query->where('is_optional', false)->where('is_restricted', false);
+        return $query->where('is_optional', false);
     }
 
     public function scopeOptional($query)
@@ -109,9 +102,9 @@ class HrHoliday extends Model
     {
         return match($this->holiday_type) {
             'national' => 'danger',
-            'state' => 'warning',
-            'religious' => 'info',
+            'regional' => 'warning',
             'company' => 'primary',
+            'restricted' => 'info',
             'optional' => 'secondary',
             default => 'dark',
         };
@@ -121,9 +114,9 @@ class HrHoliday extends Model
     {
         return match($this->holiday_type) {
             'national' => 'National Holiday',
-            'state' => 'State Holiday',
-            'religious' => 'Religious Holiday',
+            'regional' => 'Regional Holiday',
             'company' => 'Company Holiday',
+            'restricted' => 'Restricted Holiday',
             'optional' => 'Optional Holiday',
             default => ucfirst($this->holiday_type ?? '-'),
         };
@@ -136,30 +129,6 @@ class HrHoliday extends Model
      */
     public function isApplicableFor(HrEmployee $employee): bool
     {
-        // If holiday is restricted, check applicability
-        if ($this->is_restricted) {
-            // Check religion
-            if ($this->applicable_religions && count($this->applicable_religions) > 0) {
-                if (!in_array($employee->religion, $this->applicable_religions)) {
-                    return false;
-                }
-            }
-
-            // Check gender
-            if ($this->applicable_genders && count($this->applicable_genders) > 0) {
-                if (!in_array($employee->gender, $this->applicable_genders)) {
-                    return false;
-                }
-            }
-
-            // Check location
-            if ($this->applicable_locations && count($this->applicable_locations) > 0) {
-                if (!in_array($employee->hr_work_location_id, $this->applicable_locations)) {
-                    return false;
-                }
-            }
-        }
-
         return true;
     }
 
@@ -218,10 +187,23 @@ class HrHoliday extends Model
     {
         return [
             'national' => 'National Holiday',
-            'state' => 'State Holiday',
-            'religious' => 'Religious Holiday',
+            'regional' => 'Regional Holiday',
             'company' => 'Company Holiday',
+            'restricted' => 'Restricted Holiday',
             'optional' => 'Optional Holiday',
         ];
+    }
+
+    // Backward-compatible aliases used by existing forms.
+    public function getIsRestrictedAttribute()
+    {
+        return $this->holiday_type === 'restricted';
+    }
+
+    public function setIsRestrictedAttribute($value): void
+    {
+        if ((bool) $value) {
+            $this->attributes['holiday_type'] = 'restricted';
+        }
     }
 }

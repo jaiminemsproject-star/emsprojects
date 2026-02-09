@@ -8,9 +8,11 @@ use App\Http\Requests\UpdateBomRequest;
 use App\Models\Bom;
 use App\Models\BomItem;
 use App\Models\Project;
+use App\Models\Tasks\Task;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Enums\BomItemMaterialCategory;
 
@@ -103,12 +105,41 @@ class BomController extends Controller
 
         $assemblyWeights = $bom->assembly_weights;
         $categorySummary = $bom->category_summary;
+        $taskStats = [
+            'total' => 0,
+            'open' => 0,
+            'completed' => 0,
+            'overdue' => 0,
+        ];
+        $recentTasks = collect();
+
+        if (auth()->user()?->can('tasks.view') && Schema::hasTable('tasks')) {
+            $taskQuery = Task::query()
+                ->with(['status', 'priority', 'assignee'])
+                ->where('project_id', $project->id)
+                ->where('bom_id', $bom->id)
+                ->notArchived();
+
+            $taskStats = [
+                'total' => (clone $taskQuery)->count(),
+                'open' => (clone $taskQuery)->open()->count(),
+                'completed' => (clone $taskQuery)->closed()->count(),
+                'overdue' => (clone $taskQuery)->overdue()->count(),
+            ];
+
+            $recentTasks = (clone $taskQuery)
+                ->orderByDesc('updated_at')
+                ->limit(6)
+                ->get();
+        }
 
         return view('projects.boms.show', compact(
             'project',
             'bom',
             'assemblyWeights',
-            'categorySummary'
+            'categorySummary',
+            'taskStats',
+            'recentTasks'
         ));
     }
 	

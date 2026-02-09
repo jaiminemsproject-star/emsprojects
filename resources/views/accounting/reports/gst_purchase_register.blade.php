@@ -3,11 +3,49 @@
 @section('title', 'GST Purchase Register')
 
 @section('content')
+@php
+    $periodFrom = request('from_date', optional($fromDate)->toDateString());
+    $periodTo = request('to_date', optional($toDate)->toDateString());
+    $gstTotalPaise = (int) (($totals['cgst'] ?? 0) + ($totals['sgst'] ?? 0) + ($totals['igst'] ?? 0));
+@endphp
 <div class="container-fluid">
-    <h1 class="h4 mb-3">GST Purchase Register (Invoice-wise)</h1>
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+        <div>
+            <h1 class="h4 mb-1">GST Purchase Register (Invoice-wise)</h1>
+            <div class="small text-muted">Posting-date based · {{ $periodFrom }} to {{ $periodTo }}</div>
+        </div>
+    </div>
+
     <p class="text-muted small mb-3">
         Date filter is applied on <strong>Posting Date</strong> (books/voucher date). Invoice Date is shown separately for GST compliance.
     </p>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body py-3">
+                <div class="text-muted small">Taxable Value</div>
+                <div class="h6 mb-0">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['taxable'] ?? 0) }}</div>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body py-3">
+                <div class="text-muted small">GST Total</div>
+                <div class="h6 mb-0">{{ \\App\\Support\\MoneyHelper::fromPaise($gstTotalPaise) }}</div>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body py-3">
+                <div class="text-muted small">Invoice Total</div>
+                <div class="h6 mb-0">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['invoice'] ?? 0) }}</div>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body py-3">
+                <div class="text-muted small">Net Payable</div>
+                <div class="h6 mb-0">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['net_payable'] ?? 0) }}</div>
+            </div></div>
+        </div>
+    </div>
 
     <div class="card mb-3">
         <div class="card-body">
@@ -16,18 +54,12 @@
 
                 <div class="col-md-3">
                     <label class="form-label form-label-sm">Posting Date From</label>
-                    <input type="date"
-                           name="from_date"
-                           value="{{ request('from_date', optional($fromDate)->toDateString()) }}"
-                           class="form-control form-control-sm">
+                    <input type="date" name="from_date" value="{{ $periodFrom }}" class="form-control form-control-sm">
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label form-label-sm">Posting Date To</label>
-                    <input type="date"
-                           name="to_date"
-                           value="{{ request('to_date', optional($toDate)->toDateString()) }}"
-                           class="form-control form-control-sm">
+                    <input type="date" name="to_date" value="{{ $periodTo }}" class="form-control form-control-sm">
                 </div>
 
                 <div class="col-md-3">
@@ -45,10 +77,8 @@
                 <div class="col-md-2">
                     <label class="form-label form-label-sm">Status</label>
                     <select name="status" class="form-select form-select-sm">
-                        @php
-    $curStatus = request('status', $status ?? 'posted');
-@endphp
-<option value="posted" {{ $curStatus === 'posted' ? 'selected' : '' }}>Posted</option>
+                        @php $curStatus = request('status', $status ?? 'posted'); @endphp
+                        <option value="posted" {{ $curStatus === 'posted' ? 'selected' : '' }}>Posted</option>
                         <option value="draft" {{ $curStatus === 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="cancelled" {{ $curStatus === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                         <option value="all" {{ $curStatus === 'all' ? 'selected' : '' }}>All</option>
@@ -59,11 +89,21 @@
                     <button class="btn btn-sm btn-primary">Apply</button>
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-md-6 d-flex gap-2 flex-wrap">
                     <a class="btn btn-sm btn-outline-secondary"
                        href="{{ route('accounting.reports.gst-purchase-register.export', request()->all()) }}">
                         Export CSV
                     </a>
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('accounting.reports.gst-purchase-register') }}">Reset</a>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label form-label-sm">Quick search</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" id="gprSearch" class="form-control" placeholder="Invoice no / voucher / supplier / gstin / status...">
+                        <button type="button" id="gprSearchClear" class="btn btn-outline-secondary">Clear</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -78,45 +118,45 @@
                             <tbody>
                             <tr>
                                 <th class="text-muted" style="width: 180px;">Taxable Value</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['taxable'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['taxable'] ?? 0) }}</td>
 
                                 <th class="text-muted" style="width: 120px;">CGST</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['cgst'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['cgst'] ?? 0) }}</td>
 
                                 <th class="text-muted" style="width: 120px;">SGST</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['sgst'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['sgst'] ?? 0) }}</td>
 
                                 <th class="text-muted" style="width: 120px;">IGST</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['igst'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['igst'] ?? 0) }}</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">RCM CGST</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['rcm_cgst'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['rcm_cgst'] ?? 0) }}</td>
 
                                 <th class="text-muted">RCM SGST</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['rcm_sgst'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['rcm_sgst'] ?? 0) }}</td>
 
                                 <th class="text-muted">RCM IGST</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['rcm_igst'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['rcm_igst'] ?? 0) }}</td>
 
                                 @php
                                     $rcmTotalPaise = ($totals['rcm_cgst'] ?? 0) + ($totals['rcm_sgst'] ?? 0) + ($totals['rcm_igst'] ?? 0);
                                 @endphp
                                 <th class="text-muted">RCM Total GST</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($rcmTotalPaise) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($rcmTotalPaise) }}</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Invoice Total</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['invoice'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['invoice'] ?? 0) }}</td>
 
                                 <th class="text-muted">TCS</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['tcs_amount'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['tcs_amount'] ?? 0) }}</td>
 
                                 <th class="text-muted">TDS</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['tds_amount'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['tds_amount'] ?? 0) }}</td>
 
                                 <th class="text-muted">Net Payable</th>
-                                <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($totals['net_payable'] ?? 0) }}</td>
+                                <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($totals['net_payable'] ?? 0) }}</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Bills</th>
@@ -150,65 +190,85 @@
                             </tr>
                             </thead>
                             <tbody>
+                            <tr id="gprNoMatch" class="d-none">
+                                <td colspan="17" class="text-center text-muted py-4">No bills match the search text.</td>
+                            </tr>
                             @if(count($bills))
-                            @foreach($bills as $bill)
-                                @php
-                                    $taxablePaise = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_basic') ?? $bill->total_basic ?? 0);
-                                    $cgstPaise    = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_cgst') ?? $bill->total_cgst ?? 0);
-                                    $sgstPaise    = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_sgst') ?? $bill->total_sgst ?? 0);
-                                    $igstPaise    = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_igst') ?? $bill->total_igst ?? 0);
-                                    $gstPaise     = $cgstPaise + $sgstPaise + $igstPaise;
-                                    $rcmCgstPaise = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_rcm_cgst') ?? $bill->total_rcm_cgst ?? 0);
-                                    $rcmSgstPaise = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_rcm_sgst') ?? $bill->total_rcm_sgst ?? 0);
-                                    $rcmIgstPaise = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_rcm_igst') ?? $bill->total_rcm_igst ?? 0);
-                                    $rcmGstPaise  = $rcmCgstPaise + $rcmSgstPaise + $rcmIgstPaise;
-                                    $invoicePaise = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('total_amount') ?? $bill->total_amount ?? 0);
-                                    $tcsPaise     = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('tcs_amount') ?? $bill->tcs_amount ?? 0);
-                                    $tdsPaise     = \App\Support\MoneyHelper::toPaise($bill->getRawOriginal('tds_amount') ?? $bill->tds_amount ?? 0);
-                                    $netPaise     = ($invoicePaise + $tcsPaise) - $tdsPaise;
-                                @endphp
-                                <tr>
-                                    <td>{{ optional($bill->bill_date)->toDateString() }}</td>
-                                    <td>{{ optional($bill->getAttribute('posting_date') ?: optional($bill->voucher)->voucher_date ?: $bill->bill_date)->toDateString() }}</td>
-                                    <td>{{ $bill->bill_number }}</td>
-                                    <td>
-                                        @if($bill->voucher)
-                                            <a href="{{ route('accounting.vouchers.show', $bill->voucher) }}" class="text-decoration-none">
-                                                {{ $bill->voucher->voucher_no }}
-                                            </a>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td>{{ $bill->supplier?->name }}</td>
-                                    <td>{{ $bill->supplier?->gstin }}</td>
+                                @foreach($bills as $bill)
+                                    @php
+                                        $taxablePaise = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_basic') ?? $bill->total_basic ?? 0);
+                                        $cgstPaise    = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_cgst') ?? $bill->total_cgst ?? 0);
+                                        $sgstPaise    = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_sgst') ?? $bill->total_sgst ?? 0);
+                                        $igstPaise    = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_igst') ?? $bill->total_igst ?? 0);
+                                        $gstPaise     = $cgstPaise + $sgstPaise + $igstPaise;
+                                        $rcmCgstPaise = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_rcm_cgst') ?? $bill->total_rcm_cgst ?? 0);
+                                        $rcmSgstPaise = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_rcm_sgst') ?? $bill->total_rcm_sgst ?? 0);
+                                        $rcmIgstPaise = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_rcm_igst') ?? $bill->total_rcm_igst ?? 0);
+                                        $rcmGstPaise  = $rcmCgstPaise + $rcmSgstPaise + $rcmIgstPaise;
+                                        $invoicePaise = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('total_amount') ?? $bill->total_amount ?? 0);
+                                        $tcsPaise     = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('tcs_amount') ?? $bill->tcs_amount ?? 0);
+                                        $tdsPaise     = \\App\\Support\\MoneyHelper::toPaise($bill->getRawOriginal('tds_amount') ?? $bill->tds_amount ?? 0);
+                                        $netPaise     = ($invoicePaise + $tcsPaise) - $tdsPaise;
+                                        $postingDate  = optional($bill->getAttribute('posting_date') ?: optional($bill->voucher)->voucher_date ?: $bill->bill_date)->toDateString();
+                                        $searchText = strtolower(trim(
+                                            (optional($bill->bill_date)->toDateString() ?? '') . ' ' .
+                                            ($postingDate ?? '') . ' ' .
+                                            ($bill->bill_number ?? '') . ' ' .
+                                            (optional($bill->voucher)->voucher_no ?? '') . ' ' .
+                                            ($bill->supplier?->name ?? '') . ' ' .
+                                            ($bill->supplier?->gstin ?? '') . ' ' .
+                                            ($bill->status ?? '')
+                                        ));
+                                    @endphp
+                                    <tr class="gpr-row" data-row-text="{{ $searchText }}">
+                                        <td>{{ optional($bill->bill_date)->toDateString() }}</td>
+                                        <td>{{ $postingDate }}</td>
+                                        <td>{{ $bill->bill_number }}</td>
+                                        <td>
+                                            @if($bill->voucher)
+                                                <a href="{{ route('accounting.vouchers.show', $bill->voucher) }}" class="text-decoration-none">
+                                                    {{ $bill->voucher->voucher_no }}
+                                                </a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($bill->supplier)
+                                                <a href="{{ route('accounting.reports.supplier-ageing', ['supplier_id' => $bill->supplier->id, 'as_of_date' => $periodTo]) }}" class="text-decoration-none">
+                                                    {{ $bill->supplier->name }}
+                                                </a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>{{ $bill->supplier?->gstin }}</td>
 
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($taxablePaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($cgstPaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($sgstPaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($igstPaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($gstPaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($rcmGstPaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($invoicePaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($tcsPaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($tdsPaise) }}</td>
-                                    <td class="text-end">{{ \App\Support\MoneyHelper::fromPaise($netPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($taxablePaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($cgstPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($sgstPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($igstPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($gstPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($rcmGstPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($invoicePaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($tcsPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($tdsPaise) }}</td>
+                                        <td class="text-end">{{ \\App\\Support\\MoneyHelper::fromPaise($netPaise) }}</td>
 
-                                    <td>
-                                        <span class="badge bg-{{ $bill->status === 'posted' ? 'success' : ($bill->status === 'draft' ? 'secondary' : 'danger') }}">
-                                            {{ $bill->status }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                                        @endforeach
+                                        <td>
+                                            <span class="badge bg-{{ $bill->status === 'posted' ? 'success' : ($bill->status === 'draft' ? 'secondary' : 'danger') }}">
+                                                {{ $bill->status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             @else
-
                                 <tr>
                                     <td colspan="17" class="text-center text-muted py-4">
                                         No purchase bills found for selected filters.
                                     </td>
                                 </tr>
-                                                        @endif
+                            @endif
                             </tbody>
                         </table>
                     </div>
@@ -224,3 +284,42 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.gpr-row:hover td { background: #f5faff; }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('gprSearch');
+    const clearBtn = document.getElementById('gprSearchClear');
+    const rows = Array.from(document.querySelectorAll('.gpr-row'));
+    const noMatch = document.getElementById('gprNoMatch');
+    if (!input || !rows.length) return;
+
+    const applyFilter = function () {
+        const needle = (input.value || '').trim().toLowerCase();
+        let visible = 0;
+        rows.forEach((row) => {
+            const hay = (row.dataset.rowText || row.textContent || '').toLowerCase();
+            const show = needle === '' || hay.includes(needle);
+            row.classList.toggle('d-none', !show);
+            if (show) visible++;
+        });
+        if (noMatch) noMatch.classList.toggle('d-none', needle === '' || visible > 0);
+    };
+
+    input.addEventListener('input', applyFilter);
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            input.value = '';
+            applyFilter();
+        });
+    }
+    applyFilter();
+});
+</script>
+@endpush

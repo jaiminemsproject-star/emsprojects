@@ -193,9 +193,6 @@ Route::prefix('my')->name('my.')->group(function () {
 		Route::match(['get', 'post'], 'bulk-entry', [\App\Http\Controllers\Hr\HrAttendanceBulkEntryController::class, 'handle'])
    			 ->name('bulk-entry');
       
-      	// Show (after named routes)
-        Route::get('{attendance}', [HrAttendanceController::class, 'show'])->name('show');
-
         // Process Attendance
         Route::post('process', [HrAttendanceController::class, 'process'])->name('process');
 
@@ -214,6 +211,9 @@ Route::prefix('my')->name('my.')->group(function () {
 
         // Punch Import
         Route::match(['get', 'post'], 'import-punches', [HrAttendanceController::class, 'importPunches'])->name('import-punches');
+
+        // Keep catch-all show route last so static attendance URLs don't get shadowed.
+        Route::get('{attendance}', [HrAttendanceController::class, 'show'])->name('show');
     });
 
     // ===========================

@@ -3,13 +3,51 @@
 @section('title', 'New DPR')
 
 @section('content')
+@php
+    $isScoped = !empty($projectId);
+    $listUrl = $isScoped
+        ? url('/projects/'.$projectId.'/production-dprs')
+        : url('/production/production-dprs');
+    $createUrl = $isScoped
+        ? url('/projects/'.$projectId.'/production-dprs/create')
+        : url('/production/production-dprs/create');
+    $storeUrl = $isScoped
+        ? url('/projects/'.$projectId.'/production-dprs')
+        : url('/production/production-dprs');
+@endphp
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="mb-0"><i class="bi bi-plus-circle"></i> New DPR</h2>
-        <a class="btn btn-outline-secondary" href="{{ url('/projects/'.$projectId.'/production-dprs') }}">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-plus-circle"></i> New DPR</h2>
+            <div class="text-muted small">{{ $isScoped ? 'Project-specific DPR creation' : 'Global mode: select a project first' }}</div>
+        </div>
+        <a class="btn btn-outline-secondary" href="{{ $listUrl }}">
             <i class="bi bi-arrow-left"></i> Back
         </a>
     </div>
+
+    @if(! $isScoped)
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="GET" action="{{ $createUrl }}" class="row g-2 align-items-end">
+                    <div class="col-md-6">
+                        <label class="form-label">Select Project</label>
+                        <select name="project_id" class="form-select" onchange="this.form.submit()">
+                            <option value="">— Select —</option>
+                            @foreach(($projects ?? collect()) as $p)
+                                <option value="{{ $p->id }}" {{ (string) request('project_id') === (string) $p->id ? 'selected' : '' }}>
+                                    {{ $p->code }} — {{ $p->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="{{ $createUrl }}" class="btn btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 
     @if($errors->any())
         <div class="alert alert-danger">
@@ -19,10 +57,19 @@
         </div>
     @endif
 
+    @if(! $isScoped)
+        <div class="alert alert-info">
+            Select a project to load approved plans and cutting plans for DPR creation.
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ url('/projects/'.$projectId.'/production-dprs') }}">
+            <form method="POST" action="{{ $storeUrl }}">
                 @csrf
+                @if(! $isScoped)
+                    <input type="hidden" name="project_id" value="{{ request('project_id') }}">
+                @endif
 
                 <div class="row g-3">
                     <div class="col-md-6">

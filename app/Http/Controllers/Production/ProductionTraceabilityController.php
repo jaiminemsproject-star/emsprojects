@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers\Production;
@@ -779,6 +778,5 @@ class ProductionTraceabilityController extends Controller
             ->with('success', 'Fitup traceability saved.');
     }
 }
-
 
 

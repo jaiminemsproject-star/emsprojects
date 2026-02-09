@@ -38,6 +38,15 @@
                 <div class="col-md-2 text-end small text-muted">
                     Company #{{ $companyId }}
                 </div>
+
+                <div class="col-md-6">
+                    <label class="form-label form-label-sm">Quick search movement rows</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="cashFlowSearch" class="form-control" placeholder="Search voucher no/type/narration/ledger...">
+                        <button type="button" class="btn btn-outline-secondary" id="cashFlowSearchClear">Clear</button>
+                    </div>
+                </div>
             </form>
 
             @if($cashAccounts->isEmpty())
@@ -51,6 +60,26 @@
             @endif
         </div>
     </div>
+
+    @if($cashAccounts->count())
+        <div class="card mb-3">
+            <div class="card-body py-2">
+                <div class="small text-muted mb-1">Cash/Bank Ledgers Used</div>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach($cashAccounts as $acc)
+                        <a href="{{ route('accounting.reports.ledger', [
+                            'account_id' => $acc->id,
+                            'from_date' => optional($fromDate)->toDateString(),
+                            'to_date' => optional($toDate)->toDateString(),
+                        ]) }}"
+                           class="badge rounded-pill text-bg-light text-decoration-none border">
+                            {{ $acc->code }} - {{ $acc->name }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
 
     <div class="row mb-3">
         <div class="col-md-3">
@@ -146,6 +175,10 @@
         </div>
     </div>
 
+    <div id="cashFlowNoMatch" class="alert alert-warning d-none py-2">
+        No cash-flow movement rows match your search text.
+    </div>
+
     {{-- Detailed cash/bank movements --}}
     <div class="card">
         <div class="card-header py-2">
@@ -159,21 +192,42 @@
                             <th style="width: 10%;">Date</th>
                             <th style="width: 14%;">Voucher No</th>
                             <th style="width: 14%;">Type</th>
-                            <th style="width: 32%;">Narration</th>
-                            <th class="text-end" style="width: 10%;">Debit</th>
-                            <th class="text-end" style="width: 10%;">Credit</th>
-                            <th class="text-end" style="width: 10%;">Net (In / Out)</th>
+                            <th style="width: 20%;">Ledger</th>
+                            <th style="width: 24%;">Narration</th>
+                            <th class="text-end" style="width: 7%;">Debit</th>
+                            <th class="text-end" style="width: 7%;">Credit</th>
+                            <th class="text-end" style="width: 8%;">Net (In / Out)</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($lines as $row)
                             @php
                                 $delta = $row['inflow'] - $row['outflow'];
+                                $searchText = strtolower(trim(
+                                    ($row['voucher_no'] ?? '') . ' ' .
+                                    ($row['voucher_type'] ?? '') . ' ' .
+                                    ($row['narration'] ?? '') . ' ' .
+                                    ($row['account_code'] ?? '') . ' ' .
+                                    ($row['account_name'] ?? '')
+                                ));
                             @endphp
-                            <tr>
+                            <tr class="cash-flow-detail-row" data-search-text="{{ $searchText }}">
                                 <td class="small">{{ \Illuminate\Support\Carbon::parse($row['date'])->toDateString() }}</td>
-                                <td class="small">{{ $row['voucher_no'] }}</td>
+                                <td class="small">
+                                    <a href="{{ route('accounting.vouchers.show', $row['voucher_id']) }}" class="text-decoration-none">
+                                        {{ $row['voucher_no'] }}
+                                    </a>
+                                </td>
                                 <td class="small text-uppercase">{{ $row['voucher_type'] }}</td>
+                                <td class="small">
+                                    <a href="{{ route('accounting.reports.ledger', [
+                                        'account_id' => $row['account_id'],
+                                        'from_date' => optional($fromDate)->toDateString(),
+                                        'to_date' => optional($toDate)->toDateString(),
+                                    ]) }}" class="text-decoration-none">
+                                        {{ $row['account_code'] }} - {{ $row['account_name'] }}
+                                    </a>
+                                </td>
                                 <td class="small">{{ $row['narration'] }}</td>
                                 <td class="small text-end">{{ number_format($row['debit'], 2) }}</td>
                                 <td class="small text-end">{{ number_format($row['credit'], 2) }}</td>
@@ -189,7 +243,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="small text-muted text-center py-2">
+                                <td colspan="8" class="small text-muted text-center py-2">
                                     No movements for selected period.
                                 </td>
                             </tr>
@@ -201,3 +255,39 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('cashFlowSearch');
+    const clearBtn = document.getElementById('cashFlowSearchClear');
+    const noMatch = document.getElementById('cashFlowNoMatch');
+    const rows = Array.from(document.querySelectorAll('.cash-flow-detail-row'));
+
+    function applySearch() {
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        let visible = 0;
+
+        rows.forEach((row) => {
+            const txt = row.dataset.searchText || '';
+            const match = !query || txt.includes(query);
+            row.classList.toggle('d-none', !match);
+            if (match) visible += 1;
+        });
+
+        if (noMatch) {
+            noMatch.classList.toggle('d-none', !(query && visible === 0));
+        }
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applySearch);
+    if (clearBtn && searchInput) {
+        clearBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            applySearch();
+            searchInput.focus();
+        });
+    }
+});
+</script>
+@endpush

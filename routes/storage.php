@@ -26,7 +26,11 @@ Route::middleware(['auth', EnsureHasStorageAccess::class])
         Route::delete('folders/{folder}/access/{user}', [StorageFolderAccessController::class, 'destroy'])->name('folders.access.destroy');
 
         // Files
+        Route::post('files/bulk-download', [StorageFileController::class, 'bulkDownload'])->name('files.bulk-download');
+        Route::post('files/bulk-delete', [StorageFileController::class, 'bulkDestroy'])->name('files.bulk-destroy');
+        Route::post('files/bulk-move', [StorageFileController::class, 'bulkMove'])->name('files.bulk-move');
         Route::post('folders/{folder}/files', [StorageFileController::class, 'store'])->name('files.store');
+        Route::get('files/{file}/preview', [StorageFileController::class, 'preview'])->name('files.preview');
         Route::get('files/{file}/download', [StorageFileController::class, 'download'])->name('files.download');
         Route::put('files/{file}', [StorageFileController::class, 'update'])->name('files.update');
         Route::delete('files/{file}', [StorageFileController::class, 'destroy'])->name('files.destroy');

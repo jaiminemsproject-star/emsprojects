@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Production;
 
 use App\Http\Controllers\Controller;
 use App\Models\Party;
+use App\Models\Project;
 use App\Models\StoreStockItem;
 use App\Models\Uom;
 use App\Models\User;
@@ -43,21 +44,56 @@ class ProductionDprController extends Controller
         return $cache;
     }
 
-
-    public function index(Request $request, $project)
+    protected function resolveProjectId(Request $request, $project = null): ?int
     {
-        $projectId = (int) $project;
+        $projectId = 0;
 
-        $rows = DB::table('production_dprs as d')
+        if (is_object($project)) {
+            $projectId = (int) ($project->id ?? 0);
+        } else {
+            $projectId = (int) ($project ?? 0);
+        }
+
+        if ($projectId <= 0) {
+            $projectId = (int) $request->integer('project_id');
+        }
+
+        return $projectId > 0 ? $projectId : null;
+    }
+
+    protected function resolveProjectIdFromDpr(int $dprId): ?int
+    {
+        $projectId = DB::table('production_dprs as d')
             ->join('production_plans as p', 'p.id', '=', 'd.production_plan_id')
+            ->where('d.id', $dprId)
+            ->value('p.project_id');
+
+        return $projectId ? (int) $projectId : null;
+    }
+
+    public function index(Request $request, $project = null)
+    {
+        $projectId = $this->resolveProjectId($request, $project);
+
+        $rowsQuery = DB::table('production_dprs as d')
+            ->join('production_plans as p', 'p.id', '=', 'd.production_plan_id')
+            ->leftJoin('projects as pr', 'pr.id', '=', 'p.project_id')
             ->leftJoin('production_activities as a', 'a.id', '=', 'd.production_activity_id')
             ->leftJoin('parties as c', 'c.id', '=', 'd.contractor_party_id')
             ->leftJoin('users as u', 'u.id', '=', 'd.worker_user_id')
-            ->where('p.project_id', $projectId)
-            ->orderByDesc('d.id')
+            ->orderByDesc('d.id');
+
+        if ($projectId) {
+            $rowsQuery->where('p.project_id', $projectId);
+        }
+
+        $rows = $rowsQuery
             ->select([
                 'd.*',
                 'p.plan_number',
+                'p.project_id',
+                'pr.code as project_code',
+                'pr.name as project_name',
                 'a.name as activity_name',
                 'a.code as activity_code',
                 'c.name as contractor_name',
@@ -65,34 +101,48 @@ class ProductionDprController extends Controller
             ])
             ->paginate(25);
 
+        $projects = Project::query()
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get(['id', 'code', 'name']);
+
         return view('production.dprs.index', [
             'projectId' => $projectId,
             'rows' => $rows,
+            'projects' => $projects,
         ]);
     }
 
-    public function create(Request $request, $project)
+    public function create(Request $request, $project = null)
     {
-        $projectId = (int) $project;
+        $projectId = $this->resolveProjectId($request, $project) ?? 0;
+        $projects = Project::query()
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get(['id', 'code', 'name']);
 
-        $plans = DB::table('production_plans')
-            ->where('project_id', $projectId)
-            ->where('status', 'approved')
-            ->orderByDesc('id')
-            ->get();
-
+        $plans = collect();
+        $cuttingPlans = collect();
+        $stockPlates = collect();
         $activities = DB::table('production_activities')
             ->where('is_active', 1)
             ->orderBy('default_sequence')
             ->orderBy('name')
             ->get();
 
+        if ($projectId > 0) {
+            $plans = DB::table('production_plans')
+                ->where('project_id', $projectId)
+                ->where('status', 'approved')
+                ->orderByDesc('id')
+                ->get();
+
         // Cutting plan is optional for most activities, but required when activity is CUTTING.
         // We load project-level cutting plans here and filter client-side by selected plan's BOM.
-        $cuttingPlans = DB::table('cutting_plans')
-            ->where('project_id', $projectId)
-            ->orderByDesc('id')
-            ->get(['id', 'bom_id', 'name', 'grade', 'thickness_mm', 'status']);
+            $cuttingPlans = DB::table('cutting_plans')
+                ->where('project_id', $projectId)
+                ->orderByDesc('id')
+                ->get(['id', 'bom_id', 'name', 'grade', 'thickness_mm', 'status']);
         // Attach cutting plan plate sizes (W x L x Thk) for matching Store plates on DPR create.
         // NOTE: Cutting plan header does not store width/length; those are in cutting_plan_plates.
         if (Schema::hasTable('cutting_plan_plates') && $cuttingPlans->count() > 0) {
@@ -181,33 +231,33 @@ class ProductionDprController extends Controller
 
         // Store plates/stock selection (used for Cutting traceability: plate no / heat no linking)
         // Kept lightweight: only latest 500 available plates for this project (or common store).
-        $stockPlates = collect();
-        if (Schema::hasTable('store_stock_items')) {
-            $stockPlates = DB::table('store_stock_items as s')
-                ->join('items as it', 'it.id', '=', 's.item_id')
-                ->where('s.status', 'available')
-                ->where('s.material_category', 'steel_plate')
-                ->where(function ($q) use ($projectId) {
-                    $q->whereNull('s.project_id')->orWhere('s.project_id', $projectId);
-                })
-                ->orderByDesc('s.id')
-                ->limit(500)
-                ->get([
-                    's.id',
-                    's.item_id',
-                    'it.name as item_name',
-                    's.material_category',
-                    's.project_id',
-                    's.grade',
-                    's.thickness_mm',
-                    's.width_mm',
-                    's.length_mm',
-                    's.plate_number',
-                    's.heat_number',
-                    's.mtc_number',
-                    's.qty_pcs_available',
-                    's.weight_kg_available',
-                ]);
+            if (Schema::hasTable('store_stock_items')) {
+                $stockPlates = DB::table('store_stock_items as s')
+                    ->join('items as it', 'it.id', '=', 's.item_id')
+                    ->where('s.status', 'available')
+                    ->where('s.material_category', 'steel_plate')
+                    ->where(function ($q) use ($projectId) {
+                        $q->whereNull('s.project_id')->orWhere('s.project_id', $projectId);
+                    })
+                    ->orderByDesc('s.id')
+                    ->limit(500)
+                    ->get([
+                        's.id',
+                        's.item_id',
+                        'it.name as item_name',
+                        's.material_category',
+                        's.project_id',
+                        's.grade',
+                        's.thickness_mm',
+                        's.width_mm',
+                        's.length_mm',
+                        's.plate_number',
+                        's.heat_number',
+                        's.mtc_number',
+                        's.qty_pcs_available',
+                        's.weight_kg_available',
+                    ]);
+            }
         }
 
         $contractors = Party::query()
@@ -222,6 +272,7 @@ class ProductionDprController extends Controller
 
         return view('production.dprs.create', [
             'projectId' => $projectId,
+            'projects' => $projects,
             'plans' => $plans,
             'activities' => $activities,
             'cuttingPlans' => $cuttingPlans,
@@ -231,9 +282,9 @@ class ProductionDprController extends Controller
         ]);
     }
 
-    public function store(Request $request, $project)
+    public function store(Request $request, $project = null)
     {
-        $projectId = (int) $project;
+        $projectId = $this->resolveProjectId($request, $project);
 
         $rules = [
             'production_plan_id' => ['required','integer'],
@@ -253,6 +304,17 @@ class ProductionDprController extends Controller
         }
 
         $data = $request->validate($rules);
+
+        if (! $projectId && ! empty($data['production_plan_id'])) {
+            $projectId = DB::table('production_plans')
+                ->where('id', (int) $data['production_plan_id'])
+                ->value('project_id');
+            $projectId = $projectId ? (int) $projectId : null;
+        }
+
+        if (! $projectId) {
+            return back()->withErrors(['project_id' => 'Please select a project.'])->withInput();
+        }
 
         $plan = DB::table('production_plans')
             ->where('id', (int) $data['production_plan_id'])
@@ -572,10 +634,13 @@ class ProductionDprController extends Controller
             ->with('success', 'DPR created (draft). Tick items and submit.');
     }
 
-    public function show(Request $request, $project, $production_dpr)
+    public function show(Request $request, $project = null, $production_dpr = null)
     {
-        $projectId = (int) $project;
         $dprId = (int) $production_dpr;
+        $projectId = $this->resolveProjectId($request, $project) ?? $this->resolveProjectIdFromDpr($dprId);
+        if (! $projectId) {
+            abort(404);
+        }
 
         $dprQuery = DB::table('production_dprs as d')
             ->join('production_plans as p', 'p.id', '=', 'd.production_plan_id')
@@ -689,10 +754,13 @@ class ProductionDprController extends Controller
         ]);
     }
 
-    public function submit(Request $request, $project, $production_dpr)
+    public function submit(Request $request, $project = null, $production_dpr = null)
     {
-        $projectId = (int) $project;
         $dprId = (int) $production_dpr;
+        $projectId = $this->resolveProjectId($request, $project) ?? $this->resolveProjectIdFromDpr($dprId);
+        if (! $projectId) {
+            abort(404);
+        }
 
         $data = $request->validate([
             'geo_latitude' => ['nullable','numeric'],
@@ -928,10 +996,13 @@ class ProductionDprController extends Controller
             ->with('success','DPR submitted. Awaiting approval.');
     }
 
-    public function approve(Request $request, $project, $production_dpr)
+    public function approve(Request $request, $project = null, $production_dpr = null)
     {
-        $projectId = (int) $project;
         $dprId = (int) $production_dpr;
+        $projectId = $this->resolveProjectId($request, $project) ?? $this->resolveProjectIdFromDpr($dprId);
+        if (! $projectId) {
+            abort(404);
+        }
 
         $dpr = DB::table('production_dprs as d')
             ->join('production_plans as p', 'p.id', '=', 'd.production_plan_id')
@@ -1033,8 +1104,5 @@ class ProductionDprController extends Controller
             ->with('success','DPR approved.');
     }
 }
-
-
-
 
 

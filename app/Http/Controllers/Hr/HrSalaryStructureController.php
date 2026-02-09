@@ -69,10 +69,9 @@ class HrSalaryStructureController extends Controller
             'is_active' => 'boolean',
             'components' => 'required|array|min:1',
             'components.*.id' => 'required|exists:hr_salary_components,id',
-            'components.*.calculation_type' => 'required|in:fixed,percentage,percent_of_basic,percent_of_gross,percent_of_ctc',
+            'components.*.calculation_type' => 'required|in:fixed,percent_of_basic,percent_of_gross,percent_of_ctc,formula,slab_based',
             'components.*.calculation_value' => 'nullable|numeric|min:0',
             'components.*.percentage' => 'nullable|numeric|min:0|max:100',
-            'components.*.based_on' => 'nullable|in:basic,gross,ctc',
         ]);
 
         $validated['code'] = strtoupper($validated['code']);
@@ -90,9 +89,8 @@ class HrSalaryStructureController extends Controller
             foreach ($validated['components'] as $comp) {
                 $structure->components()->attach($comp['id'], [
                     'calculation_type' => $comp['calculation_type'],
-                    'calculation_value' => $comp['calculation_value'] ?? 0,
+                    'value' => $comp['calculation_value'] ?? 0,
                     'percentage' => $comp['percentage'] ?? null,
-                    'based_on' => $comp['based_on'] ?? 'basic',
                     'is_active' => true,
                 ]);
             }
@@ -150,10 +148,9 @@ class HrSalaryStructureController extends Controller
             'is_active' => 'boolean',
             'components' => 'required|array|min:1',
             'components.*.id' => 'required|exists:hr_salary_components,id',
-            'components.*.calculation_type' => 'required|in:fixed,percentage,percent_of_basic,percent_of_gross,percent_of_ctc',
+            'components.*.calculation_type' => 'required|in:fixed,percent_of_basic,percent_of_gross,percent_of_ctc,formula,slab_based',
             'components.*.calculation_value' => 'nullable|numeric|min:0',
             'components.*.percentage' => 'nullable|numeric|min:0|max:100',
-            'components.*.based_on' => 'nullable|in:basic,gross,ctc',
         ]);
 
         $validated['code'] = strtoupper($validated['code']);
@@ -173,9 +170,8 @@ class HrSalaryStructureController extends Controller
             foreach ($validated['components'] as $comp) {
                 $syncData[$comp['id']] = [
                     'calculation_type' => $comp['calculation_type'],
-                    'calculation_value' => $comp['calculation_value'] ?? 0,
+                    'value' => $comp['calculation_value'] ?? 0,
                     'percentage' => $comp['percentage'] ?? null,
-                    'based_on' => $comp['based_on'] ?? 'basic',
                     'is_active' => true,
                 ];
             }

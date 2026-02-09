@@ -3,71 +3,165 @@
 @section('title', 'Purchase RFQs')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Purchase RFQs</h1>
-
-        @can('purchase.rfq.create')
-            <a href="{{ route('purchase-rfqs.create') }}" class="btn btn-sm btn-primary">
-                + New RFQ
-            </a>
-        @endcan
-    </div>
-
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <div class="card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered mb-0 align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th style="width: 120px;">RFQ No</th>
-                        <th>Project</th>
-                        <th style="width: 120px;">RFQ Date</th>
-                        <th style="width: 120px;">Due Date</th>
-                        <th style="width: 120px;">Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @forelse($rfqs as $rfq)
-                        <tr>
-                            <td>
-                                <a href="{{ route('purchase-rfqs.show', $rfq) }}">
-                                    {{ $rfq->code }}
-                                </a>
-                            </td>
-                            <td>
-                                @if($rfq->project)
-                                    {{ $rfq->project->code }} - {{ $rfq->project->name }}
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                            </td>
-                            <td>{{ optional($rfq->rfq_date)?->format('d-m-Y') ?: '-' }}</td>
-                            <td>{{ optional($rfq->due_date)?->format('d-m-Y') ?: '-' }}</td>
-                            <td>{{ ucfirst($rfq->status) }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-3">
-                                No RFQs found.
-                            </td>
-                        </tr>
-                    @endforelse
-                    </tbody>
-                </table>
+    @php
+        $rows = $rfqs->getCollection();
+        $draftCount = $rows->where('status', 'draft')->count();
+        $sentCount = $rows->where('status', 'sent')->count();
+        $poCount = $rows->where('status', 'po_generated')->count();
+        $closedCount = $rows->where('status', 'closed')->count();
+    @endphp
+    <div class="container-fluid px-0">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h1 class="h4 mb-0"><i class="bi bi-envelope-paper me-1"></i> Purchase RFQs</h1>
+                <div class="small text-muted">Create, send, compare quotes, and convert L1 to POs.</div>
             </div>
+
+            @can('purchase.rfq.create')
+                <a href="{{ route('purchase-rfqs.create') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> New RFQ
+                </a>
+            @endcan
         </div>
 
-        @if($rfqs instanceof \Illuminate\Pagination\AbstractPaginator)
-            <div class="card-footer py-2">
-                {{ $rfqs->links() }}
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
+
+        <div class="row g-2 mb-3">
+            <div class="col-md-3 col-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <div class="small text-muted">Draft</div>
+                        <div class="h5 mb-0">{{ $draftCount }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <div class="small text-muted">Sent</div>
+                        <div class="h5 mb-0">{{ $sentCount }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <div class="small text-muted">PO Generated</div>
+                        <div class="h5 mb-0">{{ $poCount }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <div class="small text-muted">Closed</div>
+                        <div class="h5 mb-0">{{ $closedCount }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="GET" class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="q" class="form-control form-control-sm" value="{{ $q ?? request('q') }}" placeholder="RFQ number or remarks">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Project</label>
+                        <select name="project_id" class="form-select form-select-sm">
+                            <option value="">All</option>
+                            @foreach(($projects ?? collect()) as $p)
+                                <option value="{{ $p->id }}" @selected((string) ($projectId ?? request('project_id')) === (string) $p->id)>
+                                    {{ $p->code }} - {{ $p->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="">All</option>
+                            @foreach(($statusOptions ?? []) as $k => $v)
+                                <option value="{{ $k }}" @selected(($status ?? request('status')) === $k)>{{ $v }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex gap-1">
+                        <button class="btn btn-sm btn-outline-primary w-100" type="submit">Go</button>
+                        <a href="{{ route('purchase-rfqs.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 140px;">RFQ No</th>
+                                <th>Project</th>
+                                <th style="width: 120px;">RFQ Date</th>
+                                <th style="width: 120px;">Due Date</th>
+                                <th style="width: 120px;">Status</th>
+                                <th style="width: 120px;" class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($rfqs as $rfq)
+                                @php
+                                    $statusClass = match($rfq->status) {
+                                        'sent' => 'info',
+                                        'po_generated' => 'success',
+                                        'closed' => 'dark',
+                                        'cancelled' => 'danger',
+                                        default => 'secondary',
+                                    };
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('purchase-rfqs.show', $rfq) }}" class="fw-semibold text-decoration-none">
+                                            {{ $rfq->code }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if($rfq->project)
+                                            {{ $rfq->project->code }} - {{ $rfq->project->name }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ optional($rfq->rfq_date)?->format('d-m-Y') ?: '-' }}</td>
+                                    <td>{{ optional($rfq->due_date)?->format('d-m-Y') ?: '-' }}</td>
+                                    <td><span class="badge bg-{{ $statusClass }}">{{ ucfirst(str_replace('_', ' ', $rfq->status)) }}</span></td>
+                                    <td class="text-end">
+                                        <a href="{{ route('purchase-rfqs.show', $rfq) }}" class="btn btn-sm btn-outline-secondary">Open</a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">No RFQs found.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            @if($rfqs instanceof \Illuminate\Pagination\AbstractPaginator)
+                <div class="card-footer py-2 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Showing {{ $rfqs->count() }} of {{ $rfqs->total() }} RFQs</small>
+                    {{ $rfqs->links() }}
+                </div>
+            @endif
+        </div>
     </div>
 @endsection

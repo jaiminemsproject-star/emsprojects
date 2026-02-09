@@ -7,6 +7,7 @@ use App\Models\Accounting\Account;
 use App\Models\Accounting\AccountGroup;
 use App\Models\Accounting\AccountType;
 use App\Models\Accounting\VoucherLine;
+use App\Models\GstAccountRate;
 use App\Models\Party;
 use App\Services\Accounting\AccountGstRateRecorderService;
 use Illuminate\Http\Request;
@@ -15,7 +16,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use App\Services\Accounting\AccountCodeGeneratorService;
-
 
 class AccountController extends Controller
 {
@@ -38,7 +38,7 @@ class AccountController extends Controller
 
     public function __construct(
         protected AccountGstRateRecorderService $accountGstRateRecorder,
-       	protected AccountCodeGeneratorService $accountCodeGenerator
+        protected AccountCodeGeneratorService $accountCodeGenerator
     ) {
         $this->middleware('permission:accounting.accounts.view')->only('index');
         $this->middleware('permission:accounting.accounts.create')->only(['create', 'store']);
@@ -118,8 +118,6 @@ class AccountController extends Controller
         }
     }
 
-
-    
     public function index(Request $request)
     {
         $companyId = $this->defaultCompanyId();
@@ -137,8 +135,6 @@ class AccountController extends Controller
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
-
-        $groupsById = $groups->keyBy('id');
 
         // Build descendants map for group filter (parent -> all descendants)
         $childrenByParent = $groups->groupBy('parent_id');
@@ -239,10 +235,6 @@ class AccountController extends Controller
             'hasFilters' => ($q !== '' || $groupId || $type !== '' || in_array($status, ['active','inactive'], true)),
         ]);
     }
-
-
-
-
     /**
      * Flatten groups for filters with indentation.
      *
@@ -345,7 +337,7 @@ class AccountController extends Controller
         return $map;
     }
 
-public function create()
+    public function create()
     {
         $account                    = new Account();
         $account->company_id        = $this->defaultCompanyId();
@@ -354,10 +346,18 @@ public function create()
         $groups      = $this->groupOptions();
         $ledgerTypes = $this->ledgerTypeOptions($account->company_id);
         $hasVouchers = false;
+        $latestGstRate  = null;
 
-                $groupTypeMap = $this->groupTypeMap($account->company_id, $ledgerTypes);
+        $groupTypeMap = $this->groupTypeMap($account->company_id, $ledgerTypes);
 
-        return view('accounting.accounts.create', compact('account', 'groups', 'ledgerTypes', 'groupTypeMap', 'hasVouchers'));
+        return view('accounting.accounts.create', compact(
+            'account',
+            'groups',
+            'ledgerTypes',
+            'groupTypeMap',
+            'hasVouchers',
+            'latestGstRate'
+        ));
     }
 
     public function store(Request $request)
@@ -428,7 +428,7 @@ public function create()
                 accountGroupId: (int) $data['account_group_id']
             );
         }
-$data['company_id']        = $companyId;
+        $data['company_id']        = $companyId;
         $data['is_active']         = $request->boolean('is_active', true);
         $data['is_gst_applicable'] = $request->boolean('is_gst_applicable', false);
 
@@ -491,10 +491,34 @@ $data['company_id']        = $companyId;
         $groups      = $this->groupOptions();
         $ledgerTypes = $this->ledgerTypeOptions($account->company_id);
         $hasVouchers = VoucherLine::where('account_id', $account->id)->exists();
+        $today = now()->toDateString();
+        $latestGstRate = GstAccountRate::query()
+            ->where('account_id', $account->id)
+            ->whereDate('effective_from', '<=', $today)
+            ->where(function ($q) use ($today) {
+                $q->whereNull('effective_to')
+                    ->orWhereDate('effective_to', '>=', $today);
+            })
+            ->orderByDesc('effective_from')
+            ->first();
 
-                $groupTypeMap = $this->groupTypeMap((int) $account->company_id, $ledgerTypes);
+        if (! $latestGstRate) {
+            $latestGstRate = GstAccountRate::query()
+                ->where('account_id', $account->id)
+                ->orderByDesc('effective_from')
+                ->first();
+        }
 
-        return view('accounting.accounts.edit', compact('account', 'groups', 'ledgerTypes', 'groupTypeMap', 'hasVouchers'));
+        $groupTypeMap = $this->groupTypeMap((int) $account->company_id, $ledgerTypes);
+
+        return view('accounting.accounts.edit', compact(
+            'account',
+            'groups',
+            'ledgerTypes',
+            'groupTypeMap',
+            'hasVouchers',
+            'latestGstRate'
+        ));
     }
 
     public function update(Request $request, Account $account)

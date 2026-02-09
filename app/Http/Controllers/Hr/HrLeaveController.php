@@ -494,14 +494,62 @@ class HrLeaveController extends Controller
      */
     public function yearEndProcessing(Request $request)
     {
-        $request->validate([
-            'from_year' => 'required|integer',
-            'to_year' => 'required|integer',
+        $currentYear = (int) now()->year;
+
+        if (!$request->isMethod('post')) {
+            $fromYear = (int) $request->query('from_year', $currentYear - 1);
+            $toYear = (int) $request->query('to_year', $currentYear);
+
+            $previewBalances = HrLeaveBalance::with(['leaveType', 'employee'])
+                ->where('year', $fromYear)
+                ->whereHas('employee', fn($q) => $q->where('status', 'active'))
+                ->get();
+
+            $eligibleCount = 0;
+            $eligibleDays = 0.0;
+
+            foreach ($previewBalances as $balance) {
+                $leaveType = $balance->leaveType;
+                if (!$leaveType || !$leaveType->is_carry_forward) {
+                    continue;
+                }
+
+                $available = (float) $balance->available_balance;
+                if ($available <= 0) {
+                    continue;
+                }
+
+                $maxCarry = $leaveType->max_carry_forward_days !== null
+                    ? (float) $leaveType->max_carry_forward_days
+                    : $available;
+                $carryForward = min($available, $maxCarry);
+
+                if ($carryForward <= 0) {
+                    continue;
+                }
+
+                $eligibleCount++;
+                $eligibleDays += $carryForward;
+            }
+
+            $summary = [
+                'from_year' => $fromYear,
+                'to_year' => $toYear,
+                'source_balances' => $previewBalances->count(),
+                'eligible_balances' => $eligibleCount,
+                'estimated_days' => round($eligibleDays, 2),
+            ];
+
+            return view('hr.leave.year-end', compact('fromYear', 'toYear', 'summary'));
+        }
+
+        $validated = $request->validate([
+            'from_year' => 'required|integer|min:2000|max:2100',
+            'to_year' => 'required|integer|min:2000|max:2100|gt:from_year',
         ]);
 
-        $fromYear = $request->from_year;
-        $toYear = $request->to_year;
-
+        $fromYear = (int) $validated['from_year'];
+        $toYear = (int) $validated['to_year'];
         $processed = 0;
 
         DB::transaction(function () use ($fromYear, $toYear, &$processed) {
@@ -512,13 +560,23 @@ class HrLeaveController extends Controller
 
             foreach ($balances as $balance) {
                 $leaveType = $balance->leaveType;
-                $available = $balance->available_balance;
-
-                if ($available <= 0 || !$leaveType->is_carry_forward) {
+                if (!$leaveType || !$leaveType->is_carry_forward) {
                     continue;
                 }
 
-                $carryForward = min($available, $leaveType->max_carry_forward_days ?? $available);
+                $available = (float) $balance->available_balance;
+                if ($available <= 0) {
+                    continue;
+                }
+
+                $maxCarry = $leaveType->max_carry_forward_days !== null
+                    ? (float) $leaveType->max_carry_forward_days
+                    : $available;
+                $carryForward = min($available, $maxCarry);
+
+                if ($carryForward <= 0) {
+                    continue;
+                }
 
                 // Create or update next year balance
                 $newBalance = HrLeaveBalance::firstOrCreate(
@@ -531,12 +589,21 @@ class HrLeaveController extends Controller
                         'company_id' => $balance->company_id,
                         'opening_balance' => 0,
                         'credited' => 0,
-                        'availed' => 0,
+                        'used' => 0,
+                        'pending' => 0,
                         'adjusted' => 0,
+                        'lapsed' => 0,
+                        'encashed' => 0,
+                        'carry_forward' => 0,
+                        'closing_balance' => 0,
+                        'available_balance' => 0,
+                        'is_processed' => false,
                     ]
                 );
 
                 $newBalance->increment('opening_balance', $carryForward);
+                $newBalance->increment('carry_forward', $carryForward);
+                $newBalance->increment('available_balance', $carryForward);
 
                 // Create transaction
                 HrLeaveTransaction::create([
@@ -554,7 +621,9 @@ class HrLeaveController extends Controller
             }
         });
 
-        return back()->with('success', "Year end processing completed. {$processed} balances carried forward.");
+        return redirect()
+            ->route('hr.leave.year-end', ['from_year' => $fromYear, 'to_year' => $toYear])
+            ->with('success', "Year end processing completed. {$processed} balances carried forward.");
     }
 
     /**

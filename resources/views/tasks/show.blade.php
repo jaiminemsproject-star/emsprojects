@@ -24,6 +24,9 @@
             @endif
         </div>
         <div class="d-flex gap-2">
+            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
             <a href="{{ route('tasks.edit', $task) }}" class="btn btn-outline-primary">
                 <i class="bi bi-pencil me-1"></i> Edit
             </a>
@@ -197,7 +200,7 @@
                             <input class="form-check-input" type="checkbox" 
                                    id="item-{{ $item->id }}" 
                                    {{ $item->is_completed ? 'checked' : '' }}
-                                   onchange="toggleChecklistItem({{ $task->id }}, {{ $checklist->id }}, {{ $item->id }})">
+                                   onchange="toggleChecklistItem(this, {{ $task->id }}, {{ $checklist->id }}, {{ $item->id }})">
                             <label class="form-check-label {{ $item->is_completed ? 'text-muted text-decoration-line-through' : '' }}" 
                                    for="item-{{ $item->id }}">
                                 {{ $item->content }}
@@ -262,7 +265,7 @@
                                         <i class="bi bi-three-dots"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#" onclick="editComment({{ $comment->id }})">Edit</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="editComment({{ $task->id }}, {{ $comment->id }}, @js($comment->content))">Edit</a></li>
                                         <li><a class="dropdown-item text-danger" href="#" onclick="deleteComment({{ $task->id }}, {{ $comment->id }})">Delete</a></li>
                                     </ul>
                                 </div>
@@ -552,41 +555,126 @@
 function updateStatus(statusId) {
     fetch('{{ route("tasks.update-status", $task) }}', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
         body: JSON.stringify({ status_id: statusId })
-    }).then(() => location.reload());
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Unable to update status.');
+        }
+        location.reload();
+    })
+    .catch(error => alert(error.message));
 }
 
 function updateAssignee(userId) {
     fetch('{{ route("tasks.update-assignee", $task) }}', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
         body: JSON.stringify({ assignee_id: userId })
-    }).then(() => location.reload());
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Unable to update assignee.');
+        }
+        location.reload();
+    })
+    .catch(error => alert(error.message));
 }
 
 function updatePriority(priorityId) {
     fetch('{{ route("tasks.update", $task) }}', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
         body: JSON.stringify({ priority_id: priorityId })
-    }).then(() => location.reload());
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Unable to update priority.');
+        }
+        location.reload();
+    })
+    .catch(error => alert(error.message));
+}
+
+function editComment(taskId, commentId, currentContent) {
+    const content = prompt('Edit comment', currentContent ?? '');
+    if (content === null) {
+        return;
+    }
+
+    const trimmed = content.trim();
+    if (!trimmed) {
+        alert('Comment cannot be empty.');
+        return;
+    }
+
+    fetch(`/tasks/${taskId}/comments/${commentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ content: trimmed })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            throw new Error(data.message || 'Unable to edit comment.');
+        }
+        location.reload();
+    })
+    .catch(error => alert(error.message));
 }
 
 function deleteComment(taskId, commentId) {
     if (confirm('Delete this comment?')) {
         fetch(`/tasks/${taskId}/comments/${commentId}`, {
             method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-        }).then(() => location.reload());
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message || 'Unable to delete comment.');
+            }
+            location.reload();
+        })
+        .catch(error => alert(error.message));
     }
 }
 
-function toggleChecklistItem(taskId, checklistId, itemId) {
+function toggleChecklistItem(checkbox, taskId, checklistId, itemId) {
     fetch(`/tasks/${taskId}/checklists/${checklistId}/items/${itemId}/toggle`, {
         method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-    });
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            checkbox.checked = !checkbox.checked;
+            throw new Error('Unable to update checklist item.');
+        }
+    })
+    .catch(error => alert(error.message));
 }
 </script>
 @endpush

@@ -1,5 +1,5 @@
 @php
-$isEdit = isset($uom) && $uom->exists;
+    $isEdit = isset($uom) && $uom->exists;
 @endphp
 
 <form method="POST"
@@ -37,37 +37,8 @@ $isEdit = isset($uom) && $uom->exists;
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
-<div class="col-md-4">
-    <label for="category" class="form-label">Category</label>
-    <select id="category" name="category" class="form-select @error('category') is-invalid @enderror">
-        <option value="">Select category</option>
 
-        @php
-            $categories = [
-                'length' => 'Length',
-                'weight' => 'Weight',
-                'volume' => 'Volume',
-                'area' => 'Area',
-                'count' => 'Count / Unit',
-                'time' => 'Time',
-                'temp' => 'Temperature',
-                'other' => 'Other',
-            ];
-        @endphp
-
-        @foreach($categories as $value => $label)
-            <option value="{{ $value }}" {{ old('category', $uom->category ?? '') === $value ? 'selected' : '' }}>
-                {{ $label }}
-            </option>
-        @endforeach
-    </select>
-
-    @error('category')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
-
-        {{-- <div class="col-md-4">
+        <div class="col-md-4">
             <label for="category" class="form-label">Category</label>
             <input type="text"
                    id="category"
@@ -79,7 +50,7 @@ $isEdit = isset($uom) && $uom->exists;
             @error('category')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-        </div> --}}
+        </div>
     </div>
 
     <div class="row mb-3">

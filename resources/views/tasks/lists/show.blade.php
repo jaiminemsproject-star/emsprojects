@@ -152,6 +152,11 @@
                         <option value="">All Assignees</option>
                         <option value="me" {{ request('assignee') === 'me' ? 'selected' : '' }}>Assigned to Me</option>
                         <option value="unassigned" {{ request('assignee') === 'unassigned' ? 'selected' : '' }}>Unassigned</option>
+                        @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ request('assignee') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }}
+                        </option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-auto">

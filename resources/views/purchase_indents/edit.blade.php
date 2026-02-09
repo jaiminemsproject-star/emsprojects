@@ -3,6 +3,38 @@
 @section('title', 'Edit Purchase Indent ' . $indent->code)
 
 @section('content')
+    <style>
+    /* Select2 inside table: match Bootstrap .form-select-sm height */
+    .select2-container { width: 100% !important; }
+
+    .select2-container--default .select2-selection--single {
+        height: calc(1.5em + .5rem + 2px) !important;
+        padding: .25rem .5rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 1.5em !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: calc(1.5em + .5rem + 2px) !important;
+    }
+
+    /* Make dropdown search look less like a separate textbox */
+    .select2-container--default .select2-search--dropdown {
+        padding: 4px 6px;
+        border-bottom: 1px solid #dee2e6;
+        background: #fff;
+    }
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 0 !important;
+        outline: none !important;
+        box-shadow: none !important;
+        padding: 4px 6px !important;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+</style>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="h4 mb-0">Edit Purchase Indent {{ $indent->code }}</h1>
@@ -136,6 +168,18 @@ const ITEM_META = {!! $itemMetaJson !!};
             });
         }
 
+
+        function splitCodeName(text) {
+            const t = String(text ?? '');
+            const idx = t.indexOf(' - ');
+            if (idx === -1) return { code: '', name: t };
+        
+            return {
+                code: t.slice(0, idx).trim(),
+                name: t.slice(idx + 3).trim()
+            };
+        }
+
         const ITEM_OPTIONS_HTML = ITEM_META.map(item => {
             return `<option value="${item.id}">${escapeHtml(item.name)}</option>`;
         }).join('');
@@ -173,12 +217,64 @@ const ITEM_META = {!! $itemMetaJson !!};
         }
 
         function initItemSelect(el) {
-            initSelect2(el, {
-                placeholder: 'Search item...',
-                minimumResultsForSearch: 0,
-                tags: false
-            });
+    initSelect2(el, {
+        placeholder: 'Select item...',
+        minimumResultsForSearch: 0,
+        tags: false,
+
+        // ✅ Show Name only after selection (hide code), keep code visible in dropdown list
+        templateResult: function (data) {
+            if (!data.id || !window.jQuery) return data.text;
+
+            const p = splitCodeName(data.text);
+            if (!p.code) return data.text;
+
+            const $c = window.jQuery('<div class="d-flex flex-column"></div>');
+            window.jQuery('<div class="fw-semibold"></div>').text(p.name).appendTo($c);
+            window.jQuery('<div class="text-muted small"></div>').text(p.code).appendTo($c);
+            return $c;
+        },
+        templateSelection: function (data) {
+            if (!data.id) return data.text;
+            const p = splitCodeName(data.text);
+            return p.name || data.text;
         }
+    });
+
+    // If select2 is not loaded, stop here (page still works as normal select)
+    if (!(window.jQuery && window.jQuery.fn && window.jQuery.fn.select2)) return;
+
+    const $el = window.jQuery(el);
+
+    // ✅ User can type immediately (no need to click the search box)
+    $el.off('select2:open.indent').on('select2:open.indent', function () {
+        setTimeout(() => {
+            const field = document.querySelector('.select2-container--open .select2-search__field');
+            if (field) field.focus();
+        }, 0);
+    });
+
+    // ✅ When user starts typing on the closed select, open dropdown and filter
+    const $container = $el.next('.select2-container');
+    $container.find('.select2-selection')
+        .off('keydown.indentType')
+        .on('keydown.indentType', function (e) {
+            if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                $el.select2('open');
+
+                // Put first key into search field; after that, user types normally
+                setTimeout(() => {
+                    const $field = window.jQuery('.select2-container--open .select2-search__field');
+                    if ($field.length) {
+                        $field.val(e.key).trigger('input');
+                    }
+                }, 0);
+
+                e.preventDefault();
+            }
+        });
+}
+
 
         function initBrandSelect(el) {
             initSelect2(el, {

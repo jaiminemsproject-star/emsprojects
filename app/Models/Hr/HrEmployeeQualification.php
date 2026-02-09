@@ -12,22 +12,26 @@ class HrEmployeeQualification extends Model
     protected $fillable = [
         'hr_employee_id',
         'qualification_type',
-        'qualification_name',
+        'degree_name',
         'specialization',
-        'institution',
-        'board_university',
+        'institution_name',
+        'university_board',
         'year_of_passing',
-        'percentage',
-        'grade',
-        'document_path',
+        'percentage_cgpa',
+        'grade_type',
+        'roll_number',
+        'certificate_path',
         'is_verified',
+        'verified_by',
+        'verified_at',
         'remarks',
     ];
 
     protected $casts = [
         'year_of_passing' => 'integer',
-        'percentage' => 'decimal:2',
+        'percentage_cgpa' => 'decimal:2',
         'is_verified' => 'boolean',
+        'verified_at' => 'datetime',
     ];
 
     // ==================== RELATIONSHIPS ====================
@@ -68,10 +72,61 @@ class HrEmployeeQualification extends Model
 
     public function getFullQualificationAttribute(): string
     {
-        $parts = [$this->qualification_name];
+        $parts = [$this->degree_name];
         if ($this->specialization) {
             $parts[] = "({$this->specialization})";
         }
         return implode(' ', $parts);
+    }
+
+    // Backward-compatible aliases
+    public function getQualificationNameAttribute()
+    {
+        return $this->degree_name;
+    }
+
+    public function setQualificationNameAttribute($value): void
+    {
+        $this->attributes['degree_name'] = $value;
+    }
+
+    public function getInstitutionAttribute()
+    {
+        return $this->institution_name;
+    }
+
+    public function setInstitutionAttribute($value): void
+    {
+        $this->attributes['institution_name'] = $value;
+    }
+
+    public function getBoardUniversityAttribute()
+    {
+        return $this->university_board;
+    }
+
+    public function setBoardUniversityAttribute($value): void
+    {
+        $this->attributes['university_board'] = $value;
+    }
+
+    public function getPercentageAttribute()
+    {
+        return $this->percentage_cgpa;
+    }
+
+    public function setPercentageAttribute($value): void
+    {
+        $this->attributes['percentage_cgpa'] = $value;
+    }
+
+    public function getDocumentPathAttribute()
+    {
+        return $this->certificate_path;
+    }
+
+    public function setDocumentPathAttribute($value): void
+    {
+        $this->attributes['certificate_path'] = $value;
     }
 }

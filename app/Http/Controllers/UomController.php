@@ -17,51 +17,42 @@ class UomController extends Controller
         $this->middleware('permission:core.uom.delete')->only(['destroy']);
     }
     public function index(Request $request)
-{
-    $query = Uom::query();
+    {
+        $query = Uom::query();
 
-    // 🔍 Filters
-    if ($request->filled('code')) {
-        $query->where('code', 'like', '%' . trim($request->code) . '%');
+        $q = trim((string) $request->get('q', ''));
+        if ($q !== '') {
+            $like = '%' . $q . '%';
+            $query->where(function ($qq) use ($like) {
+                $qq->where('code', 'like', $like)
+                    ->orWhere('name', 'like', $like)
+                    ->orWhere('category', 'like', $like);
+            });
+        }
+
+        $status = $request->get('status');
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        $sort = (string) $request->get('sort', '');
+        $dir = strtolower((string) $request->get('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        $sortable = ['code', 'name', 'category', 'decimal_places', 'is_active', 'created_at'];
+
+        if ($sort !== '' && in_array($sort, $sortable, true)) {
+            $query->orderBy($sort, $dir);
+        } else {
+            // Preserve existing behaviour
+            $query->orderBy('code');
+        }
+
+        $uoms = $query->paginate(25)->withQueryString();
+
+        return view('uoms.index', compact('uoms'));
     }
-
-    if ($request->filled('name')) {
-        $query->where('name', 'like', '%' . trim($request->name) . '%');
-    }
-
-    // Category from SELECT (exact match)
-    if ($request->filled('category')) {
-        $query->where('category', $request->category);
-    }
-
-    // Status filter
-    if ($request->filled('status')) {
-        $query->where('is_active', $request->status === 'active');
-    }
-
-    // 🔃 Sorting (managed here)
-    $sortable = ['code', 'name', 'category', 'decimal_places', 'is_active', 'created_at'];
-
-    $sort = $request->get('sort', 'created_at'); // default column
-    $dir  = $request->get('dir', 'desc');        // default DESC
-
-    if (! in_array($sort, $sortable, true)) {
-        $sort = 'created_at';
-    }
-
-    if (! in_array($dir, ['asc', 'desc'], true)) {
-        $dir = 'desc';
-    }
-
-    $query->orderBy($sort, $dir);
-
-    // 📄 Pagination
-    $uoms = $query->paginate(10)->withQueryString();
-
-    return view('uoms.index', compact('uoms'));
-}
-
-
 
     public function create()
     {

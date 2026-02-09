@@ -90,6 +90,60 @@ class ProductionPlanController extends Controller
     }
 
     /**
+     * Resource create route exists; guide users to the canonical BOM flow.
+     */
+    public function create(Request $request, $project)
+    {
+        $projectId = is_object($project) ? (int) ($project->id ?? 0) : (int) $project;
+
+        return redirect()
+            ->route('projects.production-plans.from-bom', ['project' => $projectId])
+            ->with('info', 'Create production plan from approved BOM.');
+    }
+
+    /**
+     * Direct store is intentionally not used in current workflow.
+     */
+    public function store(Request $request, $project)
+    {
+        $projectId = is_object($project) ? (int) ($project->id ?? 0) : (int) $project;
+
+        return redirect()
+            ->route('projects.production-plans.from-bom', ['project' => $projectId])
+            ->with('error', 'Use "Create from BOM" to create production plans.');
+    }
+
+    public function edit(Request $request, $project, $production_plan)
+    {
+        $projectId = is_object($project) ? (int) ($project->id ?? 0) : (int) $project;
+        $planId = is_object($production_plan) ? (int) ($production_plan->id ?? 0) : (int) $production_plan;
+
+        return redirect()
+            ->route('projects.production-plans.show', ['project' => $projectId, 'production_plan' => $planId])
+            ->with('info', 'Edit route configuration from plan details.');
+    }
+
+    public function update(Request $request, $project, $production_plan)
+    {
+        $projectId = is_object($project) ? (int) ($project->id ?? 0) : (int) $project;
+        $planId = is_object($production_plan) ? (int) ($production_plan->id ?? 0) : (int) $production_plan;
+
+        return redirect()
+            ->route('projects.production-plans.show', ['project' => $projectId, 'production_plan' => $planId])
+            ->with('error', 'Plan header update is not supported. Update routing/items instead.');
+    }
+
+    public function destroy(Request $request, $project, $production_plan)
+    {
+        $projectId = is_object($project) ? (int) ($project->id ?? 0) : (int) $project;
+        $planId = is_object($production_plan) ? (int) ($production_plan->id ?? 0) : (int) $production_plan;
+
+        return redirect()
+            ->route('projects.production-plans.show', ['project' => $projectId, 'production_plan' => $planId])
+            ->with('error', 'Deleting production plans is disabled.');
+    }
+
+    /**
      * Approve (project-scoped).
      */
     public function approve(Request $request, $project, $production_plan)
@@ -152,6 +206,5 @@ class ProductionPlanController extends Controller
             ->with('success', 'Production plan approved.');
     }
 }
-
 
 

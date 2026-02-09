@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hr\HrLeavePolicy;
+use App\Models\Hr\HrLeavePolicyDetail;
 use App\Models\Hr\HrLeaveType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HrLeavePolicyController extends Controller
 {
@@ -50,21 +52,42 @@ class HrLeavePolicyController extends Controller
             'code' => 'required|string|max:20|unique:hr_leave_policies,code',
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:500',
-            'hr_leave_type_id' => 'required|exists:hr_leave_types,id',
-            'annual_quota' => 'required|numeric|min:0|max:365',
-            'accrual_type' => 'required|in:yearly,monthly,quarterly',
-            'accrual_timing' => 'nullable|in:start,end',
-            'prorate_for_new_joiners' => 'boolean',
-            'effective_after_months' => 'nullable|integer|min:0',
-            'applicable_to' => 'nullable|in:all,male,female',
+            'leave_entitlements' => 'required|array|min:1',
+            'leave_entitlements.*.leave_type_id' => 'required|exists:hr_leave_types,id',
+            'leave_entitlements.*.annual_entitlement' => 'required|numeric|min:0|max:365',
+            'leave_entitlements.*.max_accumulation' => 'nullable|numeric|min:0|max:365',
             'is_active' => 'boolean',
         ]);
 
-        $validated['code'] = strtoupper($validated['code']);
-        $validated['is_active'] = $request->boolean('is_active', true);
-        $validated['prorate_for_new_joiners'] = $request->boolean('prorate_for_new_joiners', true);
+        DB::transaction(function () use ($validated, $request) {
+            $policy = HrLeavePolicy::create([
+                'company_id' => 1,
+                'code' => strtoupper($validated['code']),
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'leave_year_type' => 'calendar',
+                'allow_leave_in_probation' => false,
+                'allow_backdated_application' => false,
+                'max_backdate_days' => 7,
+                'allow_future_application' => true,
+                'max_future_days' => 90,
+                'sandwich_rule_enabled' => true,
+                'sandwich_min_gap_days' => 0,
+                'approval_levels' => 1,
+                'skip_level_on_absence' => true,
+                'is_active' => $request->boolean('is_active', true),
+            ]);
 
-        HrLeavePolicy::create($validated);
+            foreach ($validated['leave_entitlements'] as $row) {
+                HrLeavePolicyDetail::create([
+                    'hr_leave_policy_id' => $policy->id,
+                    'hr_leave_type_id' => $row['leave_type_id'],
+                    'days_per_year' => $row['annual_entitlement'],
+                    'max_carry_forward' => $row['max_accumulation'] ?? 0,
+                    'allow_encashment' => false,
+                ]);
+            }
+        });
 
         return redirect()->route('hr.leave-policies.index')
                          ->with('success', 'Leave policy created successfully.');
@@ -72,13 +95,14 @@ class HrLeavePolicyController extends Controller
 
     public function show(HrLeavePolicy $leavePolicy)
     {
-        $leavePolicy->load('leaveType');
+        $leavePolicy->load(['leaveType', 'entitlements.leaveType']);
         $leavePolicy->loadCount('employees');
-        return view('hr.leave-policies.show', ['policy' => $leavePolicy]);
+        return view('hr.leave-policies.show', compact('leavePolicy'));
     }
 
     public function edit(HrLeavePolicy $leavePolicy)
     {
+        $leavePolicy->load('entitlements.leaveType');
         $leaveTypes = HrLeaveType::where('is_active', true)->orderBy('name')->get();
         return view('hr.leave-policies.form', ['policy' => $leavePolicy, 'leaveTypes' => $leaveTypes]);
     }
@@ -89,21 +113,33 @@ class HrLeavePolicyController extends Controller
             'code' => 'required|string|max:20|unique:hr_leave_policies,code,' . $leavePolicy->id,
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:500',
-            'hr_leave_type_id' => 'required|exists:hr_leave_types,id',
-            'annual_quota' => 'required|numeric|min:0|max:365',
-            'accrual_type' => 'required|in:yearly,monthly,quarterly',
-            'accrual_timing' => 'nullable|in:start,end',
-            'prorate_for_new_joiners' => 'boolean',
-            'effective_after_months' => 'nullable|integer|min:0',
-            'applicable_to' => 'nullable|in:all,male,female',
+            'leave_entitlements' => 'required|array|min:1',
+            'leave_entitlements.*.leave_type_id' => 'required|exists:hr_leave_types,id',
+            'leave_entitlements.*.annual_entitlement' => 'required|numeric|min:0|max:365',
+            'leave_entitlements.*.max_accumulation' => 'nullable|numeric|min:0|max:365',
             'is_active' => 'boolean',
         ]);
 
-        $validated['code'] = strtoupper($validated['code']);
-        $validated['is_active'] = $request->boolean('is_active', true);
-        $validated['prorate_for_new_joiners'] = $request->boolean('prorate_for_new_joiners', true);
+        DB::transaction(function () use ($validated, $request, $leavePolicy) {
+            $leavePolicy->update([
+                'code' => strtoupper($validated['code']),
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'is_active' => $request->boolean('is_active', true),
+            ]);
 
-        $leavePolicy->update($validated);
+            $leavePolicy->details()->delete();
+
+            foreach ($validated['leave_entitlements'] as $row) {
+                HrLeavePolicyDetail::create([
+                    'hr_leave_policy_id' => $leavePolicy->id,
+                    'hr_leave_type_id' => $row['leave_type_id'],
+                    'days_per_year' => $row['annual_entitlement'],
+                    'max_carry_forward' => $row['max_accumulation'] ?? 0,
+                    'allow_encashment' => false,
+                ]);
+            }
+        });
 
         return redirect()->route('hr.leave-policies.index')
                          ->with('success', 'Leave policy updated successfully.');

@@ -1,6 +1,10 @@
 @extends('layouts.erp')
 
 @section('content')
+@php
+    $taskIndexRoute = \Illuminate\Support\Facades\Route::has('tasks.index') ? 'tasks.index' : null;
+    $taskCreateRoute = \Illuminate\Support\Facades\Route::has('tasks.create') ? 'tasks.create' : null;
+@endphp
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -33,6 +37,22 @@
             <a href="{{ route('projects.production-billing.index', $project) }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
+
+            @can('tasks.view')
+                @if($taskIndexRoute)
+                    <a href="{{ route($taskIndexRoute, ['project' => $project->id, 'q' => $bill->bill_number]) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-list-task"></i> Related Tasks
+                    </a>
+                @endif
+            @endcan
+
+            @can('tasks.create')
+                @if($taskCreateRoute)
+                    <a href="{{ route($taskCreateRoute, ['project' => $project->id, 'title' => 'Billing '. $bill->bill_number .' follow-up', 'description' => 'Linked from Billing '. $bill->bill_number]) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Add Task
+                    </a>
+                @endif
+            @endcan
 
             @can('production.billing.update')
                 @if($bill->status === 'draft')

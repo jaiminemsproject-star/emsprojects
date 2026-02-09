@@ -23,7 +23,7 @@ class HrAttendanceController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('permission:hr.attendance.view')->only(['index', 'show', 'monthly', 'report']);
-        $this->middleware('permission:hr.attendance.create')->only(['create', 'store', 'manualEntry']);
+        $this->middleware('permission:hr.attendance.create')->only(['create', 'store', 'manualEntry', 'importPunches']);
         $this->middleware('permission:hr.attendance.update')->only(['edit', 'update', 'approve']);
         $this->middleware('permission:hr.attendance.process')->only(['process', 'lock']);
     }
@@ -307,7 +307,10 @@ class HrAttendanceController extends Controller
             ->orderByDesc('attendance_date')
             ->paginate(50);
 
-        return view('hr.attendance.ot-approval', compact('pendingOt'));
+        return view('hr.attendance.ot-approval', [
+            'pendingOt' => $pendingOt,
+            'records' => $pendingOt,
+        ]);
     }
 
     public function regularization(Request $request): View|RedirectResponse
@@ -350,8 +353,159 @@ class HrAttendanceController extends Controller
 
         $attendanceId = $request->get('attendance_id');
         $attendance = $attendanceId ? HrAttendance::with('employee')->findOrFail($attendanceId) : null;
+        $regularizations = HrAttendanceRegularization::with(['employee', 'attendance'])
+            ->orderByDesc('created_at')
+            ->paginate(50);
 
-        return view('hr.attendance.regularization', compact('attendance'));
+        return view('hr.attendance.regularization', compact('attendance', 'regularizations'));
+    }
+
+    public function importPunches(Request $request): View|RedirectResponse
+    {
+        if ($request->isMethod('post')) {
+            $validated = $request->validate([
+                'file' => 'required|file|mimes:csv,txt|max:10240',
+                'default_date' => 'nullable|date',
+                'has_header' => 'nullable|boolean',
+                'auto_process' => 'nullable|boolean',
+            ]);
+
+            $defaultDate = isset($validated['default_date']) && $validated['default_date']
+                ? Carbon::parse($validated['default_date'])->startOfDay()
+                : null;
+            $hasHeader = $request->boolean('has_header', true);
+            $autoProcess = $request->boolean('auto_process', true);
+
+            $handle = fopen($validated['file']->getRealPath(), 'r');
+            if ($handle === false) {
+                return back()->with('error', 'Unable to read the uploaded file.');
+            }
+
+            $header = [];
+            $imported = 0;
+            $duplicate = 0;
+            $failed = 0;
+            $errors = [];
+            $employeeDates = [];
+            $rowNumber = 0;
+
+            while (($row = fgetcsv($handle)) !== false) {
+                $rowNumber++;
+
+                if ($this->isImportRowEmpty($row)) {
+                    continue;
+                }
+
+                if ($rowNumber === 1 && $hasHeader) {
+                    $header = array_map(fn ($h) => $this->normalizeImportHeader((string) $h), $row);
+                    continue;
+                }
+
+                try {
+                    $mapped = !empty($header)
+                        ? $this->mapImportRowByHeader($row, $header)
+                        : [
+                            'employee_code' => $row[0] ?? null,
+                            'punch_time' => $row[1] ?? null,
+                            'punch_type' => $row[2] ?? null,
+                            'device_id' => $row[3] ?? null,
+                            'location_name' => $row[4] ?? null,
+                            'remarks' => $row[5] ?? null,
+                        ];
+
+                    $employee = $this->resolveEmployeeForPunchImport($mapped);
+                    if (!$employee) {
+                        $failed++;
+                        $errors[] = "Row {$rowNumber}: employee not found.";
+                        continue;
+                    }
+
+                    $punchTime = $this->resolveImportPunchTime($mapped, $defaultDate);
+                    if (!$punchTime) {
+                        $failed++;
+                        $errors[] = "Row {$rowNumber}: invalid or missing punch time.";
+                        continue;
+                    }
+
+                    $punchType = $this->normalizeImportPunchType($this->findImportValue(
+                        $mapped,
+                        ['punch_type', 'type', 'direction', 'in_out', 'io']
+                    ));
+
+                    $exists = HrAttendancePunch::query()
+                        ->where('hr_employee_id', $employee->id)
+                        ->where('punch_time', $punchTime)
+                        ->where('punch_type', $punchType)
+                        ->exists();
+
+                    if ($exists) {
+                        $duplicate++;
+                        continue;
+                    }
+
+                    HrAttendancePunch::create([
+                        'hr_employee_id' => $employee->id,
+                        'punch_time' => $punchTime,
+                        'punch_type' => $punchType,
+                        'source' => 'import',
+                        'device_id' => $this->findImportValue($mapped, ['device_id', 'device', 'terminal_id', 'machine_id']),
+                        'location_name' => $this->findImportValue($mapped, ['location_name', 'location', 'site']),
+                        'raw_data' => substr(json_encode($mapped) ?: '', 0, 255),
+                        'is_processed' => false,
+                        'is_valid' => true,
+                        'remarks' => $this->findImportValue($mapped, ['remarks', 'remark', 'note', 'notes']),
+                        'created_by' => auth()->id(),
+                    ]);
+
+                    $employeeDates[$employee->id . '|' . $punchTime->toDateString()] = [
+                        'employee_id' => $employee->id,
+                        'date' => $punchTime->toDateString(),
+                    ];
+                    $imported++;
+                } catch (\Throwable $e) {
+                    $failed++;
+                    $errors[] = "Row {$rowNumber}: " . $e->getMessage();
+                }
+            }
+
+            fclose($handle);
+
+            $processedCount = 0;
+            if ($autoProcess && $imported > 0 && !empty($employeeDates)) {
+                $employees = HrEmployee::whereIn('id', collect($employeeDates)->pluck('employee_id')->unique()->values())
+                    ->get()
+                    ->keyBy('id');
+
+                foreach ($employeeDates as $pair) {
+                    $employee = $employees[$pair['employee_id']] ?? null;
+                    if (!$employee) {
+                        continue;
+                    }
+
+                    try {
+                        $this->processEmployeeAttendance($employee, Carbon::parse($pair['date']));
+                        $processedCount++;
+                    } catch (\Throwable $e) {
+                        $errors[] = "Processing {$employee->employee_code} on {$pair['date']}: " . $e->getMessage();
+                    }
+                }
+            }
+
+            $message = "Punch import complete. Imported: {$imported}, Duplicates: {$duplicate}, Failed: {$failed}.";
+            if ($autoProcess) {
+                $message .= " Attendance processed: {$processedCount}.";
+            }
+
+            return back()
+                ->with($failed > 0 ? 'warning' : 'success', $message)
+                ->with('import_errors', array_slice($errors, 0, 50));
+        }
+
+        $recentPunches = HrAttendancePunch::with('employee')
+            ->orderByDesc('punch_time')
+            ->paginate(50);
+
+        return view('hr.attendance.import-punches', compact('recentPunches'));
     }
 
     public function approveRegularization(HrAttendanceRegularization $regularization): RedirectResponse
@@ -384,6 +538,26 @@ class HrAttendanceController extends Controller
             DB::rollBack();
             return back()->with('error', 'Failed to approve: ' . $e->getMessage());
         }
+    }
+
+    public function rejectRegularization(Request $request, HrAttendanceRegularization $regularization): RedirectResponse
+    {
+        if ($regularization->status !== 'pending') {
+            return back()->with('error', 'This request is already processed.');
+        }
+
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:1000',
+        ]);
+
+        $regularization->update([
+            'status' => 'rejected',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+            'approval_remarks' => $validated['reason'] ?? 'Rejected by reviewer.',
+        ]);
+
+        return back()->with('success', 'Regularization request rejected.');
     }
 
     public function report(Request $request): View
@@ -432,6 +606,151 @@ class HrAttendanceController extends Controller
     }
 
     // Private Methods
+
+    private function normalizeImportHeader(string $header): string
+    {
+        $header = strtolower(trim($header));
+        $header = preg_replace('/[^a-z0-9]+/', '_', $header) ?? '';
+        return trim($header, '_');
+    }
+
+    private function isImportRowEmpty(array $row): bool
+    {
+        foreach ($row as $cell) {
+            if (trim((string) $cell) !== '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function mapImportRowByHeader(array $row, array $header): array
+    {
+        $mapped = [];
+        foreach ($header as $index => $name) {
+            if ($name === '') {
+                continue;
+            }
+            $mapped[$name] = isset($row[$index]) ? trim((string) $row[$index]) : null;
+        }
+
+        return $mapped;
+    }
+
+    private function findImportValue(array $row, array $keys): ?string
+    {
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $row) && trim((string) $row[$key]) !== '') {
+                return trim((string) $row[$key]);
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveEmployeeForPunchImport(array $row): ?HrEmployee
+    {
+        $employeeId = $this->findImportValue($row, ['hr_employee_id', 'employee_id', 'emp_id']);
+        if ($employeeId !== null && ctype_digit($employeeId)) {
+            $employee = HrEmployee::find((int) $employeeId);
+            if ($employee) {
+                return $employee;
+            }
+        }
+
+        $employeeCode = $this->findImportValue($row, ['employee_code', 'emp_code', 'employeecode', 'code']);
+        if ($employeeCode) {
+            $employee = HrEmployee::where('employee_code', $employeeCode)->first();
+            if ($employee) {
+                return $employee;
+            }
+        }
+
+        $biometricId = $this->findImportValue($row, ['biometric_id', 'biometricid', 'biometric', 'device_user_id', 'user_id']);
+        if ($biometricId) {
+            $employee = HrEmployee::where('biometric_id', $biometricId)->first();
+            if ($employee) {
+                return $employee;
+            }
+        }
+
+        $cardNumber = $this->findImportValue($row, ['card_number', 'card', 'card_no']);
+        if ($cardNumber) {
+            return HrEmployee::where('card_number', $cardNumber)->first();
+        }
+
+        return null;
+    }
+
+    private function resolveImportPunchTime(array $row, ?Carbon $defaultDate): ?Carbon
+    {
+        $full = $this->findImportValue($row, ['punch_time', 'datetime', 'punch_datetime', 'timestamp', 'date_time', 'time_stamp']);
+        if ($full) {
+            try {
+                return Carbon::parse($full);
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        $date = $this->findImportValue($row, ['date', 'punch_date', 'attendance_date', 'log_date']);
+        $time = $this->findImportValue($row, ['time', 'log_time', 'punch_at', 'clock_time']);
+
+        if ($date && $time) {
+            try {
+                return Carbon::parse("{$date} {$time}");
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        if (!$date && $time && $defaultDate) {
+            try {
+                return Carbon::parse($defaultDate->toDateString() . ' ' . $time);
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        if ($date) {
+            try {
+                return Carbon::parse($date)->startOfDay();
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizeImportPunchType(?string $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        if ($value === '') {
+            return 'unknown';
+        }
+
+        $in = ['in', 'checkin', 'check_in', 'punchin', 'punch_in', 'entry', 'i', '1'];
+        $out = ['out', 'checkout', 'check_out', 'punchout', 'punch_out', 'exit', 'o', '0'];
+        $breakStart = ['break_start', 'breakstart', 'break-in', 'breakin', 'bstart'];
+        $breakEnd = ['break_end', 'breakend', 'break-out', 'breakout', 'bend'];
+
+        if (in_array($value, $in, true)) {
+            return 'in';
+        }
+        if (in_array($value, $out, true)) {
+            return 'out';
+        }
+        if (in_array($value, $breakStart, true)) {
+            return 'break_start';
+        }
+        if (in_array($value, $breakEnd, true)) {
+            return 'break_end';
+        }
+
+        return 'unknown';
+    }
 
     private function processEmployeeAttendance(HrEmployee $employee, Carbon $date): void
     {

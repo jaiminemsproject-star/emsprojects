@@ -39,14 +39,44 @@ class PurchaseOrderController extends Controller
         $this->middleware('permission:purchase.po.delete')->only(['cancel']);
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $orders = PurchaseOrder::with(['vendor',
-            'vendorBranch', 'project'])
-            ->orderByDesc('id')
-            ->paginate(25);
+        $query = PurchaseOrder::query()
+            ->with(['vendor', 'vendorBranch', 'project'])
+            ->orderByDesc('id');
 
-        return view('purchase_orders.index', compact('orders'));
+        if ($q = trim((string) $request->get('q', ''))) {
+            $query->where(function ($qq) use ($q) {
+                $qq->where('code', 'like', '%' . $q . '%')
+                    ->orWhereHas('vendor', function ($vq) use ($q) {
+                        $vq->where('name', 'like', '%' . $q . '%');
+                    });
+            });
+        }
+
+        if ($status = trim((string) $request->get('status', ''))) {
+            $query->where('status', $status);
+        }
+
+        if ($vendorId = (int) $request->get('vendor_id', 0)) {
+            $query->where('vendor_party_id', $vendorId);
+        }
+
+        if ($projectId = (int) $request->get('project_id', 0)) {
+            $query->where('project_id', $projectId);
+        }
+
+        $orders = $query->paginate(25)->withQueryString();
+        $vendors = Party::query()
+            ->where('is_supplier', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+        $projects = \App\Models\Project::query()
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get(['id', 'code', 'name']);
+
+        return view('purchase_orders.index', compact('orders', 'vendors', 'projects'));
     }
 
     public function show(PurchaseOrder $purchaseOrder): View
@@ -1163,6 +1193,5 @@ class PurchaseOrderController extends Controller
             ->first();
     }
 }
-
 
 

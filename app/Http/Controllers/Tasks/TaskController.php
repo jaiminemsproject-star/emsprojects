@@ -25,16 +25,27 @@ class TaskController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:tasks.view')->only(['index', 'show']);
+        $this->middleware('permission:tasks.view')->only(['index', 'show', 'watch', 'unwatch']);
         $this->middleware('permission:tasks.create')->only(['create', 'store', 'duplicate']);
         $this->middleware('permission:tasks.update')->only(['edit', 'update', 'updateStatus', 'updateAssignee', 'bulkUpdate']);
         $this->middleware('permission:tasks.delete')->only(['destroy', 'bulkDelete']);
     }
 
+    protected function getCompanyId(): int
+    {
+        return auth()->user()->company_id ?? 1;
+    }
+
     public function index(Request $request): View
     {
+        $companyId = $this->getCompanyId();
+
         $query = Task::with(['status', 'priority', 'assignee', 'taskList', 'labels', 'project'])
-            ->forCompany(1)
+            ->withCount([
+                'children as subtask_count',
+                'children as completed_subtask_count' => fn($q) => $q->whereHas('status', fn($s) => $s->where('is_closed', true)),
+            ])
+            ->forCompany($companyId)
             ->notArchived();
 
         if ($taskListId = $request->get('list')) {
@@ -43,6 +54,10 @@ class TaskController extends Controller
 
         if ($projectId = $request->get('project')) {
             $query->forProject($projectId);
+        }
+
+        if ($bomId = $request->get('bom')) {
+            $query->where('bom_id', $bomId);
         }
 
         if ($statusIds = $request->get('status')) {
@@ -80,13 +95,18 @@ class TaskController extends Controller
         }
 
         $sortField = $request->get('sort', 'created_at');
-        $sortDir = $request->get('dir', 'desc');
+        $sortDir = strtolower((string) $request->get('dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $allowedSortFields = ['created_at', 'updated_at', 'due_date', 'title', 'task_number', 'status_id', 'priority_id'];
+        if (!in_array($sortField, $allowedSortFields, true)) {
+            $sortField = 'created_at';
+        }
         $query->orderBy($sortField, $sortDir);
 
         if (!$request->get('include_subtasks')) {
             $query->rootTasks();
         }
 
+        $statsQuery = clone $query;
         $tasks = $query->paginate(25)->withQueryString();
 
         $taskLists = TaskList::active()->notArchived()->orderBy('name')->get();
@@ -95,9 +115,23 @@ class TaskController extends Controller
         $labels = TaskLabel::active()->orderBy('name')->get();
         $users = User::where('is_active', true)->orderBy('name')->get();
         $projects = Project::where('status', 'active')->orderBy('name')->get();
+        $selectedProjectId = (int) ($request->get('project') ?: 0);
+        if ($selectedProjectId <= 0 && $request->filled('bom')) {
+            $selectedProjectId = (int) (Bom::where('id', (int) $request->get('bom'))->value('project_id') ?: 0);
+        }
+        $boms = $selectedProjectId > 0
+            ? Bom::query()->where('project_id', $selectedProjectId)->orderBy('bom_number')->get()
+            : collect();
+        $stats = [
+            'total' => (clone $statsQuery)->count(),
+            'open' => (clone $statsQuery)->open()->count(),
+            'completed' => (clone $statsQuery)->closed()->count(),
+            'overdue' => (clone $statsQuery)->overdue()->count(),
+            'due_today' => (clone $statsQuery)->dueToday()->count(),
+        ];
 
         return view('tasks.index', compact(
-            'tasks', 'taskLists', 'statuses', 'priorities', 'labels', 'users', 'projects'
+            'tasks', 'taskLists', 'statuses', 'priorities', 'labels', 'users', 'projects', 'boms', 'stats'
         ));
     }
 
@@ -121,13 +155,30 @@ class TaskController extends Controller
             $task->project_id = $projectId;
         }
 
+        if ($bomId = $request->get('bom')) {
+            $bom = Bom::query()->find($bomId);
+            if ($bom) {
+                $task->bom_id = $bom->id;
+                $task->project_id = $task->project_id ?: $bom->project_id;
+            }
+        }
+
         if ($parentId = $request->get('parent')) {
             $task->parent_id = $parentId;
             $parent = Task::find($parentId);
             if ($parent) {
                 $task->task_list_id = $parent->task_list_id;
                 $task->project_id = $parent->project_id;
+                $task->bom_id = $parent->bom_id;
             }
+        }
+
+        if ($prefillTitle = trim((string) $request->get('title', ''))) {
+            $task->title = $prefillTitle;
+        }
+
+        if ($prefillDescription = trim((string) $request->get('description', ''))) {
+            $task->description = $prefillDescription;
         }
 
         if (!$task->status_id) {
@@ -140,10 +191,13 @@ class TaskController extends Controller
         $labels = TaskLabel::active()->orderBy('name')->get();
         $users = User::where('is_active', true)->orderBy('name')->get();
         $projects = Project::where('status', 'active')->orderBy('name')->get();
+        $boms = $task->project_id
+            ? Bom::query()->where('project_id', $task->project_id)->orderBy('bom_number')->get()
+            : collect();
         $templates = TaskTemplate::active()->orderBy('name')->get();
 
         return view('tasks.create', compact(
-            'task', 'taskLists', 'statuses', 'priorities', 'labels', 'users', 'projects', 'templates'
+            'task', 'taskLists', 'statuses', 'priorities', 'labels', 'users', 'projects', 'boms', 'templates'
         ));
     }
 
@@ -218,7 +272,7 @@ class TaskController extends Controller
         $projects = Project::where('status', 'active')->orderBy('name')->get();
         $boms = $task->project_id ? Bom::where('project_id', $task->project_id)->get() : collect();
 
-        return view('tasks.edit', compact(
+        return view('tasks.create', compact(
             'task', 'taskLists', 'statuses', 'priorities', 'labels', 'users', 'projects', 'boms'
         ));
     }
