@@ -293,7 +293,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('party-banks/{bank}', [PartyBankController::class, 'destroy'])->name('party-banks.destroy');
 
     // Party branches (additional GSTINs)
-    Route::post('parties/{party}/branches', [PartyBranchController::class, 'store'])->name('parties.branches.store');
+    // Route::post('parties/{party}/branches', [PartyBranchController::class, 'store'])->name('parties.branches.store');
+
+
+    Route::post('/parties/{party}/branches', [PartyBranchController::class, 'store'])
+    ->name('parties.branches.store');
+
     Route::get('api/parties/{party}/branches', [PartyBranchController::class, 'apiIndex'])->name('api.parties.branches');
     Route::delete('party-branches/{branch}', [PartyBranchController::class, 'destroy'])->name('party-branches.destroy');
 

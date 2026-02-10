@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\Accounting\Voucher;
 use App\Observers\Accounting\VoucherTdsCertificateObserver;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Party;
+use App\Policies\PartyPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,4 +29,9 @@ class AppServiceProvider extends ServiceProvider
         // when Purchase/Subcontractor vouchers are posted.
         Voucher::observe(VoucherTdsCertificateObserver::class);
     }
+
+    protected $policies = [
+    Party::class => PartyPolicy::class,
+];
+
 }

@@ -52,75 +52,77 @@ class PartyBranchController extends Controller
      * This is mainly used to store additional GSTIN registrations for the same legal entity
      * (e.g. branches in other states).
      */
-    public function store(Request $request, Party $party)
-    {
-        $this->authorizeForUser($request->user(), 'update', $party);
+   public function store(Request $request, Party $party)
+{
 
-        $data = $request->validate([
-            'branch_name'   => ['nullable', 'string', 'max:150'],
-            'gstin'         => ['required', 'string', 'max:20', function ($attribute, $value, $fail) use ($party) {
-                $gstin = strtoupper(preg_replace('/\s+/', '', (string) $value));
 
-                // Don't allow duplicating the same GSTIN already saved as the party primary GSTIN
+$this->authorizeForUser($request->user(), 'update', $party);
+
+
+    $data = $request->validate([
+        'branch_name' => ['nullable', 'string', 'max:150'],
+
+        'gstin' => [
+            'required',
+            'string',
+            'max:20',
+            function ($attribute, $value, $fail) use ($party) {
+
+                $gstin = strtoupper(preg_replace('/\s+/', '', $value));
+
+                // Same as party GSTIN
                 if ($party->gstin && $gstin === $party->gstin) {
                     $fail('This GSTIN is already saved as the party primary GSTIN.');
                     return;
                 }
 
-                // Guard: GSTIN must belong to the same PAN as the party (same legal entity)
+                // PAN check (same legal entity)
                 if ($party->pan && strlen($gstin) >= 12) {
                     $maybePan = substr($gstin, 2, 10);
                     if (preg_match('/^[A-Z]{5}[0-9]{4}[A-Z]$/', $maybePan) && $maybePan !== $party->pan) {
-                        $fail('This GSTIN belongs to a different PAN. Please create/open the correct party instead of adding it as a branch.');
+                        $fail('This GSTIN belongs to a different PAN.');
                         return;
                     }
                 }
 
-                // Check other party primary GSTINs
-                $existsInParties = Party::query()
-                    ->where('id', '!=', $party->id)
-                    ->whereNotNull('gstin')
+                // Existing GSTIN check
+                $exists = Party::where('id', '!=', $party->id)
                     ->where('gstin', $gstin)
-                    ->exists();
+                    ->exists()
+                    || PartyBranch::where('gstin', $gstin)->exists();
 
-                // Check branches (any party, including same party)
-                $existsInBranches = PartyBranch::query()
-                    ->whereNotNull('gstin')
-                    ->where('gstin', $gstin)
-                    ->exists();
-
-                if ($existsInParties || $existsInBranches) {
-                    $fail('This GSTIN is already present in the system. Please use the existing party/branch.');
+                if ($exists) {
+                    $fail('This GSTIN already exists in the system.');
                 }
-            }],
-
-            'address_line1' => ['nullable', 'string', 'max:200'],
-            'address_line2' => ['nullable', 'string', 'max:200'],
-            'city'          => ['nullable', 'string', 'max:100'],
-            'state'         => ['nullable', 'string', 'max:100'],
-            'pincode'       => ['nullable', 'string', 'max:20'],
-            'country'       => ['nullable', 'string', 'max:100'],
-        ]);
-
-        $data['party_id'] = $party->id;
-
-        // Normalize GSTIN
-        $data['gstin'] = strtoupper(preg_replace('/\s+/', '', (string) $data['gstin']));
-
-        $party->branches()->create($data);
-
-        // If party PAN is blank, try to populate from GSTIN (positions 3-12)
-        if (!$party->pan && strlen($data['gstin']) >= 12) {
-            $maybePan = substr($data['gstin'], 2, 10);
-            if (preg_match('/^[A-Z]{5}[0-9]{4}[A-Z]$/', $maybePan)) {
-                $party->update(['pan' => $maybePan]);
             }
-        }
+        ],
 
-        return redirect()
-            ->route('parties.show', $party)
-            ->with('success', 'Branch GSTIN added successfully.');
+        'address_line1' => ['nullable', 'string', 'max:200'],
+        'address_line2' => ['nullable', 'string', 'max:200'],
+        'city'          => ['nullable', 'string', 'max:100'],
+        'state'         => ['nullable', 'string', 'max:100'],
+        'pincode'       => ['nullable', 'string', 'max:20'],
+        'country'       => ['nullable', 'string', 'max:100'],
+    ]);
+
+    $data['party_id'] = $party->id;
+    $data['gstin'] = strtoupper(preg_replace('/\s+/', '', $data['gstin']));
+
+    $party->branches()->create($data);
+
+    // Auto PAN fill
+    if (!$party->pan && strlen($data['gstin']) >= 12) {
+        $maybePan = substr($data['gstin'], 2, 10);
+        if (preg_match('/^[A-Z]{5}[0-9]{4}[A-Z]$/', $maybePan)) {
+            $party->update(['pan' => $maybePan]);
+        }
     }
+    
+
+    return redirect()
+        ->route('parties.show', $party)
+        ->with('success', 'Branch GSTIN added successfully.');
+}
 
     /**
      * Remove the specified branch.
