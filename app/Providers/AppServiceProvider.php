@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
         // Phase 1.6 / DEV18: create payable-side TDS certificate tracking rows
         // when Purchase/Subcontractor vouchers are posted.
         Voucher::observe(VoucherTdsCertificateObserver::class);
+        
     }
 
     protected $policies = [

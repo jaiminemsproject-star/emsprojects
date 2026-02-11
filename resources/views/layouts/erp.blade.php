@@ -54,6 +54,24 @@
     <link rel="stylesheet" href="{{ asset('css/erp-color-modes.css') }}">
 
     {{-- Per-page extra styles --}}
+    <style>/* Sidebar default width */
+.erp-sidebar-wrapper {
+    width: 260px;
+    transition: all 0.3s ease;
+}
+
+/* Hide sidebar on desktop */
+.sidebar-collapsed .erp-sidebar-wrapper {
+    margin-left: -260px;
+}
+
+/* Smooth main expand */
+.erp-main-scroll {
+    transition: all 0.3s ease;
+}
+
+
+</style>
     @stack('styles')
 </head>
 <body class="bg-body-tertiary">
@@ -75,14 +93,28 @@
                 <div class="d-flex align-items-center gap-2">
 
                     {{-- Mobile sidebar toggle --}}
-                    <button class="btn btn-outline-secondary btn-sm d-inline-flex d-md-none me-1"
+                    {{-- <button class="btn btn-outline-secondary btn-sm d-inline-flex d-md-none me-1"
                             type="button"
                             data-bs-toggle="offcanvas"
                             data-bs-target="#sidebarOffcanvas"
                             aria-controls="sidebarOffcanvas"
                             aria-label="Toggle navigation">
                         <i class="bi bi-list"></i>
-                    </button>
+                    </button> --}}
+<button class="btn btn-outline-secondary btn-sm d-inline-flex d-md-none me-1"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#sidebarOffcanvas"
+        aria-controls="sidebarOffcanvas"
+        aria-label="Toggle navigation">
+    <i class="bi bi-list"></i>
+</button>
+<button class="btn btn-sm erp-hamburger-btn me-2 d-none d-lg-inline-flex" type="button" id="sidebarToggle"
+    aria-label="Toggle navigation">
+    <i class="bi bi-list"></i>
+</button>
+
+
 
                     {{-- Logo + app name --}}
                     <a href="{{ route('dashboard') }}"
@@ -112,9 +144,9 @@
                     @auth
                         {{-- Notifications dropdown --}}
                         @php
-                            $notifUser = auth()->user();
-                            $notifUnread = $notifUser?->unreadNotifications()->count() ?? 0;
-                            $notifLatest = $notifUser?->notifications()->latest()->limit(5)->get() ?? collect();
+    $notifUser = auth()->user();
+    $notifUnread = $notifUser?->unreadNotifications()->count() ?? 0;
+    $notifLatest = $notifUser?->notifications()->latest()->limit(5)->get() ?? collect();
                         @endphp
 
                         <div class="dropdown">
@@ -147,11 +179,11 @@
                                 <div class="list-group list-group-flush">
                                     @forelse($notifLatest as $n)
                                         @php
-                                            $data = $n->data ?? [];
-                                            $title = $data['title'] ?? ($data['message'] ?? class_basename($n->type));
-                                            $message = $data['message'] ?? '';
-                                            $url = $data['url'] ?? null;
-                                            $isUnread = $n->read_at === null;
+        $data = $n->data ?? [];
+        $title = $data['title'] ?? ($data['message'] ?? class_basename($n->type));
+        $message = $data['message'] ?? '';
+        $url = $data['url'] ?? null;
+        $isUnread = $n->read_at === null;
                                         @endphp
 
                                         <a
@@ -259,7 +291,7 @@
     <div class="d-flex flex-grow-1 overflow-hidden">
 
         {{-- Desktop sidebar (independent scroll) --}}
-        <aside class="border-end bg-body d-none d-md-flex flex-column erp-sidebar-wrapper">
+        <aside   id="desktopSidebar" class="border-end bg-body d-none d-md-flex flex-column erp-sidebar-wrapper">
             @include('partials.sidebar', ['sidebarId' => 'desktop'])
         </aside>
 
@@ -313,6 +345,30 @@
 
 {{-- Theme toggle (no build required) --}}
 <script src="{{ asset('js/erp-theme.js') }}" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const toggleBtn = document.getElementById("sidebarToggle");
+
+        toggleBtn.addEventListener("click", function () {
+
+            // MOBILE
+            if (window.innerWidth < 768) {
+                let offcanvas = new bootstrap.Offcanvas(
+                    document.getElementById('sidebarOffcanvas')
+                );
+                offcanvas.toggle();
+            }
+
+            // DESKTOP
+            else {
+                document.body.classList.toggle("sidebar-collapsed");
+            }
+
+        });
+
+    });
+</script>
 
 {{-- Per-page extra scripts --}}
 @stack('scripts')

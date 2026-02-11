@@ -31,31 +31,89 @@ class PurchaseIndentController extends Controller
         $this->middleware('permission:purchase.indent.delete')->only(['cancel']);
     }
 
-    public function index(Request $request): View
+    // public function index(Request $request): View
+    // {
+    //     $query = PurchaseIndent::query()
+    //         ->with(['project', 'department'])
+    //         ->orderByDesc('id');
+
+    //     if ($status = trim((string) $request->input('status', ''))) {
+    //         $query->where('status', $status);
+    //     }
+
+    //     if ($proc = trim((string) $request->input('procurement_status', ''))) {
+    //         $query->where('procurement_status', $proc);
+    //     }
+
+    //     if ($p = (int) $request->input('project_id')) {
+    //         $query->where('project_id', $p);
+    //     }
+
+    //     if ($q = trim((string) $request->input('q', ''))) {
+    //         $query->where('code', 'like', '%' . $q . '%');
+    //     }
+
+    //     $indents = $query->paginate(25)->withQueryString();
+    //     $projects = Project::query()
+    //         ->orderBy('code')
+    //         ->orderBy('name')
+    //         ->get(['id', 'code', 'name']);
+
+    //     $statusOptions = [
+    //         'draft' => 'Draft',
+    //         'approved' => 'Approved',
+    //         'rejected' => 'Rejected',
+    //         'cancelled' => 'Cancelled',
+    //     ];
+
+    //     $procurementOptions = [
+    //         'open' => 'Open',
+    //         'rfq_created' => 'RFQ Created',
+    //         'partially_ordered' => 'Partially Ordered',
+    //         'ordered' => 'Ordered',
+    //         'closed' => 'Closed',
+    //         'cancelled' => 'Cancelled',
+    //     ];
+
+    //     return view('purchase_indents.index', compact('indents', 'projects', 'statusOptions', 'procurementOptions'));
+    // }
+
+
+        public function index(Request $request): View|\Illuminate\Http\JsonResponse
     {
         $query = PurchaseIndent::query()
             ->with(['project', 'department'])
             ->orderByDesc('id');
 
-        if ($status = trim((string) $request->input('status', ''))) {
+        // Filters
+        if ($status = $request->input('status')) {
             $query->where('status', $status);
         }
 
-        if ($proc = trim((string) $request->input('procurement_status', ''))) {
+        if ($proc = $request->input('procurement_status')) {
             $query->where('procurement_status', $proc);
         }
 
-        if ($p = (int) $request->input('project_id')) {
-            $query->where('project_id', $p);
+        if ($project = $request->input('project_id')) {
+            $query->where('project_id', $project);
         }
 
-        if ($q = trim((string) $request->input('q', ''))) {
-            $query->where('code', 'like', '%' . $q . '%');
+        if ($q = $request->input('q')) {
+            $query->where('code', 'like', "%{$q}%");
         }
 
         $indents = $query->paginate(25)->withQueryString();
-        $projects = Project::query()
-            ->orderBy('code')
+
+        // AJAX response
+        if ($request->ajax()) {
+
+            return response()->json([
+                'table' => view('purchase_indents.partials.table', compact('indents'))->render(),
+                'summary' => view('purchase_indents.partials.summary', compact('indents'))->render(),
+            ]);
+        }
+
+        $projects = Project::orderBy('code')
             ->orderBy('name')
             ->get(['id', 'code', 'name']);
 
@@ -75,7 +133,12 @@ class PurchaseIndentController extends Controller
             'cancelled' => 'Cancelled',
         ];
 
-        return view('purchase_indents.index', compact('indents', 'projects', 'statusOptions', 'procurementOptions'));
+        return view('purchase_indents.index', compact(
+            'indents',
+            'projects',
+            'statusOptions',
+            'procurementOptions'
+        ));
     }
 
     public function create(): View
