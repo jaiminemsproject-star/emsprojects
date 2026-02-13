@@ -1092,7 +1092,16 @@
                             </li>
                         @endif
                     @endcan
-
+@if(\Illuminate\Support\Facades\Route::has('purchase-orders.index'))
+                            <li class="nav-item">
+                                <a data-erp-menu-item href="{{ route('purchase-orders.index') }}"
+                                   class="nav-link erp-nav-link d-flex align-items-center px-3 py-1
+                                          {{ $isRoute('purchase-orders.*') ? 'active' : 'text-body-secondary' }}">
+                                    <i class="bi bi-cart-check me-2"></i>
+                                    <span>Purchase Orders</span>
+                                </a>
+                            </li>
+                        @endif
                     @can('purchase.rfq.view')
                         @if(\Illuminate\Support\Facades\Route::has('purchase-rfqs.index'))
                             <li class="nav-item">

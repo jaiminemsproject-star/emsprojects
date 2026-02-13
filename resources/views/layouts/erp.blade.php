@@ -15,6 +15,7 @@
         @endif
     </title>
 
+    <style></style>
     {{-- Theme bootstrapper (prevents flash). Uses Bootstrap 5.3 color modes via data-bs-theme --}}
     <script>
         (function () {

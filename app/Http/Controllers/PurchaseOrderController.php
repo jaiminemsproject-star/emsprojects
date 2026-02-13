@@ -39,45 +39,47 @@ class PurchaseOrderController extends Controller
         $this->middleware('permission:purchase.po.delete')->only(['cancel']);
     }
 
-    public function index(Request $request): View
-    {
-        $query = PurchaseOrder::query()
-            ->with(['vendor', 'vendorBranch', 'project'])
-            ->orderByDesc('id');
+   public function index(Request $request): View|\Illuminate\Http\JsonResponse
+{
+    $query = PurchaseOrder::query()
+        ->with(['vendor', 'vendorBranch', 'project'])
+        ->orderByDesc('id');
 
-        if ($q = trim((string) $request->get('q', ''))) {
-            $query->where(function ($qq) use ($q) {
-                $qq->where('code', 'like', '%' . $q . '%')
-                    ->orWhereHas('vendor', function ($vq) use ($q) {
-                        $vq->where('name', 'like', '%' . $q . '%');
-                    });
-            });
-        }
+   if ($poNumber = trim((string) $request->get('po_number', ''))) {
+    $query->where('code', 'like', '%' . $poNumber . '%');
+}
 
-        if ($status = trim((string) $request->get('status', ''))) {
-            $query->where('status', $status);
-        }
+if ($vendorId = (int) $request->get('vendor_id', 0)) {
+    $query->where('vendor_party_id', $vendorId);
+}
 
-        if ($vendorId = (int) $request->get('vendor_id', 0)) {
-            $query->where('vendor_party_id', $vendorId);
-        }
 
-        if ($projectId = (int) $request->get('project_id', 0)) {
-            $query->where('project_id', $projectId);
-        }
-
-        $orders = $query->paginate(25)->withQueryString();
-        $vendors = Party::query()
-            ->where('is_supplier', true)
-            ->orderBy('name')
-            ->get(['id', 'name']);
-        $projects = \App\Models\Project::query()
-            ->orderBy('code')
-            ->orderBy('name')
-            ->get(['id', 'code', 'name']);
-
-        return view('purchase_orders.index', compact('orders', 'vendors', 'projects'));
+    if ($status = trim((string) $request->get('status', ''))) {
+        $query->where('status', $status);
     }
+
+    if ($vendorId = (int) $request->get('vendor_id', 0)) {
+        $query->where('vendor_party_id', $vendorId);
+    }
+
+    if ($projectId = (int) $request->get('project_id', 0)) {
+        $query->where('project_id', $projectId);
+    }
+
+    $orders = $query->paginate(25);
+
+    if ($request->ajax()) {
+        return response()->json([
+            'html' => view('purchase_orders.partials.table', compact('orders'))->render()
+        ]);
+    }
+
+    $vendors = Party::where('is_supplier', true)->orderBy('name')->get(['id','name']);
+    $projects = \App\Models\Project::orderBy('code')->orderBy('name')->get(['id','code','name']);
+
+    return view('purchase_orders.index', compact('orders','vendors','projects'));
+}
+
 
     public function show(PurchaseOrder $purchaseOrder): View
     {
