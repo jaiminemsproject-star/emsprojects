@@ -42,47 +42,94 @@ class PurchaseRfqController extends Controller
         $this->middleware('permission:purchase.rfq.delete')->only(['destroy', 'cancel']);
     }
 
-    public function index(Request $request): View
-    {
-        $q = trim((string) $request->get('q', ''));
-        $status = trim((string) $request->get('status', ''));
-        $projectId = (int) $request->get('project_id', 0);
+    // public function index(Request $request): View
+    // {
+    //     $q = trim((string) $request->get('q', ''));
+    //     $status = trim((string) $request->get('status', ''));
+    //     $projectId = (int) $request->get('project_id', 0);
 
-        $query = PurchaseRfq::query()
-            ->with(['project', 'department', 'indent'])
-            ->orderByDesc('id');
+    //     $query = PurchaseRfq::query()
+    //         ->with(['project', 'department', 'indent'])
+    //         ->orderByDesc('id');
 
-        if ($q !== '') {
-            $query->where(function ($qq) use ($q) {
-                $qq->where('code', 'like', '%' . $q . '%')
-                    ->orWhere('remarks', 'like', '%' . $q . '%');
-            });
-        }
+    //     if ($q !== '') {
+    //         $query->where(function ($qq) use ($q) {
+    //             $qq->where('code', 'like', '%' . $q . '%')
+    //                 ->orWhere('remarks', 'like', '%' . $q . '%');
+    //         });
+    //     }
 
-        if ($status !== '') {
-            $query->where('status', $status);
-        }
+    //     if ($status !== '') {
+    //         $query->where('status', $status);
+    //     }
 
-        if ($projectId > 0) {
-            $query->where('project_id', $projectId);
-        }
+    //     if ($projectId > 0) {
+    //         $query->where('project_id', $projectId);
+    //     }
 
-        $rfqs = $query->paginate(25)->withQueryString();
-        $projects = Project::query()
-            ->orderBy('code')
-            ->orderBy('name')
-            ->get(['id', 'code', 'name']);
+    //     $rfqs = $query->paginate(25)->withQueryString();
+    //     $projects = Project::query()
+    //         ->orderBy('code')
+    //         ->orderBy('name')
+    //         ->get(['id', 'code', 'name']);
 
-        $statusOptions = [
-            'draft'        => 'Draft',
-            'sent'         => 'Sent',
-            'po_generated' => 'PO Generated',
-            'closed'       => 'Closed',
-            'cancelled'    => 'Cancelled',
-        ];
+    //     $statusOptions = [
+    //         'draft'        => 'Draft',
+    //         'sent'         => 'Sent',
+    //         'po_generated' => 'PO Generated',
+    //         'closed'       => 'Closed',
+    //         'cancelled'    => 'Cancelled',
+    //     ];
 
-        return view('purchase_rfqs.index', compact('rfqs', 'q', 'status', 'statusOptions', 'projects', 'projectId'));
+    //     return view('purchase_rfqs.index', compact('rfqs', 'q', 'status', 'statusOptions', 'projects', 'projectId'));
+    // }
+public function index(Request $request)
+{
+    $query = PurchaseRfq::query()
+        ->with(['project'])
+        ->orderByDesc('id');
+
+    // 🔍 RFQ No filter
+    if ($request->filled('code')) {
+        $query->where('code', 'like', '%' . $request->code . '%');
     }
+
+    // 🔍 Remarks filter
+    if ($request->filled('remarks')) {
+        $query->where('remarks', 'like', '%' . $request->remarks . '%');
+    }
+
+    // 🔍 Status filter
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // 🔍 Project filter
+    if ($request->filled('project_id')) {
+        $query->where('project_id', $request->project_id);
+    }
+
+    $rfqs = $query->paginate(25);
+
+    if ($request->ajax()) {
+        return view('purchase_rfqs.partials.table', compact('rfqs'))->render();
+    }
+
+    $projects = Project::orderBy('code')->get(['id','code','name']);
+
+    $statusOptions = [
+        'draft' => 'Draft',
+        'sent' => 'Sent',
+        'po_generated' => 'PO Generated',
+        'closed' => 'Closed',
+        'cancelled' => 'Cancelled',
+    ];
+
+    return view('purchase_rfqs.index',
+        compact('rfqs','projects','statusOptions')
+    );
+}
+
 
     public function create(Request $request): View
     {
