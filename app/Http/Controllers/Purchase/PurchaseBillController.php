@@ -40,60 +40,153 @@ class PurchaseBillController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(Request $request)
-    {
-        $query = PurchaseBill::with(['supplier', 'voucher', 'purchaseOrder.project', 'project', 'expenseLines.project'])
-            // Sort by Posting Date (Voucher date) first for accounting users
-            ->orderByDesc('posting_date')
-            ->orderByDesc('bill_date')
-            ->orderByDesc('id');
+    // public function index(Request $request)
+    // {
+    //     $query = PurchaseBill::with(['supplier', 'voucher', 'purchaseOrder.project', 'project', 'expenseLines.project'])
+    //         // Sort by Posting Date (Voucher date) first for accounting users
+    //         ->orderByDesc('posting_date')
+    //         ->orderByDesc('bill_date')
+    //         ->orderByDesc('id');
 
-        if ($supplierId = $request->get('supplier_id')) {
-            $query->where('supplier_id', $supplierId);
-        }
+    //     if ($supplierId = $request->get('supplier_id')) {
+    //         $query->where('supplier_id', $supplierId);
+    //     }
 
-        if ($status = $request->get('status')) {
-            $query->where('status', $status);
-        }
+    //     if ($status = $request->get('status')) {
+    //         $query->where('status', $status);
+    //     }
 
-        if ($projectId = $request->get('project_id')) {
-            $query->where(function ($q) use ($projectId) {
-                $q->where('project_id', $projectId)
-                  ->orWhereHas('purchaseOrder', function ($qpo) use ($projectId) {
-                      $qpo->where('project_id', $projectId);
-                  })
-                  ->orWhereHas('expenseLines', function ($qe) use ($projectId) {
-                      $qe->where('project_id', $projectId);
-                  });
-            });
-        }
+    //     if ($projectId = $request->get('project_id')) {
+    //         $query->where(function ($q) use ($projectId) {
+    //             $q->where('project_id', $projectId)
+    //               ->orWhereHas('purchaseOrder', function ($qpo) use ($projectId) {
+    //                   $qpo->where('project_id', $projectId);
+    //               })
+    //               ->orWhereHas('expenseLines', function ($qe) use ($projectId) {
+    //                   $qe->where('project_id', $projectId);
+    //               });
+    //         });
+    //     }
 
-        if ($search = trim($request->get('q', ''))) {
-            $query->where(function ($q) use ($search) {
-                $q->where('bill_number', 'like', '%' . $search . '%')
-                    ->orWhere('reference_no', 'like', '%' . $search . '%');
-            });
-        }
+    //     if ($search = trim($request->get('q', ''))) {
+    //         $query->where(function ($q) use ($search) {
+    //             $q->where('bill_number', 'like', '%' . $search . '%')
+    //                 ->orWhere('reference_no', 'like', '%' . $search . '%');
+    //         });
+    //     }
 
-        $bills     = $query->paginate(25)->withQueryString();
+    //     $bills     = $query->paginate(25)->withQueryString();
 
-        // Suppliers + Contractors only (so purchase bills stay consistent)
-        $suppliers = Party::query()
-            ->where(function ($q) {
-                $q->where('is_supplier', true)
-                  ->orWhere('is_contractor', true);
-            })
-            ->orderBy('name')
-            ->get();
+    //     // Suppliers + Contractors only (so purchase bills stay consistent)
+    //     $suppliers = Party::query()
+    //         ->where(function ($q) {
+    //             $q->where('is_supplier', true)
+    //               ->orWhere('is_contractor', true);
+    //         })
+    //         ->orderBy('name')
+    //         ->get();
 
-        // Projects (for filter / display)
-        $projects = Project::query()
-            ->orderBy('code')
-            ->orderBy('name')
-            ->get();
+    //     // Projects (for filter / display)
+    //     $projects = Project::query()
+    //         ->orderBy('code')
+    //         ->orderBy('name')
+    //         ->get();
 
-        return view('purchase.bills.index', compact('bills', 'suppliers', 'projects'));
+    //     return view('purchase.bills.index', compact('bills', 'suppliers', 'projects'));
+    // }
+
+
+public function index(Request $request)
+{
+    $query = PurchaseBill::with([
+            'supplier',
+            'voucher',
+            'purchaseOrder.project',
+            'project',
+            'expenseLines.project'
+        ])
+        ->orderByDesc('posting_date')
+        ->orderByDesc('bill_date')
+        ->orderByDesc('id');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filters
+    |--------------------------------------------------------------------------
+    */
+
+    // Supplier Filter
+    if ($request->filled('supplier_id')) {
+        $query->where('supplier_id', $request->supplier_id);
     }
+
+    // Status Filter
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // Project Filter (direct / PO / Expense line)
+    if ($request->filled('project_id')) {
+        $projectId = $request->project_id;
+
+        $query->where(function ($q) use ($projectId) {
+            $q->where('project_id', $projectId)
+              ->orWhereHas('purchaseOrder', function ($qpo) use ($projectId) {
+                  $qpo->where('project_id', $projectId);
+              })
+              ->orWhereHas('expenseLines', function ($qe) use ($projectId) {
+                  $qe->where('project_id', $projectId);
+              });
+        });
+    }
+
+    // Search Filter
+    if ($request->filled('q')) {
+        $search = trim($request->q);
+
+        $query->where(function ($q) use ($search) {
+            $q->where('bill_number', 'like', "%{$search}%")
+              ->orWhere('reference_no', 'like', "%{$search}%");
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    $bills = $query->paginate(25);
+
+    /*
+    |--------------------------------------------------------------------------
+    | AJAX Response (No Page Reload)
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->ajax()) {
+        return view('purchase.bills.partials.table', compact('bills'))->render();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Normal Page Load Data
+    |--------------------------------------------------------------------------
+    */
+
+    $suppliers = Party::where(function ($q) {
+            $q->where('is_supplier', true)
+              ->orWhere('is_contractor', true);
+        })
+        ->orderBy('name')
+        ->get();
+
+    $projects = Project::orderBy('code')
+        ->orderBy('name')
+        ->get();
+
+    return view('purchase.bills.index', compact('bills', 'suppliers', 'projects'));
+}
 
     public function create()
 	{

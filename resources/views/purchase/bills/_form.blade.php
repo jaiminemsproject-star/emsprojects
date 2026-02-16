@@ -1,126 +1,264 @@
 @php
-    /** @var \App\Models\PurchaseBill|null $bill */
-    $isEdit = isset($bill) && $bill->exists;
+/** @var \App\Models\PurchaseBill|null $bill */
+$isEdit = isset($bill) && $bill->exists;
 
-    // ------- ITEM LINES (old() -> existing -> blank rows) -------
-    $itemLines = old('lines');
-    if ($itemLines === null) {
-        if ($isEdit) {
-            $itemLines = $bill->lines
-                ->whereNotNull('item_id')
-                ->values()
-                ->map(function ($l) {
-                    return [
-                        'id' => $l->id,
-                        'material_receipt_id' => $l->material_receipt_id,
-                        'material_receipt_line_id' => $l->material_receipt_line_id,
-                        'item_id' => $l->item_id,
-                        'uom_id' => $l->uom_id,
-                        'qty' => $l->qty,
-                        'rate' => $l->rate,
-                        'discount_percent' => $l->discount_percent,
-                        'discount_amount' => $l->discount_amount,
-                        'basic_amount' => $l->basic_amount,
-                        'tax_rate' => $l->tax_rate,
-                        'tax_amount' => $l->tax_amount,
-                        'cgst_amount' => $l->cgst_amount,
-                        'sgst_amount' => $l->sgst_amount,
-                        'igst_amount' => $l->igst_amount,
-                        'total_amount' => $l->total_amount,
-                        'account_id' => $l->account_id,
-                    ];
-                })
-                ->all();
-        } else {
-            $itemLines = [];
-        }
-    }
-
-    $emptyLines = isset($emptyLines) ? (int) $emptyLines : 3;
-    $minRows = max($emptyLines, count($itemLines));
-    // always keep a few extra empty rows for data entry
-    $targetRows = max($minRows, 5);
-    for ($i = count($itemLines); $i < $targetRows; $i++) {
-        $itemLines[] = [
-            'id' => null,
-            'material_receipt_id' => null,
-            'material_receipt_line_id' => null,
-            'item_id' => null,
-            'uom_id' => null,
-            'qty' => null,
-            'rate' => null,
-            'discount_percent' => 0,
-            'discount_amount' => 0,
-            'basic_amount' => 0,
-            'tax_rate' => 0,
-            'tax_amount' => 0,
-            'cgst_amount' => 0,
-            'sgst_amount' => 0,
-            'igst_amount' => 0,
-            'total_amount' => 0,
-            'account_id' => null,
-        ];
-    }
-
-    // ------- EXPENSE LINES (old() -> existing -> blank rows) -------
-    $expenseLines = old('expense_lines');
-    if ($expenseLines === null) {
-        if ($isEdit) {
-            $expenseLines = $bill->expenseLines->values()->map(function ($l) {
+// ------- ITEM LINES (old() -> existing -> blank rows) -------
+$itemLines = old('lines');
+if ($itemLines === null) {
+    if ($isEdit) {
+        $itemLines = $bill->lines
+            ->whereNotNull('item_id')
+            ->values()
+            ->map(function ($l) {
                 return [
-                    'account_id' => $l->account_id,
-                    // Phase-B: preserve per-expense-line project split when editing
-                    'project_id' => $l->project_id,
-                    'description' => $l->description,
-                    'amount' => $l->basic_amount,
+                    'id' => $l->id,
+                    'material_receipt_id' => $l->material_receipt_id,
+                    'material_receipt_line_id' => $l->material_receipt_line_id,
+                    'item_id' => $l->item_id,
+                    'uom_id' => $l->uom_id,
+                    'qty' => $l->qty,
+                    'rate' => $l->rate,
+                    'discount_percent' => $l->discount_percent,
+                    'discount_amount' => $l->discount_amount,
+                    'basic_amount' => $l->basic_amount,
                     'tax_rate' => $l->tax_rate,
                     'tax_amount' => $l->tax_amount,
                     'cgst_amount' => $l->cgst_amount,
                     'sgst_amount' => $l->sgst_amount,
                     'igst_amount' => $l->igst_amount,
                     'total_amount' => $l->total_amount,
-                    'is_reverse_charge' => (bool) ($l->is_reverse_charge ?? false),
+                    'account_id' => $l->account_id,
                 ];
-            })->all();
-        } else {
-            $expenseLines = [];
-        }
+            })
+            ->all();
+    } else {
+        $itemLines = [];
     }
+}
 
-    $targetExpenseRows = max(3, count($expenseLines));
-    for ($i = count($expenseLines); $i < $targetExpenseRows; $i++) {
-        $expenseLines[] = [
-            'account_id' => null,
-            'project_id' => null,
-            'description' => null,
-            'amount' => null,
-            'tax_rate' => 0,
-            'tax_amount' => 0,
-            'cgst_amount' => 0,
-            'sgst_amount' => 0,
-            'igst_amount' => 0,
-            'total_amount' => 0,
-            'is_reverse_charge' => false,
-        ];
+$emptyLines = isset($emptyLines) ? (int) $emptyLines : 3;
+$minRows = max($emptyLines, count($itemLines));
+// always keep a few extra empty rows for data entry
+$targetRows = max($minRows, 5);
+for ($i = count($itemLines); $i < $targetRows; $i++) {
+    $itemLines[] = [
+        'id' => null,
+        'material_receipt_id' => null,
+        'material_receipt_line_id' => null,
+        'item_id' => null,
+        'uom_id' => null,
+        'qty' => null,
+        'rate' => null,
+        'discount_percent' => 0,
+        'discount_amount' => 0,
+        'basic_amount' => 0,
+        'tax_rate' => 0,
+        'tax_amount' => 0,
+        'cgst_amount' => 0,
+        'sgst_amount' => 0,
+        'igst_amount' => 0,
+        'total_amount' => 0,
+        'account_id' => null,
+    ];
+}
+
+// ------- EXPENSE LINES (old() -> existing -> blank rows) -------
+$expenseLines = old('expense_lines');
+if ($expenseLines === null) {
+    if ($isEdit) {
+        $expenseLines = $bill->expenseLines->values()->map(function ($l) {
+            return [
+                'account_id' => $l->account_id,
+                // Phase-B: preserve per-expense-line project split when editing
+                'project_id' => $l->project_id,
+                'description' => $l->description,
+                'amount' => $l->basic_amount,
+                'tax_rate' => $l->tax_rate,
+                'tax_amount' => $l->tax_amount,
+                'cgst_amount' => $l->cgst_amount,
+                'sgst_amount' => $l->sgst_amount,
+                'igst_amount' => $l->igst_amount,
+                'total_amount' => $l->total_amount,
+                'is_reverse_charge' => (bool) ($l->is_reverse_charge ?? false),
+            ];
+        })->all();
+    } else {
+        $expenseLines = [];
     }
+}
 
-    // Company GST State Code (for GST split preview)
-    $companyGstNumber = $company->gst_number ?? '';
-    $companyGstStateCode = (preg_match('/^\d{2}/', $companyGstNumber) ? substr($companyGstNumber, 0, 2) : '');
+$targetExpenseRows = max(3, count($expenseLines));
+for ($i = count($expenseLines); $i < $targetExpenseRows; $i++) {
+    $expenseLines[] = [
+        'account_id' => null,
+        'project_id' => null,
+        'description' => null,
+        'amount' => null,
+        'tax_rate' => 0,
+        'tax_amount' => 0,
+        'cgst_amount' => 0,
+        'sgst_amount' => 0,
+        'igst_amount' => 0,
+        'total_amount' => 0,
+        'is_reverse_charge' => false,
+    ];
+}
 
-    // Initial summary (will be re-calculated live by JS)
-    $initTotalBasic = (float) ($bill->total_basic ?? 0);
-    $initTotalTax   = (float) ($bill->total_tax ?? 0);
-    $initTotalCgst  = (float) ($bill->total_cgst ?? 0);
-    $initTotalSgst  = (float) ($bill->total_sgst ?? 0);
-    $initTotalIgst  = (float) ($bill->total_igst ?? 0);
-    $initCalculatedTotal = $initTotalBasic + $initTotalTax;
-    $initRoundOff = (float) ($bill->round_off ?? 0);
-    $initInvoiceTotal = (float) ($bill->total_amount ?? $initCalculatedTotal);
-    $initTcs = (float) ($bill->tcs_amount ?? 0);
-    $initTds = (float) ($bill->tds_amount ?? 0);
-    $initNet = (float) ($bill->net_payable ?? 0);
+// Company GST State Code (for GST split preview)
+$companyGstNumber = $company->gst_number ?? '';
+$companyGstStateCode = (preg_match('/^\d{2}/', $companyGstNumber) ? substr($companyGstNumber, 0, 2) : '');
+
+// Initial summary (will be re-calculated live by JS)
+$initTotalBasic = (float) ($bill->total_basic ?? 0);
+$initTotalTax = (float) ($bill->total_tax ?? 0);
+$initTotalCgst = (float) ($bill->total_cgst ?? 0);
+$initTotalSgst = (float) ($bill->total_sgst ?? 0);
+$initTotalIgst = (float) ($bill->total_igst ?? 0);
+$initCalculatedTotal = $initTotalBasic + $initTotalTax;
+$initRoundOff = (float) ($bill->round_off ?? 0);
+$initInvoiceTotal = (float) ($bill->total_amount ?? $initCalculatedTotal);
+$initTcs = (float) ($bill->tcs_amount ?? 0);
+$initTds = (float) ($bill->tds_amount ?? 0);
+$initNet = (float) ($bill->net_payable ?? 0);
 @endphp
+
+
+<style>
+
+
+/* Only expense table scroll */
+#expense-table-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: 420px;   /* optional vertical scroll */
+}
+
+/* Prevent column shrink */
+#expense-lines-table th,
+#expense-lines-table td {
+    white-space: nowrap;
+    min-width: 110px;
+    vertical-align: middle;
+}
+
+/* Ledger column wider */
+#expense-lines-table th:nth-child(1),
+#expense-lines-table td:nth-child(1) {
+    min-width: 200px;
+}
+
+/* Project column wider */
+#expense-lines-table th:nth-child(2),
+#expense-lines-table td:nth-child(2) {
+    min-width: 200px;
+}
+
+/* Description column bigger */
+#expense-lines-table th:nth-child(3),
+#expense-lines-table td:nth-child(3) {
+    min-width: 250px;
+}
+
+/* Sticky header */
+#expense-lines-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    z-index: 2;
+}
+
+    /* Enable smooth horizontal scroll */
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Prevent column shrink */
+#bill-lines-table th,
+#bill-lines-table td {
+    white-space: nowrap;
+    min-width: 110px;
+    vertical-align: middle;
+}
+
+/* Make Item column little wider */
+#bill-lines-table th:first-child,
+#bill-lines-table td:first-child {
+    min-width: 220px;
+}
+
+/* Optional: Total column slightly bigger */
+#bill-lines-table th:last-child,
+#bill-lines-table td:last-child {
+    min-width: 130px;
+}
+.table-responsive {
+    max-height: 420px;
+}
+
+#bill-lines-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    z-index: 2;
+}
+
+    .select2-container--default .select2-selection--single {
+    height: 38px;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 24px;
+}
+
+    .section-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+        padding: 20px;
+    }
+
+    .section-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #495057;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 4px;
+    }
+
+    .form-control-sm,
+    .form-select-sm {
+        border-radius: 8px;
+        padding: 6px 10px;
+    }
+
+    .form-text {
+        font-size: 11px;
+        color: #6c757d;
+    }
+
+    .btn-sm {
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-weight: 500;
+    }
+
+    .divider-line {
+        border-top: 1px dashed #dee2e6;
+        margin: 25px 0;
+    }
+</style>
 
 <form method="POST"
       action="{{ $isEdit ? route('purchase.bills.update', $bill) : route('purchase.bills.store') }}"
@@ -132,8 +270,155 @@
     @endif
 
     <input type="hidden" name="purchase_order_id" id="purchase_order_id" value="{{ old('purchase_order_id', $bill->purchase_order_id) }}">
+<div class="section-card">
+
+    <!-- ================= Supplier Section ================= -->
+    <div class="section-title">Supplier Information</div>
 
     <div class="row g-3">
+    <div class="col-lg-7">
+        <label class="form-label">
+            Supplier / Contractor <span class="text-danger">*</span>
+        </label>
+    
+        <div class="d-flex gap-2">
+    
+            <!-- Supplier Select -->
+            <div class="flex-grow-1">
+                <select name="supplier_id" id="supplier_id"
+                    class="form-select form-select-sm select2-basic @error('supplier_id') is-invalid @enderror">
+                    <option value="">-- Select Supplier --</option>
+                    @foreach($suppliers as $s)
+                        <option value="{{ $s->id }}" {{ (string) old('supplier_id', $bill->supplier_id) === (string) $s->id ? 'selected' : '' }}>
+                            {{ $s->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+    
+            <!-- Fetch Button -->
+            <div>
+                <button type="button" class="btn btn-primary btn-sm px-3" id="btnFetchGrn">
+                    Fetch GRN/PO
+                </button>
+            </div>
+    
+        </div>
+    
+        <div class="form-text">
+            Start typing to search supplier.
+        </div>
+    </div>
+
+
+        <div class="col-lg-5">
+            <label class="form-label">Supplier GSTIN / Branch</label>
+            <select name="supplier_branch_id" id="supplier_branch_id" class="form-select form-select-sm">
+                <option value="">-- Use Primary GSTIN --</option>
+            </select>
+
+            <div class="form-text">
+                Selecting branch will affect GST calculation.
+            </div>
+        </div>
+    </div>
+
+
+    <div class="divider-line"></div>
+
+
+    <!-- ================= Bill Details ================= -->
+    <div class="section-title">Invoice Details</div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <label class="form-label">Bill Date <span class="text-danger">*</span></label>
+            <input type="date" name="bill_date" class="form-control form-control-sm">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Posting Date <span class="text-danger">*</span></label>
+            <input type="date" name="posting_date" class="form-control form-control-sm">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Due Date</label>
+            <input type="date" name="due_date" class="form-control form-control-sm">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Bill No <span class="text-danger">*</span></label>
+            <input type="text" name="bill_number" class="form-control form-control-sm">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Invoice No (Supplier)</label>
+            <input type="text" name="reference_no" class="form-control form-control-sm">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Challan No</label>
+            <input type="text" name="challan_number" class="form-control form-control-sm">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Project</label>
+            <select name="project_id" class="form-select form-select-sm select2-basic">
+                <option value="">-- Select Project --</option>
+                @foreach($projects as $p)
+                    <option value="{{ $p->id }}">
+                        {{ $p->code }} - {{ $p->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+    </div>
+
+
+    <div class="divider-line"></div>
+
+
+    <!-- ================= Finance Section ================= -->
+    <div class="section-title">Financial Details</div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <label class="form-label">Linked Purchase Order</label>
+            <input type="text" class="form-control form-control-sm" placeholder="(Fetch GRN/PO to link)" readonly>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Currency</label>
+            <input type="text" name="currency" class="form-control form-control-sm" value="INR">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Exchange Rate</label>
+            <input type="number" step="0.0001" name="exchange_rate" class="form-control form-control-sm" value="1">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="draft">Draft</option>
+                <option value="posted">Posted</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+
+        <div class="col-md-12">
+            <label class="form-label">Remarks</label>
+            <textarea name="remarks" rows="2" class="form-control form-control-sm"></textarea>
+        </div>
+
+    </div>
+
+</div>
+
+    {{-- <div class="row g-3">
         <div class="col-md-6">
             <label class="form-label">Supplier / Contractor <span class="text-danger">*</span></label>
             <div class="d-flex gap-2">
@@ -327,7 +612,7 @@
         </div>
     </div>
 
-    <hr class="my-3">
+    <hr class="my-3"> --}}
 
     {{-- ITEM LINES --}}
     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -336,7 +621,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-sm table-bordered align-middle" id="bill-lines-table">
+        <table class="table table-sm table-bordered align-middle text-nowrap" id="bill-lines-table">
             <thead class="table-light">
             <tr>
                 <th style="width:14%">Item</th>
@@ -357,8 +642,8 @@
             <tbody id="bill-lines-tbody">
             @foreach($itemLines as $i => $line)
                 @php
-                    $mrLineId = $line['material_receipt_line_id'] ?? null;
-                    $isLinked = !empty($mrLineId);
+    $mrLineId = $line['material_receipt_line_id'] ?? null;
+    $isLinked = !empty($mrLineId);
                 @endphp
                 <tr data-line-index="{{ $i }}" class="{{ $isLinked ? 'table-warning' : '' }}">
                     <td>
@@ -475,8 +760,11 @@
 
     {{-- EXPENSE LINES --}}
     <h5 class="h6 mt-4 mb-2">Expenses (for service / freight / transport bills)</h5>
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered align-middle" id="expense-lines-table">
+    {{-- <div class="table-responsive">
+        <table class="table table-sm table-bordered align-middle" id="expense-lines-table"> --}}
+            <div class="table-responsive" id="expense-table-wrapper">
+                <table class="table table-sm table-bordered align-middle text-nowrap" id="expense-lines-table">
+
             <thead class="table-light">
             <tr>
                 <th style="width:18%">Ledger</th>
@@ -507,12 +795,12 @@
                     </td>
                 <td>
                     @php
-                        $selProj = old('expense_lines.' . $i . '.project_id', $ex['project_id'] ?? old('project_id', $bill->project_id ?? optional($bill->purchaseOrder)->project_id));
+    $selProj = old('expense_lines.' . $i . '.project_id', $ex['project_id'] ?? old('project_id', $bill->project_id ?? optional($bill->purchaseOrder)->project_id));
                     @endphp
                     <select name="expense_lines[{{ $i }}][project_id]" class="form-select form-select-sm exp-project">
                         <option value="">-- Bill Project (Default) --</option>
                         @foreach($projects as $p)
-                            <option value="{{ $p->id }}" @selected((string)$selProj === (string)$p->id)>
+                            <option value="{{ $p->id }}" @selected((string) $selProj === (string) $p->id)>
                                 {{ $p->code }} - {{ $p->name }}
                             </option>
                         @endforeach
@@ -644,122 +932,213 @@
                 </div>
             </div>
         </div>
+<div class="col-md-6">
 
-        <div class="col-md-6">
-            <h5 class="h6 mb-2">Summary (Live Preview)</h5>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <h6 class="fw-semibold mb-3 border-bottom pb-2">
+                Invoice Summary
+            </h6>
 
             <div class="table-responsive">
-                <table class="table table-sm table-bordered mb-0">
+                <table class="table table-sm align-middle mb-0">
+
                     <tr>
-                        <th class="text-end">Total Basic</th>
-                        <td class="text-end"><span id="sum_total_basic">{{ number_format($initTotalBasic, 2) }}</span></td>
+                        <th class="text-muted text-end small">Total Basic</th>
+                        <td class="text-end fw-semibold">
+                            ₹ <span id="sum_total_basic">{{ number_format($initTotalBasic, 2) }}</span>
+                        </td>
                     </tr>
+
                     <tr>
-                        <th class="text-end">Total Tax</th>
-                        <td class="text-end"><span id="sum_total_tax">{{ number_format($initTotalTax, 2) }}</span></td>
+                        <th class="text-muted text-end small">Total Tax</th>
+                        <td class="text-end">
+                            ₹ <span id="sum_total_tax">{{ number_format($initTotalTax, 2) }}</span>
+                        </td>
                     </tr>
+
                     <tr>
-                        <th class="text-end">CGST</th>
-                        <td class="text-end"><span id="sum_total_cgst">{{ number_format($initTotalCgst, 2) }}</span></td>
+                        <th class="text-muted text-end small">CGST</th>
+                        <td class="text-end">
+                            ₹ <span id="sum_total_cgst">{{ number_format($initTotalCgst, 2) }}</span>
+                        </td>
                     </tr>
+
                     <tr>
-                        <th class="text-end">SGST</th>
-                        <td class="text-end"><span id="sum_total_sgst">{{ number_format($initTotalSgst, 2) }}</span></td>
+                        <th class="text-muted text-end small">SGST</th>
+                        <td class="text-end">
+                            ₹ <span id="sum_total_sgst">{{ number_format($initTotalSgst, 2) }}</span>
+                        </td>
                     </tr>
+
                     <tr>
-                        <th class="text-end">IGST</th>
-                        <td class="text-end"><span id="sum_total_igst">{{ number_format($initTotalIgst, 2) }}</span></td>
+                        <th class="text-muted text-end small">IGST</th>
+                        <td class="text-end">
+                            ₹ <span id="sum_total_igst">{{ number_format($initTotalIgst, 2) }}</span>
+                        </td>
                     </tr>
-                    <tr>
+
+                    <tr class="border-top">
                         <th class="text-end">Calculated Total</th>
-                        <td class="text-end fw-semibold"><span id="sum_calculated_total">{{ number_format($initCalculatedTotal, 2) }}</span></td>
+                        <td class="text-end fw-semibold">
+                            ₹ <span id="sum_calculated_total">{{ number_format($initCalculatedTotal, 2) }}</span>
+                        </td>
                     </tr>
+
                     <tr>
                         <th class="text-end">Round Off</th>
-                        <td class="text-end"><span id="sum_round_off">{{ number_format($initRoundOff, 2) }}</span></td>
-                    </tr>
-                    <tr class="table-light">
-                        <th class="text-end">Invoice Total</th>
                         <td class="text-end">
-                            <div class="d-flex justify-content-end align-items-center">
-                                <div class="input-group input-group-sm" style="max-width: 220px;">
-                                    <input type="number" step="0.01" name="invoice_total" id="invoice_total"
-                                           class="form-control form-control-sm text-end @error('invoice_total') is-invalid @enderror"
-                                           value="{{ old('invoice_total', $initInvoiceTotal) }}">
-                                    <button type="button" class="btn btn-outline-secondary" id="btn_round_invoice_total" title="Round to nearest rupee">Round</button>
-                                </div>
+                            ₹ <span id="sum_round_off">{{ number_format($initRoundOff, 2) }}</span>
+                        </td>
+                    </tr>
+
+                    <tr class="table-light">
+                        <th class="text-end fw-semibold">Invoice Total</th>
+                        <td>
+                            <div class="input-group input-group-sm justify-content-end" style="max-width: 230px;">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" step="0.01" name="invoice_total" id="invoice_total"
+                                    class="form-control text-end @error('invoice_total') is-invalid @enderror"
+                                    value="{{ old('invoice_total', $initInvoiceTotal) }}">
+                                <button type="button" class="btn btn-outline-secondary" id="btn_round_invoice_total">
+                                    Round
+                                </button>
                             </div>
+
                             @error('invoice_total')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
                             @enderror
                         </td>
                     </tr>
+
                     <tr>
-                        <th class="text-end">+ TCS</th>
-                        <td class="text-end"><span id="sum_tcs">{{ number_format($initTcs, 2) }}</span></td>
+                        <th class="text-end text-success">+ TCS</th>
+                        <td class="text-end">
+                            ₹ <span id="sum_tcs">{{ number_format($initTcs, 2) }}</span>
+                        </td>
                     </tr>
+
                     <tr>
-                        <th class="text-end">– TDS</th>
-                        <td class="text-end"><span id="sum_tds">{{ number_format($initTds, 2) }}</span></td>
+                        <th class="text-end text-danger">– TDS</th>
+                        <td class="text-end">
+                            ₹ <span id="sum_tds">{{ number_format($initTds, 2) }}</span>
+                        </td>
                     </tr>
-                    <tr class="table-light">
-                        <th class="text-end">Net Payable</th>
-                        <td class="text-end fw-bold"><span id="sum_net">{{ number_format($initNet, 2) }}</span></td>
+
+                    <tr class="table-light border-top">
+                        <th class="text-end fs-6">Net Payable</th>
+                        <td class="text-end fw-bold fs-5">
+                            ₹ <span id="sum_net">{{ number_format($initNet, 2) }}</span>
+                        </td>
                     </tr>
+
                 </table>
             </div>
 
-            <div class="form-text">
-                Final amounts are calculated server-side on save. This is a preview to help you verify before saving.
+            <div class="small text-muted mt-3">
+                Final amounts are calculated server-side on save.
             </div>
+
         </div>
+    </div>
+
+</div>
+
     </div>
 
     <hr class="my-3">
 
     {{-- ATTACHMENTS --}}
-    <h5 class="h6 mb-2">Attachments</h5>
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label">Upload files (Multiple)</label>
-            <input type="file"
-                   name="attachments[]"
-                   multiple
-                   class="form-control form-control-sm @error('attachments.*') is-invalid @enderror"
-                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
-            @error('attachments.*')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-            <div class="form-text">
-                Upload invoice copy, challan, e-way bill, etc.
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-body">
+
+        <h6 class="fw-semibold border-bottom pb-2 mb-3">
+            Attachments
+        </h6>
+
+        <div class="row g-4">
+
+            <!-- Upload Section -->
+            <div class="col-md-6">
+
+                <label class="form-label fw-semibold small text-muted">
+                    Upload Files
+                </label>
+
+                <input type="file" name="attachments[]" multiple
+                    class="form-control form-control-sm @error('attachments.*') is-invalid @enderror"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+
+                @error('attachments.*')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                @enderror
+
+                <div class="small text-muted mt-2">
+                    Allowed: PDF, Images, Word, Excel.
+                </div>
+
             </div>
+
+
+            <!-- Existing Attachments -->
+            <div class="col-md-6">
+
+                @if($isEdit && $bill->attachments && $bill->attachments->count())
+
+                    <label class="form-label fw-semibold small text-muted">
+                        Existing Files
+                    </label>
+
+                    <div class="border rounded p-3 bg-light" style="max-height: 180px; overflow:auto;">
+
+                        @foreach($bill->attachments as $att)
+
+                            <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+
+                                <div class="text-truncate pe-2" style="max-width: 75%;">
+                                    <a href="{{ Storage::disk('public')->url($att->path) }}" target="_blank" rel="noopener"
+                                        class="text-decoration-none fw-semibold">
+
+                                        {{ $att->original_name ?? basename($att->path) }}
+                                    </a>
+
+                                    <div class="small text-muted">
+                                        {{ number_format(($att->size ?? 0) / 1024, 1) }} KB
+                                    </div>
+                                </div>
+
+                                <div class="form-check ms-2">
+                                    <input class="form-check-input" type="checkbox" name="attachments_delete[]"
+                                        value="{{ $att->id }}" id="att_del_{{ $att->id }}">
+                                    <label class="form-check-label small text-danger" for="att_del_{{ $att->id }}">
+                                        Remove
+                                    </label>
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                    <div class="small text-muted mt-2">
+                        Tick “Remove” and click Save to delete selected files.
+                    </div>
+
+                @endif
+
+            </div>
+
         </div>
 
-        <div class="col-md-6">
-            @if($isEdit && $bill->attachments && $bill->attachments->count())
-                <label class="form-label">Existing Attachments</label>
-                <div class="border rounded p-2" style="max-height: 160px; overflow:auto;">
-                    @foreach($bill->attachments as $att)
-                        <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
-                            <div class="text-truncate" style="max-width: 75%;">
-                                <a href="{{ Storage::disk('public')->url($att->path) }}" target="_blank" rel="noopener">
-                                    {{ $att->original_name ?? basename($att->path) }}
-                                </a>
-                                <div class="small text-muted">
-                                    {{ number_format(($att->size ?? 0) / 1024, 1) }} KB
-                                </div>
-                            </div>
-                            <div class="form-check ms-2">
-                                <input class="form-check-input" type="checkbox" name="attachments_delete[]" value="{{ $att->id }}" id="att_del_{{ $att->id }}">
-                                <label class="form-check-label small" for="att_del_{{ $att->id }}">Remove</label>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="form-text">Tick “Remove” and Save Changes to delete.</div>
-            @endif
-        </div>
     </div>
+</div>
+
 
     <hr class="my-3">
 
