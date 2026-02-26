@@ -22,67 +22,67 @@ class StoreStockItemController extends Controller
             ->only(['edit', 'update']);
     }
 
-    public function index(Request $request): View
-    {
-        $query = StoreStockItem::with(['item', 'project', 'receiptLine.receipt']);
+   public function index(Request $request)
+{
+    $query = StoreStockItem::with(['item', 'project', 'receiptLine.receipt']);
 
-        if ($request->filled('project_id')) {
-            $query->where('project_id', $request->integer('project_id'));
-        }
-
-        if ($request->filled('item_id')) {
-            $query->where('item_id', $request->integer('item_id'));
-        }
-
-        if ($request->filled('material_category')) {
-            $query->where('material_category', $request->input('material_category'));
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        if ($request->filled('is_client_material')) {
-            $isClient = $request->input('is_client_material') == '1';
-            $query->where('is_client_material', $isClient);
-        }
-
-        if ($request->filled('grade')) {
-            $grade = $request->input('grade');
-            $query->where('grade', 'like', '%' . $grade . '%');
-        }
-
-        $stockItems = $query
-            ->orderByDesc('id')
-            ->paginate(25)
-            ->withQueryString();
-
-        $projects = Project::orderBy('code')->get();
-        $items    = Item::orderBy('name')->get();
-
-        $materialCategories = [
-            'steel_plate'   => 'Steel Plate',
-            'steel_section' => 'Steel Section',
-            'consumable'    => 'Consumable',
-            'bought_out'    => 'Bought-out Item',
-        ];
-
-        $statuses = [
-            'available'  => 'Available',
-            'reserved'   => 'Reserved',
-            'consumed'   => 'Consumed',
-            'scrap'      => 'Scrap',
-            'blocked_qc' => 'Blocked (QC)',
-        ];
-
-        return view('store.store_stock_items.index', compact(
-            'stockItems',
-            'projects',
-            'items',
-            'materialCategories',
-            'statuses'
-        ));
+    if ($request->filled('project_id')) {
+        $query->where('project_id', $request->integer('project_id'));
     }
+
+    if ($request->filled('item_id')) {
+        $query->where('item_id', $request->integer('item_id'));
+    }
+
+    if ($request->filled('material_category')) {
+        $query->where('material_category', $request->material_category);
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    if ($request->filled('is_client_material')) {
+        $query->where('is_client_material', $request->is_client_material);
+    }
+
+    if ($request->filled('grade')) {
+        $query->where('grade', 'like', '%' . $request->grade . '%');
+    }
+
+    $stockItems = $query->orderByDesc('id')->paginate(25);
+
+    // AJAX request
+    if ($request->ajax()) {
+        return view('store.store_stock_items.partials.table', compact('stockItems'))->render();
+    }
+
+    $projects = Project::orderBy('code')->get();
+    $items    = Item::orderBy('name')->get();
+
+    $materialCategories = [
+        'steel_plate'   => 'Steel Plate',
+        'steel_section' => 'Steel Section',
+        'consumable'    => 'Consumable',
+        'bought_out'    => 'Bought-out Item',
+    ];
+
+    $statuses = [
+        'available'  => 'Available',
+        'reserved'   => 'Reserved',
+        'consumed'   => 'Consumed',
+        'scrap'      => 'Scrap',
+        'blocked_qc' => 'Blocked (QC)',
+    ];
+
+    return view('store.store_stock_items.index', compact(
+        'stockItems',
+        'projects',
+        'items',
+        'materialCategories',
+        'statuses'
+    ));
+}
 
     public function show(StoreStockItem $storeStockItem): View
     {
