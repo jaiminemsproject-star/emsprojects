@@ -1,7 +1,20 @@
 @extends('layouts.erp')
 
 @section('title', 'Create Material Receipt (GRN)')
+<style>
+    .line-row:hover {
+        background-color: #f8f9fa;
+    }
 
+.line-row td {
+    vertical-align: middle;
+}
+
+.table thead th {
+    white-space: nowrap;
+    font-size: 13px;
+}
+</style>
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">Create Material Receipt (GRN)</h1>
@@ -231,102 +244,151 @@
         </div>
     </form>
 
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- jQuery (if not already added) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             let lineIndex = 0;
 
             function makeRow(index) {
                 return `
-                    <tr data-row-index="${index}">
-                        <td>
-                            <select name="lines[${index}][item_id]" class="form-select form-select-sm item-select" required>
-                                <option value="">-- Select --</option>
-                                @foreach($items as $item)
-                                    <option value="{{ $item->id }}">
-                                        {{ $item->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <input type="hidden"
-                                   name="lines[${index}][purchase_order_item_id]"
-                                   class="js-po-item-id po-item-id-input">
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="lines[${index}][brand]"
-                                   class="form-control form-control-sm brand-input"
-                                   placeholder="Brand">
-                        </td>
-                        <td>
-                            <select name="lines[${index}][material_category]" class="form-select form-select-sm material-category-select" required>
-                                <option value="">-- Select --</option>
-                                @foreach($materialCategories as $key => $label)
-                                    <option value="{{ $key }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="lines[${index}][grade]"
-                                   class="form-control form-control-sm"
-                                   placeholder="Grade">
-                        </td>
-                        <td>
-                            <input type="number"
-                                   name="lines[${index}][thickness_mm]"
-                                   class="form-control form-control-sm thickness-input"
-                                   min="0" step="1">
-                        </td>
-                        <td>
-                            <input type="number"
-                                   name="lines[${index}][width_mm]"
-                                   class="form-control form-control-sm width-input"
-                                   min="0" step="1">
-                        </td>
-                        <td>
-                            <input type="number"
-                                   name="lines[${index}][length_mm]"
-                                   class="form-control form-control-sm length-input"
-                                   min="0" step="1">
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="lines[${index}][section_profile]"
-                                   class="form-control form-control-sm"
-                                   placeholder="ISMB300 etc.">
-                        </td>
-                        <td>
-                            <input type="number"
-                                   name="lines[${index}][qty_pcs]"
-                                   class="form-control form-control-sm qty-pcs-input"
-                                   min="1" step="1" value="1" required>
-                        </td>
-                        <td>
-                            <input type="number"
-                                   name="lines[${index}][received_weight_kg]"
-                                   class="form-control form-control-sm received-weight-input"
-                                   min="0" step="0.001">
-                        </td>
-                        <td>
-                            <select name="lines[${index}][uom_id]" class="form-select form-select-sm uom-select" required>
-                                <option value="">-- UOM --</option>
-                                @foreach($uoms as $uom)
-                                    <option value="{{ $uom->id }}">{{ $uom->name }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="lines[${index}][remarks]"
-                                   class="form-control form-control-sm">
-                        </td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-sm btn-link text-danger p-0 remove-line-btn">
-                                &times;
-                            </button>
-                        </td>
-                    </tr>
-                `;
+        <tr data-row-index="${index}" class="align-middle line-row">
+
+            <!-- Item -->
+            <td style="min-width:180px;">
+                <select name="lines[${index}][item_id]"
+                        class="form-select form-select-sm item-select shadow-sm"
+                        required>
+                    <option value="">Select Item</option>
+                    @foreach($items as $item)
+                        <option value="{{ $item->id }}">
+                            {{ $item->name }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <input type="hidden"
+                       name="lines[${index}][purchase_order_item_id]"
+                       class="js-po-item-id po-item-id-input">
+            </td>
+
+            <!-- Brand -->
+            <td style="min-width:130px;">
+                <input type="text"
+                       name="lines[${index}][brand]"
+                       class="form-control form-control-sm brand-input shadow-sm"
+                       placeholder="Brand name">
+            </td>
+
+            <!-- Material Category -->
+            <td style="min-width:150px;">
+                <select name="lines[${index}][material_category]"
+                        class="form-select form-select-sm material-category-select shadow-sm"
+                        required>
+                    <option value="">Category</option>
+                    @foreach($materialCategories as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </td>
+
+            <!-- Grade -->
+            <td style="min-width:100px;">
+                <input type="text"
+                       name="lines[${index}][grade]"
+                       class="form-control form-control-sm shadow-sm"
+                       placeholder="Grade">
+            </td>
+
+            <!-- Thickness -->
+            <td style="width:90px;">
+                <input type="number"
+                       name="lines[${index}][thickness_mm]"
+                       class="form-control form-control-sm text-center thickness-input shadow-sm"
+                       placeholder="T"
+                       min="0" step="1">
+            </td>
+
+            <!-- Width -->
+            <td style="width:90px;">
+                <input type="number"
+                       name="lines[${index}][width_mm]"
+                       class="form-control form-control-sm text-center width-input shadow-sm"
+                       placeholder="W"
+                       min="0" step="1">
+            </td>
+
+            <!-- Length -->
+            <td style="width:90px;">
+                <input type="number"
+                       name="lines[${index}][length_mm]"
+                       class="form-control form-control-sm text-center length-input shadow-sm"
+                       placeholder="L"
+                       min="0" step="1">
+            </td>
+
+            <!-- Section Profile -->
+            <td style="min-width:130px;">
+                <input type="text"
+                       name="lines[${index}][section_profile]"
+                       class="form-control form-control-sm shadow-sm"
+                       placeholder="ISMB300">
+            </td>
+
+            <!-- Qty -->
+            <td style="width:90px;">
+                <input type="number"
+                       name="lines[${index}][qty_pcs]"
+                       class="form-control form-control-sm text-center qty-pcs-input shadow-sm"
+                       min="1" step="1" value="1" required>
+            </td>
+
+            <!-- Weight -->
+            <td style="width:110px;">
+                <input type="number"
+                       name="lines[${index}][received_weight_kg]"
+                       class="form-control form-control-sm text-center received-weight-input shadow-sm"
+                       placeholder="Kg"
+                       min="0" step="0.001">
+            </td>
+
+            <!-- UOM -->
+            <td style="min-width:100px;">
+                <select name="lines[${index}][uom_id]"
+                        class="form-select form-select-sm uom-select shadow-sm"
+                        required>
+                    <option value="">UOM</option>
+                    @foreach($uoms as $uom)
+                        <option value="{{ $uom->id }}">{{ $uom->name }}</option>
+                    @endforeach
+                </select>
+            </td>
+
+            <!-- Remarks -->
+            <td style="min-width:150px;">
+                <input type="text"
+                       name="lines[${index}][remarks]"
+                       class="form-control form-control-sm shadow-sm"
+                       placeholder="Remarks">
+            </td>
+
+            <!-- Remove Button -->
+            <td class="text-center" style="width:50px;">
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger remove-line-btn rounded-circle"
+                        title="Remove Row">
+                    ✕
+                </button>
+            </td>
+        </tr>
+    `;
             }
 
             function addLineRow() {
