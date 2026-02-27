@@ -272,7 +272,7 @@ class AccountController extends Controller
             'CASH_IN_HAND'      => ['cash'],
             'SUNDRY_DEBTORS'    => ['debtor'],
             'SUNDRY_CREDITORS'  => ['creditor'],
-
+'BANK_OD_CC'        => ['bank'], // OD/CC are liability but still "bank-like" for payments
             'GST_INPUT_GROUP'   => ['tax'],
             'GST_OUTPUT_GROUP'  => ['tax'],
             'DUTIES_TAXES'      => ['tax'],
@@ -523,6 +523,8 @@ class AccountController extends Controller
 
     public function update(Request $request, Account $account)
     {
+
+  
         $ledgerTypes = $this->ledgerTypeOptions((int) $account->company_id);
 
         $rules = [
@@ -571,7 +573,7 @@ class AccountController extends Controller
                 ->withErrors(['type' => 'Selected Type is not allowed for the chosen Group.'])
                 ->withInput();
         }
-        $data['is_active']         = $request->boolean('is_active', true);
+$data['is_active'] = (int) $request->boolean('is_active');
         $data['is_gst_applicable'] = $request->boolean('is_gst_applicable', false);
 
         if ($data['is_gst_applicable'] && ($data['gst_rate_percent'] === null)) {
@@ -603,29 +605,58 @@ $hasVouchers  = VoucherLine::where('account_id', $account->id)->exists();
         $isSystem      = (bool) $account->is_system;
 
         // If vouchers exist, block changing OB fields.
-        if ($hasVouchers) {
-            $incomingObAmount = $data['opening_balance'] ?? null;
-            $incomingObType   = $data['opening_balance_type'] ?? null;
-            $incomingObDate   = $data['opening_balance_date'] ?? null;
+            // if ($hasVouchers) {
+            //     $incomingObAmount = $data['opening_balance'] ?? null;
+            //     $incomingObType   = $data['opening_balance_type'] ?? null;
+            //     $incomingObDate   = $data['opening_balance_date'] ?? null;
 
-            $currentObAmount = $account->opening_balance;
-            $currentObType   = $account->opening_balance_type;
-            $currentObDate   = $account->opening_balance_date ? $account->opening_balance_date->format('Y-m-d') : null;
+            //     $currentObAmount = $account->opening_balance;
+            //     $currentObType   = $account->opening_balance_type;
+            //     $currentObDate   = $account->opening_balance_date ? $account->opening_balance_date->format('Y-m-d') : null;
 
-            if (
-                (string) $incomingObAmount !== (string) $currentObAmount
-                || (string) $incomingObType !== (string) $currentObType
-                || (string) $incomingObDate !== (string) $currentObDate
-            ) {
-                return back()
-                    ->withErrors([
-                        'opening_balance' => 'Opening balance fields cannot be changed after vouchers exist for this ledger. ' .
-                            'Please use a journal voucher to adjust balances.',
-                    ])
-                    ->withInput();
-            }
-        }
+            //     if (
+            //         (string) $incomingObAmount !== (string) $currentObAmount
+            //         || (string) $incomingObType !== (string) $currentObType
+            //         || (string) $incomingObDate !== (string) $currentObDate
+            //     ) {
+            //         return back()
+            //             ->withErrors([
+            //                 'opening_balance' => 'Opening balance fields cannot be changed after vouchers exist for this ledger. ' .
+            //                     'Please use a journal voucher to adjust balances.',
+            //             ])
+            //             ->withInput();
+            //     }
+            // }
 
+
+            if ($hasVouchers) {
+    $incomingObAmount = $data['opening_balance'] ?? null;
+    $incomingObType   = $data['opening_balance_type'] ?? null;
+    $incomingObDate   = $data['opening_balance_date'] ?? null;
+
+    $currentObAmount = $account->opening_balance;
+    $currentObType   = $account->opening_balance_type;
+    $currentObDate   = $account->opening_balance_date ? $account->opening_balance_date->format('Y-m-d') : null;
+
+    // Optional: log a notice if balances are different
+    if (
+        (string) $incomingObAmount !== (string) $currentObAmount
+        || (string) $incomingObType !== (string) $currentObType
+        || (string) $incomingObDate !== (string) $currentObDate
+    ) {
+        // No error, just allow update
+        // You can log or handle audit here if needed
+        // Example:
+        // Log::info("Opening balance changed for account {$account->id}");
+    }
+}
+
+// Proceed to update the account normally
+$account->update([
+    'opening_balance' => $data['opening_balance'] ?? $account->opening_balance,
+    'opening_balance_type' => $data['opening_balance_type'] ?? $account->opening_balance_type,
+    'opening_balance_date' => $data['opening_balance_date'] ?? $account->opening_balance_date,
+]);
         if ($isSystem) {
             $blocked = [];
 

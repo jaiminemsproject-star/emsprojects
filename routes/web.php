@@ -437,7 +437,7 @@ Route::middleware('auth')->group(function () {
 
 	Route::post('store-stock-adjustments/{storeStockAdjustment}/post-to-accounts', [StoreStockAdjustmentController::class, 'postToAccounts'])
     ->name('store-stock-adjustments.post-to-accounts');
-
+Route::get('/get-item-brands/{id}', [StoreStockAdjustmentController::class, 'getBrands']);
   
     /*
     |--------------------------------------------------------------------------
@@ -779,6 +779,8 @@ Route::middleware('auth')->group(function () {
     | Accounting Module
     |--------------------------------------------------------------------------
     */
+
+    
     // NOTE: These are legacy payment/receipt routes kept for reference.
     // The active payment/receipt voucher flow is implemented in routes/accounting.php (BankCashVoucherController).
     Route::prefix('accounting/legacy')->name('accounting.legacy.')->group(function () {
