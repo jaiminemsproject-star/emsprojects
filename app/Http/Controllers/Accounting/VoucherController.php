@@ -103,7 +103,9 @@ class VoucherController extends Controller
 
     public function create()
     {
+
         $accounts    = Account::orderBy('name')->get();
+        
         $costCenters = CostCenter::orderBy('name')->get();
         $projects    = Project::orderBy('code')->orderBy('name')->get(['id','code','name']);
 

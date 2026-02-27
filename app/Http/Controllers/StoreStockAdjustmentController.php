@@ -44,13 +44,24 @@ class StoreStockAdjustmentController extends Controller
 
         return view('store_stock_adjustments.index', compact('adjustments'));
     }
+public function getBrands($id)
+{
+    $item = Item::find($id);
 
+    if (!$item) {
+        return response()->json([]);
+    }
+
+    return response()->json($item->brands ?? []);
+}
     public function create(): View
     {
         $projects    = Project::orderBy('code')->get();
         $contractors = Party::where('is_contractor', true)->orderBy('name')->get();
-        $items       = Item::orderBy('name')->limit(500)->get();
-        $uoms        = Uom::orderBy('name')->get();
+        $items       = Item::orderBy('name')->get();
+        // dd($items);
+        $uoms        = Uom::orderBy('name',)->get();
+// $uoms = \App\Models\Uom::where('is_active', 1)->orderBy('name')->get();
 
         // Build item meta for Brand dropdown (id, name, brands)
         $itemMetaJson = $items->map(function (Item $i) {

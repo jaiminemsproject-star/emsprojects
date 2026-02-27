@@ -1,27 +1,27 @@
 @csrf
 
 @php
-    $companyId     = old('company_id', $account->company_id ?? config('accounting.default_company_id', 1));
-    $gstApplicable = old('is_gst_applicable', $account->is_gst_applicable ?? false);
-    $isPartyLedger = $account->exists && $account->related_model_type === \App\Models\Party::class && $account->related_model_id;
-    $linkedParty   = $isPartyLedger ? $account->relatedModel : null;
-    $hasVouchers   = $hasVouchers ?? false;
-    $isSystem      = $account->is_system ?? false;
+$companyId = old('company_id', $account->company_id ?? config('accounting.default_company_id', 1));
+$gstApplicable = old('is_gst_applicable', $account->is_gst_applicable ?? false);
+$isPartyLedger = $account->exists && $account->related_model_type === \App\Models\Party::class && $account->related_model_id;
+$linkedParty = $isPartyLedger ? $account->relatedModel : null;
+$hasVouchers = $hasVouchers ?? false;
+$isSystem = $account->is_system ?? false;
 
-    $ledgerMode    = config('accounting.ledger_code_mode', 'manual');
-    $isNumericCode = !empty($account->code) && preg_match('/^\d+$/', (string) $account->code);
-    $lockCode      = ($ledgerMode === 'numeric_auto') || $isPartyLedger || $isSystem || $isNumericCode;
+$ledgerMode = config('accounting.ledger_code_mode', 'manual');
+$isNumericCode = !empty($account->code) && preg_match('/^\d+$/', (string) $account->code);
+$lockCode = ($ledgerMode === 'numeric_auto') || $isPartyLedger || $isSystem || $isNumericCode;
 
-    $latestGstRate = $latestGstRate ?? null;
-    $gstRateValue = old('gst_rate_percent', $latestGstRate?->igst_rate);
-    $hsnSacValue = old('hsn_sac_code', $latestGstRate?->hsn_sac_code);
-    $gstEffectiveFromValue = old('gst_effective_from', $latestGstRate?->effective_from?->format('Y-m-d'));
-    $isReverseCharge = old('is_reverse_charge', $latestGstRate?->is_reverse_charge ?? false);
+$latestGstRate = $latestGstRate ?? null;
+$gstRateValue = old('gst_rate_percent', $latestGstRate?->igst_rate);
+$hsnSacValue = old('hsn_sac_code', $latestGstRate?->hsn_sac_code);
+$gstEffectiveFromValue = old('gst_effective_from', $latestGstRate?->effective_from?->format('Y-m-d'));
+$isReverseCharge = old('is_reverse_charge', $latestGstRate?->is_reverse_charge ?? false);
 
-    $selectedGroupId = old('account_group_id', $account->account_group_id ?? null);
-    $selectedType = old('type', $account->type ?? 'ledger');
-    $openingType = old('opening_balance_type', $account->opening_balance_type ?? 'dr');
-    $isActive = old('is_active', $account->is_active ?? true);
+$selectedGroupId = old('account_group_id', $account->account_group_id ?? null);
+$selectedType = old('type', $account->type ?? 'ledger');
+$openingType = old('opening_balance_type', $account->opening_balance_type ?? 'dr');
+$isActive = old('is_active', $account->is_active ?? true);
 @endphp
 
 @if($isPartyLedger && $linkedParty)
@@ -129,12 +129,14 @@
                name="opening_balance"
                class="form-control form-control-sm @error('opening_balance') is-invalid @enderror"
                value="{{ old('opening_balance', $account->opening_balance ?? 0) }}"
-               @if($hasVouchers) readonly @endif>
-        @if($hasVouchers)
+               >
+            {{-- @if($hasVouchers) readonly @endif> --}}
+
+        {{-- @if($hasVouchers)
             <div class="form-text text-muted">
                 Opening balance locked because vouchers exist.
             </div>
-        @endif
+        @endif --}}
         @error('opening_balance')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
 
